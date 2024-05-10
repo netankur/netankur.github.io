@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Input Form</title>
+</head>
+<body>
+    <h1>Input Data</h1>
+    <form id="dataForm">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+        
+        <label for="subtitle">Subtitle:</label>
+        <input type="text" id="subtitle" name="subtitle" required><br><br>
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
+        
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br><br>
+        
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect the form data
+            const formData = {
+                title: document.getElementById('title').value,
+                subtitle: document.getElementById('subtitle').value,
+                description: document.getElementById('description').value,
+                date: document.getElementById('date').value
+            };
+
+            // Make an AJAX POST request to save the data to the server
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/saveData', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('Data saved successfully!');
+                } else {
+                    alert('Error saving data');
+                }
+            };
+            xhr.send(JSON.stringify(formData));
+        });
+    </script>
+</body>
+</html>
