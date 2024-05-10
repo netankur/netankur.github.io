@@ -13,10 +13,14 @@ fetch('https://ankurdxx.github.io/home/json/tools.json')
 
             // Add the tool's title, subtitle, description, and date
             toolElement.innerHTML = `
-                <h2>${tool.title}</h2>
-                <h3>${tool.subtitle}</h3>
-                <p>${tool.description}</p>
-                <p>Date: ${tool.date}</p>
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-0">${tool.title}</h3>
+                            <div class="subheading mb-3">${tool.subtitle}</div>
+                            <p>${tool.description}</p>
+                        </div>
+                        <div class="flex-shrink-0"><span class="text-primary">${tool.date}</span></div>
+                    </div>
             `;
 
             // Append the tool element to the container
