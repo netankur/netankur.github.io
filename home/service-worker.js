@@ -1,6 +1,6 @@
 const CACHE_NAME = 'ankur-pwa';
 const urlsToCache = [
-  '/',
+  '',
   'index.html',
   'css/styles.css',
   'js/app.js',
