@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-pwa-cache-v1';
+const CACHE_NAME = 'ankur-pwa';
 const urlsToCache = [
   '/home/', // Ensure the base URL is cached
   '/home/index.html',
