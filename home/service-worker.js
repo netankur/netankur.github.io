@@ -1,10 +1,10 @@
-const CACHE_NAME = 'my-pwa-cache-v1';
+const CACHE_NAME = 'ankur-pwa';
 const urlsToCache = [
   '/',
   '/index.html',
-  'css/styles.css',
-  'js/app.js',
-  'assets/img/icon.png'
+  '/css/styles.css',
+  '/js/app.js',
+  '/assets/img/icon.png'
 ];
 
 self.addEventListener('install', function(event) {
@@ -21,10 +21,31 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
       .then(function(response) {
+        // Cache hit - return response
         if (response) {
           return response;
         }
-        return fetch(event.request);
+
+        // Clone the request because it's a stream and can only be consumed once
+        const fetchRequest = event.request.clone();
+
+        return fetch(fetchRequest)
+          .then(function(response) {
+            // Check if we received a valid response
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            // Clone the response because it's a stream and can only be consumed once
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          });
       })
   );
 });
