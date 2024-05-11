@@ -1,7 +1,7 @@
 {
   "name": "Ankur",
   "short_name": "Ankur",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#2f517a",
   "theme_color": "#3a2f7a",
