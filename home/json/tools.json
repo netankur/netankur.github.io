@@ -7,9 +7,10 @@
         "date": "2024-07-06"
     },
     {
-        "title": "Tool 2",
-        "subtitle": "Subtitle 2",
-        "description": "Description of Tool 2.",
-        "date": "2024-05-11"
+        "title": "Words Counter",
+        "subtitle": "tools",
+        "url": "/tool/word-courter.html",
+        "description": "The words counter tool is a simple yet useful web-based application that allows you to analyze and count the number of words, sentences, paragraphs, letters and top keywords in your text.",
+        "date": "2024-07-06"
     }
 ]
