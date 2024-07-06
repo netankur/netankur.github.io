@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  <style>
+    /* Custom styles for padding around the QR code and white background */
+    #qrcode {
+      padding: 10px; /* Increased padding for better visibility */
+      background-color: #ffffff; /* White background */
+      display: inline-block;
+      border: 1px solid #ccc; /* Optional: Add a border for better separation */
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <h2 class="text-center mb-4">QR Code Generator</h2>
+        <div class="form-group">
+          <label for="qr-input">Text/URL:</label>
+          <textarea class="form-control" id="qr-input" rows="3" placeholder="Enter text or URL"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Options:</label>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="qr-width">Width:</label>
+              <input type="number" id="qr-width" class="form-control" value="128">
+            </div>
+            <div class="col-md-6">
+              <label for="qr-height">Height:</label>
+              <input type="number" id="qr-height" class="form-control" value="128">
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <label for="qr-color-dark">Dark Color:</label>
+              <input type="color" id="qr-color-dark" class="form-control" value="#000000">
+            </div>
+            <div class="col-md-6">
+              <label for="qr-color-light">Light Color:</label>
+              <input type="color" id="qr-color-light" class="form-control" value="#ffffff">
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-6">
+              <label for="qr-correct-level">Correction Level:</label>
+              <select id="qr-correct-level" class="form-control">
+                <option value="H">High</option>
+                <option value="Q">Quartile</option>
+                <option value="M">Medium</option>
+                <option value="L">Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group text-center">
+          <button class="btn btn-primary" onclick="generateQR()"><i class="fas fa-qrcode"></i> Generate QR</button>
+          <button class="btn btn-success ml-2" onclick="downloadQR()"><i class="fas fa-download"></i> Download QR</button>
+        </div>
+        <div class="text-center">
+          <div id="qrcode"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function generateQR() {
+      var text = document.getElementById("qr-input").value;
+      var width = document.getElementById("qr-width").value;
+      var height = document.getElementById("qr-height").value;
+      var colorDark = document.getElementById("qr-color-dark").value;
+      var colorLight = document.getElementById("qr-color-light").value;
+      var correctLevel = document.getElementById("qr-correct-level").value;
+
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: text,
+        width: parseInt(width),
+        height: parseInt(height),
+        colorDark: colorDark,
+        colorLight: colorLight,
+        correctLevel: QRCode.CorrectLevel[correctLevel]
+      });
+    }
+
+    function downloadQR() {
+      var canvas = document.querySelector("#qrcode canvas");
+      var url = canvas.toDataURL("image/png");
+
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'qr-code.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>
