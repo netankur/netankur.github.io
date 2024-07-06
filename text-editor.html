@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rich Text Editor</title>
+    <!-- Meta viewport for responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/ae3393d1fa.js" crossorigin="anonymous"></script>
+    <style>
+        /* Custom CSS for some additional styling */
+        .raise {
+            margin: 5px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: white;
+        }
+        /* Adjust select size */
+        select.btn-sm {
+            height: calc(1.5em + .5rem + 2px);
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            line-height: 1.5;
+            border-radius: .2rem;
+        }
+    </style>
+</head>
+<body onload="enableEditMode();">
+<div class="container mt-4">
+    <div class="mb-3">
+        <button class="btn btn-light raise" onclick="toggleDarkLight()"><i class="fas fa-adjust"></i></button>
+        <button class="btn btn-light raise" title="Negrito" onclick="execCmd('bold');"><i class="fas fa-bold"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('italic');"><i class="fas fa-italic"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('underline');"><i class="fas fa-underline"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('removeFormat');"><i class="fas fa-remove-format"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('strikeThrough');"><i class="fas fa-strikethrough"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('justifyLeft');"><i class="fas fa-align-left"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('justifyCenter');"><i class="fas fa-align-center"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('justifyRight');"><i class="fas fa-align-right"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('justifyFull');"><i class="fas fa-align-justify"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('cut');"><i class="fas fa-cut"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('copy');"><i class="fas fa-copy"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('indent');"><i class="fas fa-indent"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('outdent');"><i class="fas fa-outdent"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('subscript');"><i class="fas fa-subscript"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('superscript');"><i class="fas fa-superscript"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('undo');"><i class="fas fa-undo"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('redo');"><i class="fas fa-redo"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('insertUnorderedList');"><i class="fas fa-list-ul"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('insertOrderedList');"><i class="fas fa-list-ol"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('insertParagraph');"><i class="fas fa-paragraph"></i></button>
+        <select class="btn btn-light raise btn-sm" onchange="execCommandWithArg('formatBlock', this.value);">
+            <option value="H1">H1</option>
+            <option value="H2">H2</option>
+            <option value="H3">H3</option>
+            <option value="H4">H4</option>
+            <option value="H5">H5</option>
+            <option value="H6">H6</option>
+        </select>
+        <button class="btn btn-light raise" onclick="execCmd('insertHorizontalRule');">HR</button>
+        <button class="btn btn-light raise" onclick="execCmd('createLink', prompt('Enter a URL', 'http://'));"><i class="fas fa-link"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('unlink');"><i class="fas fa-unlink"></i></button>
+        <button class="btn btn-light raise" onclick="toggleSource();"><i class="fas fa-code"></i></button>
+        <button class="btn btn-light raise" onclick="printEditedContent();"><i class="fas fa-print"></i> Print Edited</button>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-light raise" onclick="toggleEdit();">Toggle Edit</button>
+        <select class="btn btn-light raise btn-sm" onchange="execCommandWithArg('fontName', this.value);">
+            <option value="Arial">Arial</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Courier">Courier</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+        <select class="btn btn-light raise btn-sm" onchange="execCommandWithArg('fontSize', this.value);">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+        </select>
+        <label class="raise">Fore Color: </label><input type="color" onchange="execCommandWithArg('foreColor', this.value);">
+        <label class="raise">Background: </label><input type="color" onchange="execCommandWithArg('hiliteColor', this.value);">
+        <button class="btn btn-light raise" onclick="execCommandWithArg('insertImage', prompt('Enter the image URL', ''));"><i class="fas fa-file-image"></i></button>
+        <button class="btn btn-light raise" onclick="execCmd('selectAll');">Select All</button>
+    </div>
+    <!-- Text editor iframe -->
+    <iframe id="richTextField" name="richTextField" class="border border-dark rounded" style="width: 100%; min-height: 400px;"></iframe>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    var showingSourceCode = false;
+    var isInEditMode = true;
+
+    function enableEditMode (){
+        var richTextField = document.getElementById("richTextField").contentWindow.document;
+        richTextField.designMode = 'On';
+    }
+
+    function execCmd (command) {
+        var richTextField = document.getElementById("richTextField").contentWindow.document;
+        richTextField.execCommand(command, false, null);
+    }
+    
+    function execCommandWithArg (command, arg) {
+        var richTextField = document.getElementById("richTextField").contentWindow.document;
+        richTextField.execCommand(command, false, arg);
+    }
+    
+    function toggleSource () {
+        var richTextField = document.getElementById("richTextField").contentWindow.document;
+        var body = richTextField.getElementsByTagName('body')[0];
+        if(showingSourceCode){
+            body.innerHTML = body.textContent;
+        } else {
+            body.textContent = body.innerHTML;
+        }
+        showingSourceCode = !showingSourceCode;
+    }
+
+    function toggleEdit() {
+        isInEditMode = !isInEditMode;
+        var richTextField = document.getElementById("richTextField").contentWindow.document;
+        richTextField.designMode = isInEditMode ? 'On' : 'Off';
+    }
+
+    function toggleDarkLight() {
+        document.body.classList.toggle("dark-mode");
+    }
+
+    function printEditedContent() {
+        var richTextField = document.getElementById("richTextField").contentWindow;
+        var editedContent = richTextField.document.body.innerHTML;
+        
+        // Temporarily replace iframe content with edited content
+        var originalContent = richTextField.document.body.innerHTML;
+        richTextField.document.body.innerHTML = editedContent;
+        
+        // Print the content
+        richTextField.focus();
+        richTextField.print();
+        
+        // Restore original content
+        richTextField.document.body.innerHTML = originalContent;
+    }
+</script>
+</body>
+</html>
