@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counts Tool</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4"><i class="fas fa-file-alt"></i> Word Counts Tool</h1>
+        <div class="form-group">
+            <label for="textInput">Enter Text:</label>
+            <textarea id="textInput" class="form-control" rows="10"></textarea>
+        </div>
+        <button id="analyzeBtn" class="btn btn-primary"><i class="fas fa-chart-bar"></i> Analyze</button>
+
+        <div id="results" class="mt-4">
+            <h3>Results:</h3>
+            <p><strong>Words:</strong> <span id="wordCount">0</span></p>
+            <p><strong>Paragraphs:</strong> <span id="paragraphCount">0</span></p>
+            <p><strong>Letters:</strong> <span id="letterCount">0</span></p>
+            <p><strong>Sentences:</strong> <span id="sentenceCount">0</span></p>
+            <p><strong>Main Keywords:</strong> <span id="keywords">None</span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('analyzeBtn').addEventListener('click', function () {
+            const text = document.getElementById('textInput').value;
+
+            // Word count
+            const words = text.match(/\b\w+\b/g) || [];
+            document.getElementById('wordCount').textContent = words.length;
+
+            // Paragraph count
+            const paragraphs = text.split(/\n+/);
+            document.getElementById('paragraphCount').textContent = paragraphs.length;
+
+            // Letter count
+            const letters = text.match(/[a-zA-Z]/g) || [];
+            document.getElementById('letterCount').textContent = letters.length;
+
+            // Sentence count
+            const sentences = text.match(/[^.!?]+[.!?]+[\])'"`’”]*/g) || [];
+            document.getElementById('sentenceCount').textContent = sentences.length;
+
+            // Main keywords (simple word frequency)
+            const wordFrequency = {};
+            words.forEach(word => {
+                word = word.toLowerCase();
+                wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+            });
+            const sortedWords = Object.entries(wordFrequency).sort((a, b) => b[1] - a[1]);
+            const topKeywords = sortedWords.slice(0, 5).map(([word]) => word);
+            document.getElementById('keywords').textContent = topKeywords.join(', ') || 'None';
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
