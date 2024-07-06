@@ -100,7 +100,7 @@
                                     ${meaning.definitions.map((definition, idx) => `
                                         <div class="mb-3">
                                             <p><strong>Definition ${idx + 1}:</strong> ${definition.definition}</p>
-                                            ${definition.example ? `<p><strong>Example:</strong> ${definition.example}</p>` : ''}
+                                            ${definition.example ? `<p class="text-danger"><strong>Example:</strong> ${definition.example}</p>` : ''}
                                         </div>
                                     `).join('')}
                                 </div>
