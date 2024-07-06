@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resize Tool</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Image Resize Tool</h1>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="imageInput">Upload Image</label>
+                    <input type="file" class="form-control-file" id="imageInput" accept="image/*" onchange="loadImage(event)">
+                </div>
+                <div class="form-group">
+                    <label for="widthInput">Width (px)</label>
+                    <input type="number" class="form-control" id="widthInput" placeholder="Enter width" oninput="updateHeight()">
+                </div>
+                <div class="form-group">
+                    <label for="heightInput">Height (px)</label>
+                    <input type="number" class="form-control" id="heightInput" placeholder="Enter height" oninput="updateWidth()">
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="aspectRatioLock" checked>
+                    <label class="form-check-label" for="aspectRatioLock">Lock Aspect Ratio</label>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="resizeImage()">Resize Image</button>
+                <a id="downloadLink" class="btn btn-success btn-block mt-2" style="display: none;" download><i class="fas fa-download"></i> Download Image</a>
+                <div id="output" class="mt-4 text-center">
+                    <p id="noImageText">No image uploaded.</p>
+                    <img id="imagePreview" class="img-fluid mb-4" alt="Image Preview" style="display: none;" />
+                    <img id="resizedImage" class="img-fluid" alt="Resized Image" style="display: none;" />
+                    <p id="imageDetails"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let originalAspectRatio = 1;
+
+        function loadImage(event) {
+            const fileInput = document.getElementById('imageInput');
+            const widthInput = document.getElementById('widthInput');
+            const heightInput = document.getElementById('heightInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const resizedImage = document.getElementById('resizedImage');
+            const noImageText = document.getElementById('noImageText');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    widthInput.value = img.width;
+                    heightInput.value = img.height;
+                    originalAspectRatio = img.width / img.height;
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    resizedImage.style.display = 'none';
+                    noImageText.style.display = 'none';
+                }
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function updateHeight() {
+            const widthInput = document.getElementById('widthInput');
+            const heightInput = document.getElementById('heightInput');
+            const aspectRatioLock = document.getElementById('aspectRatioLock');
+            if (aspectRatioLock.checked) {
+                heightInput.value = Math.round(widthInput.value / originalAspectRatio);
+            }
+        }
+
+        function updateWidth() {
+            const widthInput = document.getElementById('widthInput');
+            const heightInput = document.getElementById('heightInput');
+            const aspectRatioLock = document.getElementById('aspectRatioLock');
+            if (aspectRatioLock.checked) {
+                widthInput.value = Math.round(heightInput.value * originalAspectRatio);
+            }
+        }
+
+        function resizeImage() {
+            const fileInput = document.getElementById('imageInput');
+            const widthInput = document.getElementById('widthInput').value;
+            const heightInput = document.getElementById('heightInput').value;
+            const output = document.getElementById('output');
+            const imagePreview = document.getElementById('imagePreview');
+            const resizedImage = document.getElementById('resizedImage');
+            const imageDetails = document.getElementById('imageDetails');
+            const downloadLink = document.getElementById('downloadLink');
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = widthInput || img.width;
+                        canvas.height = heightInput || img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const resizedDataUrl = canvas.toDataURL('image/jpeg');
+                        resizedImage.src = resizedDataUrl;
+                        resizedImage.style.display = 'block';
+                        imagePreview.style.display = 'none';
+                        resizedImage.onload = function () {
+                            imageDetails.innerHTML = `
+                                Width: ${canvas.width}px <br>
+                                Height: ${canvas.height}px <br>
+                                Size: ${(resizedDataUrl.length * (3/4) / 1024).toFixed(2)} KB
+                            `;
+                            downloadLink.href = resizedDataUrl;
+                            downloadLink.download = `${Math.floor(100000 + Math.random() * 900000)}.jpg`;
+                            downloadLink.style.display = 'block';
+                        }
+                    }
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                output.innerHTML = 'Please upload an image.';
+            }
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
