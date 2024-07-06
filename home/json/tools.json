@@ -26,5 +26,12 @@
         "url": "/tool/dictionary.html",
         "description": "Discover meanings, phonetics, and examples of words. Perfect for quick reference and enhancing your understanding on the go.",
         "date": "2024-07-06"
+    },
+    {
+        "title": "QR Code Generator",
+        "subtitle": "tools",
+        "url": "/tool/qr-code.html",
+        "description": "Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications.",
+        "date": "2024-07-06"
     }
 ]
