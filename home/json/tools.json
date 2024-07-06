@@ -33,5 +33,12 @@
         "url": "/tool/qr-code.html",
         "description": "Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications.",
         "date": "2024-07-06"
+    },
+    {
+        "title": "Rich Text Editor",
+        "subtitle": "tools",
+        "url": "/tool/text-editor.html",
+        "description": "Easily edit and format text with our intuitive Online Rich Text Editor. Enjoy features like bold, italic, alignment, and more. Now includes a convenient print function for immediate document output. Perfect for enhancing content creation.",
+        "date": "2024-07-06"
     }
 ]
