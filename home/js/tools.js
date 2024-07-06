@@ -15,7 +15,7 @@ fetch('https://ankurdxx.github.io/home/json/tools.json')
             toolElement.innerHTML = `
                 <div class="d-flex flex-column flex-md-row justify-content-between mb-5">
                         <div class="flex-grow-1">
-                            <h3 class="mb-0">${tool.title}</h3>
+                            <h3 class="mb-0"><a href="${tool.url}">${tool.title}</a></h3>
                             <div class="subheading mb-3">${tool.subtitle}</div>
                             <p>${tool.description}</p>
                         </div>
