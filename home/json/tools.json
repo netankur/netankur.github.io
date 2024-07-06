@@ -12,5 +12,12 @@
         "url": "/tool/word-courter.html",
         "description": "The words counter tool is a simple yet useful web-based application that allows you to analyze and count the number of words, sentences, paragraphs, letters and top keywords in your text.",
         "date": "2024-07-06"
+    },
+    {
+        "title": "Text Replace",
+        "subtitle": "tools",
+        "url": "/tool/text-replace.html",
+        "description": "Enhance productivity with our interactive text replace tool. Easily find and replace text in a user-friendly interface.",
+        "date": "2024-07-06"
     }
 ]
