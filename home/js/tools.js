@@ -1,5 +1,5 @@
 // Fetch the JSON file
-fetch('https://ankurdxx.github.io/home/json/tools.json')
+fetch('https://netankur.github.io/home/json/tools.json')
     .then(response => response.json()) // Parse the JSON data
     .then(data => {
         // Select the container where the data will be displayed
