@@ -47,5 +47,12 @@
         "url": "/tool/file-encryption.html",
         "description": "Protect your sensitive files with our Secure File Encryption and Decryption Tool. Upload your documents, set a password, and encrypt them with AES-GCM encryption for maximum security. Decrypt files seamlessly when needed. Enjoy a sleek, dark-themed interface designed for both usability and style.",
         "date": "2024-07-07"
+    },
+    {
+        "title": "Music Player",
+        "subtitle": "tools",
+        "url": "/tool/music.html",
+        "description": "Our Music Player brings your favorite tunes to your fingertips with a stylish and intuitive interface. Discover and play songs in high-quality audio, complete with artist and album information displayed dynamically. Designed with a sleek dark theme for an immersive experience, our player is perfect for enjoying music on any device.",
+        "date": "2024-07-07"
     }
 ]
