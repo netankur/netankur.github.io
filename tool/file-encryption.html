@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encrypt/Decrypt Tool</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a; /* Dark background */
+            color: #e0e0e0; /* Light text color */
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        h2 {
+            color: #64ffda; /* Cyan header */
+        }
+        .file-input-container {
+            margin-bottom: 20px;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #333;
+            color: #ccc;
+            border: 1px solid #666;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .file-input {
+            display: none;
+        }
+        #password {
+            background-color: #333;
+            color: #ccc;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #00adb5; /* Teal button */
+            border-color: #00adb5;
+        }
+        .btn-primary:hover {
+            background-color: #00c4cc; /* Lighter teal on hover */
+            border-color: #00c4cc;
+        }
+        .btn-success {
+            background-color: #80deea; /* Light blue button */
+            border-color: #80deea;
+        }
+        .btn-success:hover {
+            background-color: #9ff3ff; /* Lighter blue on hover */
+            border-color: #9ff3ff;
+        }
+        .btn-danger {
+            background-color: #ff3d00; /* Red button */
+            border-color: #ff3d00;
+        }
+        .btn-danger:hover {
+            background-color: #ff6333; /* Lighter red on hover */
+            border-color: #ff6333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2><i class="fas fa-shield-alt"></i> File Encrypt/Decrypt Tool</h2>
+        <div class="file-input-container">
+            <label for="file-input" class="file-input-label"><i class="fas fa-file-upload"></i> Choose a file...</label>
+            <input type="file" id="file-input" class="file-input" accept=".txt,.pdf,.docx,.xlsx" onchange="checkFileSize(this)">
+        </div>
+        <i class="fas fa-key"></i><input type="password" id="password" class="form-control mb-3" placeholder="Enter Password">
+        <div>
+            <button id="encrypt-btn" class="btn btn-primary mr-3"><i class="fas fa-lock"></i> Encrypt</button>
+            <button id="decrypt-btn" class="btn btn-primary"><i class="fas fa-unlock"></i> Decrypt</button>
+        </div>
+        <div class="mt-3">
+            <a id="download-link" class="btn btn-success" style="display: none;"><i class="fas fa-download"></i> Download File</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery (required for Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        async function getKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    "name": "PBKDF2",
+                    salt: enc.encode(salt),
+                    "iterations": 100000,
+                    "hash": "SHA-256"
+                },
+                keyMaterial,
+                { "name": "AES-GCM", "length": 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        function checkFileSize(input) {
+            const file = input.files[0];
+            const fileSize = file.size / (1024 * 1024); // in MB
+            if (fileSize > 100) {
+                alert('File size exceeds the limit of 100MB.');
+                input.value = ''; // Clear the file input
+            }
+        }
+
+        document.getElementById('encrypt-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('file-input').files[0];
+            const password = document.getElementById('password').value;
+            if (!fileInput || !password) {
+                alert('Please select a file and enter a password.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                const key = await getKey(password, salt);
+                const encryptedContent = await window.crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    new Uint8Array(reader.result)
+                );
+
+                const encryptedBlob = new Blob([salt, iv, new Uint8Array(encryptedContent)], { type: 'application/octet-stream' });
+                const link = document.getElementById('download-link');
+                link.href = URL.createObjectURL(encryptedBlob);
+                link.download = fileInput.name + ".encrypted";
+                link.style.display = 'inline-block';
+                link.innerHTML = '<i class="fas fa-download"></i> Download Encrypted File';
+            };
+            reader.readAsArrayBuffer(fileInput);
+        });
+
+        document.getElementById('decrypt-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('file-input').files[0];
+            const password = document.getElementById('password').value;
+            if (!fileInput || !password) {
+                alert('Please select a file and enter a password.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const fileContent = new Uint8Array(reader.result);
+                const salt = fileContent.slice(0, 16);
+                const iv = fileContent.slice(16, 28);
+                const data = fileContent.slice(28);
+                const key = await getKey(password, salt);
+                try {
+                    const decryptedContent = await window.crypto.subtle.decrypt(
+                        { name: "AES-GCM", iv: iv },
+                        key,
+                        data
+                    );
+
+                    const decryptedBlob = new Blob([new Uint8Array(decryptedContent)], { type: 'application/octet-stream' });
+                    const link = document.getElementById('download-link');
+                    link.href = URL.createObjectURL(decryptedBlob);
+                    link.download = fileInput.name.replace('.encrypted', '');
+                    link.style.display = 'inline-block';
+                    link.innerHTML = '<i class="fas fa-download"></i> Download Decrypted File';
+                } catch (e) {
+                    alert('Decryption failed. Incorrect password or corrupted file.');
+                }
+            };
+            reader.readAsArrayBuffer(fileInput);
+        });
+    </script>
+</body>
+</html>
