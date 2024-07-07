@@ -40,5 +40,12 @@
         "url": "/tool/text-editor.html",
         "description": "Easily edit and format text with our intuitive Online Rich Text Editor. Enjoy features like bold, italic, alignment, and more. Now includes a convenient print function for immediate document output. Perfect for enhancing content creation.",
         "date": "2024-07-06"
+    },
+    {
+        "title": "File Encryption",
+        "subtitle": "tools",
+        "url": "/tool/file-encryption.html",
+        "description": "Protect your sensitive files with our Secure File Encryption and Decryption Tool. Upload your documents, set a password, and encrypt them with AES-GCM encryption for maximum security. Decrypt files seamlessly when needed. Enjoy a sleek, dark-themed interface designed for both usability and style.",
+        "date": "2024-07-07"
     }
 ]
