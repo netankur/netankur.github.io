@@ -86,6 +86,7 @@
             <div class="player-controls text-center">
                 <button class="btn btn-outline-secondary mr-2" id="btnPrev"><i class="fas fa-step-backward"></i></button>
                 <button class="btn btn-outline-secondary mr-2" id="btnPlayPause" onclick="togglePlayPause()"><i class="fas fa-play"></i></button>
+                <button class="btn btn-outline-secondary mr-2" id="btnRepeat" onclick="toggleRepeat()"><i class="fas fa-redo"></i></button>
                 <button class="btn btn-outline-secondary" id="btnNext"><i class="fas fa-step-forward"></i></button>
             </div>
             <div class="song-info text-center mt-3">
@@ -105,6 +106,12 @@
                     <option value="320kbps" selected>Best (320kbps)</option>
                 </select>
             </div>
+            <div class="time-sliders mt-3">
+                <input type="range" id="musicSlider" class="custom-range" value="0">
+                <div class="text-center mt-2">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                </div>
+            </div>
             <audio id="audioPlayer" class="mt-4">
                 Your browser does not support the audio element.
             </audio>
@@ -117,8 +124,13 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let isPlaying = false;
+        let isRepeat = false;
         const audioPlayer = document.getElementById('audioPlayer');
         const playPauseButton = document.getElementById('btnPlayPause');
+        const repeatButton = document.getElementById('btnRepeat');
+        const musicSlider = document.getElementById('musicSlider');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
 
         function togglePlayPause() {
             if (isPlaying) {
@@ -131,7 +143,15 @@
             isPlaying = !isPlaying;
         }
 
-        // Function to search songs based on user input
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            if (isRepeat) {
+                repeatButton.classList.add('btn-primary');
+            } else {
+                repeatButton.classList.remove('btn-primary');
+            }
+        }
+
         function searchSongs() {
             const query = document.getElementById('searchInput').value.trim();
             if (query === '') {
@@ -151,7 +171,6 @@
                 });
         }
 
-        // Function to display search results
         function displaySearchResults(songs) {
             const resultsContainer = document.getElementById('searchResults');
             resultsContainer.innerHTML = '';
@@ -173,7 +192,6 @@
             });
         }
 
-        // Function to play selected song
         function playSong(songId) {
             const apiUrl = `https://saavn.dev/api/songs/${songId}`;
 
@@ -187,18 +205,46 @@
                     const songTitle = document.getElementById('songTitle');
                     const artistAlbum = document.getElementById('artistAlbum');
 
-                    // Update UI with song details
                     coverImage.src = response.data.data[0].image[0].url;
                     songTitle.textContent = response.data.data[0].name;
                     artistAlbum.textContent = `${response.data.data[0].artists.primary[0].name} - ${response.data.data[0].album.name}`;
 
-                    // Set audio source and play the selected song
                     audioPlayer.src = selectedUrl;
                     audioPlayer.play();
-                    
-                    // Update play/pause button
                     playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
                     isPlaying = true;
+
+                    audioPlayer.addEventListener('loadedmetadata', function() {
+                        musicSlider.max = audioPlayer.duration;
+                        durationDisplay.textContent = formatTime(audioPlayer.duration);
+                    });
+
+                    audioPlayer.addEventListener('timeupdate', function() {
+                        musicSlider.value = audioPlayer.currentTime;
+                        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+                    });
+
+                    musicSlider.addEventListener('input', function() {
+                        audioPlayer.currentTime = musicSlider.value;
+                    });
+
+                    audioPlayer.addEventListener('ended', function() {
+                        if (isRepeat) {
+                            audioPlayer.currentTime = 0;
+                            audioPlayer.play();
+                        } else {
+                            // Logic to play next song or stop playback
+                        }
+                    });
+
+                    function formatTime(seconds) {
+                        let minutes = Math.floor(seconds / 60);
+                        let secs = Math.floor(seconds % 60);
+                        if (secs < 10) {
+                            secs = `0${secs}`;
+                        }
+                        return `${minutes}:${secs}`;
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching playable song:', error);
@@ -206,4 +252,4 @@
         }
     </script>
 </body>
-</html
+</html>
