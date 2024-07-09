@@ -54,5 +54,12 @@
         "url": "/tool/music.html",
         "description": "Our Music Player brings your favorite tunes to your fingertips with a stylish and intuitive interface. Discover and play songs in high-quality audio, complete with artist and album information displayed dynamically. Designed with a sleek dark theme for an immersive experience, our player is perfect for enjoying music on any device.",
         "date": "2024-07-07"
+    },
+    {
+        "title": "Simple Text Editor",
+        "subtitle": "tools",
+        "url": "/tool/text-edit.html",
+        "description": "Simple Text Editor is a user-friendly web-based text editor that allows you to create and edit text with a variety of fonts. Choose from a diverse selection of typefaces to customize your text to suit your needs.",
+        "date": "2024-07-09"
     }
 ]
