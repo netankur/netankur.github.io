@@ -72,7 +72,7 @@
     <div id="editor" contenteditable="true" class="editor"></div>
     
     <!-- Display Font File URL -->
-    <div id="fontFileUrl" style="display: none;"></div>
+    <div id="fontFileUrl"></div>
 </div>
 
 <!-- Bootstrap JS and dependencies -->
@@ -169,7 +169,7 @@ function promptFontSize() {
 
                 if (selectedFont) {
                     const regularFontFile = selectedFont.files.regular;
-                    fontFileUrlDisplay.textContent = regularFontFile;
+                    fontFileUrlDisplay.textContent = regularFontFile.replace(/^http:/, 'https:');
                 } else {
                     fontFileUrlDisplay.textContent = 'Regular font file URL not found.';
                 }
