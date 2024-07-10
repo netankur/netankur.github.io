@@ -10,70 +10,112 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom CSS -->
     <style>
+        body {
+            padding-top: 70px; /* Adjust this value according to your toolbar height */
+        }
+        .fixed-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+        .toolbar-container {
+            background-color: #f8f9fa; /* Optional: Add background color to toolbar */
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .editor-container {
+            padding-top: 50px; /* Adjust this value according to your toolbar height */
+        }
         .editor {
             border: 1px solid #ccc;
             padding: 10px;
-            margin-bottom: 20px;
-            min-height: 200px;
+            min-height: 400px; /* Increase or decrease as needed */
+            overflow-y: auto;
+        }
+        .custom-select {
+            width: 140px;
         }
     </style>
 </head>
 <body>
-
 <div class="container mt-4">
     <h2><i class="fas fa-pencil-alt"></i> Text Editor</h2>
+</div>
 
-    <!-- Toolbar -->
-    <div class="btn-toolbar mb-2" role="toolbar" aria-label="Toolbar with buttons">
-        <!-- Font styles -->
-        <div class="btn-group mr-2" role="group" aria-label="Font styles">
-            <button type="button" class="btn btn-light" onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
-        </div>
-        <!-- Alignment -->
-        <div class="btn-group mr-2" role="group" aria-label="Alignment">
-            <button type="button" class="btn btn-light" onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('justifyFull')"><i class="fas fa-align-justify"></i></button>
-        </div>
-        <!-- Lists -->
-        <div class="btn-group mr-2" role="group" aria-label="Lists">
-            <button type="button" class="btn btn-light" onclick="execCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-        </div>
-        <!-- Subscript and Superscript -->
-        <div class="btn-group mr-2" role="group" aria-label="Subscript and Superscript">
-            <button type="button" class="btn btn-light" onclick="execCmd('subscript')"><i class="fas fa-subscript"></i></button>
-            <button type="button" class="btn btn-light" onclick="execCmd('superscript')"><i class="fas fa-superscript"></i></button>
-        </div>
-        <!-- Font Size -->
-        <div class="btn-group mr-2" role="group" aria-label="Font Size">
-            <button type="button" class="btn btn-light" onclick="promptFontSize()"><i class="fas fa-text-height"></i></button>
-        </div>
-
-        <!-- Font Color -->
-        <div class="btn-group mr-2" role="group" aria-label="Font Color">
-            <input type="color" id="colorPicker" onchange="execCommandWithArg('foreColor', this.value)">
-        </div>
-        <!-- Font Family -->
-        <div class="btn-group mr-2" role="group" aria-label="Font Family">
-            <select id="fontSelect" class="custom-select" onchange="changeFont(this.value)">
-                <option value="">Select Font</option>
-            </select>
-        </div>
-        <!-- Print Button -->
-        <div class="btn-group" role="group" aria-label="Print">
-            <button type="button" class="btn btn-light" onclick="printContent()"><i class="fas fa-print"></i> Print</button>
+<!-- Toolbar -->
+<div class="fixed-top bg-white toolbar-container">
+    <div class="container">
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with buttons">
+            <!-- Font styles -->
+            <div class="btn-group mr-2" role="group" aria-label="Font styles">
+                <button type="button" class="btn btn-light" onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
+            </div>
+            <!-- Alignment -->
+            <div class="btn-group mr-2" role="group" aria-label="Alignment">
+                <button type="button" class="btn btn-light" onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('justifyRight')"><i class="fas fa-align-right"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('justifyFull')"><i class="fas fa-align-justify"></i></button>
+            </div>
+            <!-- Lists -->
+            <div class="btn-group mr-2" role="group" aria-label="Lists">
+                <button type="button" class="btn btn-light" onclick="execCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+            </div>
+            <!-- Subscript and Superscript -->
+            <div class="btn-group mr-2" role="group" aria-label="Subscript and Superscript">
+                <button type="button" class="btn btn-light" onclick="execCmd('subscript')"><i class="fas fa-subscript"></i></button>
+                <button type="button" class="btn btn-light" onclick="execCmd('superscript')"><i class="fas fa-superscript"></i></button>
+            </div>
+            <!-- Font Size -->
+            <div class="btn-group mr-2" role="group" aria-label="Font Size">
+                <button type="button" class="btn btn-light" onclick="promptFontSize()"><i class="fas fa-text-height"></i></button>
+            </div>
+            <!-- Select All Button -->
+            <div class="btn-group mr-2" role="group" aria-label="Select All">
+                <button type="button" class="btn btn-light" onclick="selectAllText()"><i class="fas fa-list-ul"></i></button>
+            </div>
+            <!-- Undo Button -->
+            <div class="btn-group mr-2" role="group" aria-label="Undo">
+                <button type="button" class="btn btn-light" onclick="execCmd('undo')"><i class="fas fa-undo"></i></button>
+            </div>
+            <!-- Redo Button -->
+            <div class="btn-group mr-2" role="group" aria-label="Redo">
+                <button type="button" class="btn btn-light" onclick="execCmd('redo')"><i class="fas fa-redo"></i></button>
+            </div>
+            <!-- Lock/Unlock Edit Mode Button -->
+            <div class="btn-group mr-2" role="group" aria-label="Lock/Unlock Edit Mode">
+                <button type="button" class="btn btn-light" onclick="toggleEditMode()"><i class="fas fa-lock-open"></i></button>
+            </div>
+            <!-- Print Button -->
+            <div class="btn-group mr-2" role="group" aria-label="Print">
+                <button type="button" class="btn btn-light" onclick="printContent()"><i class="fas fa-print"></i></button>
+            </div>
+            <!-- Font Color -->
+            <div class="btn-group mr-2" role="group" aria-label="Font Color">
+                <button type="button" class="btn btn-light" id="colorButton"><i class="fa fa-adjust" id="c"></i></button>
+                <input type="color" id="colorPicker" onchange="execCommandWithArg('foreColor', this.value)" style="display: none;">
+            </div>
+            <!-- Font Family -->
+            <div class="btn-group mr-2" role="group" aria-label="Font Family">
+                <select id="fontSelect" class="custom-select" onchange="changeFont(this.value)">
+                    <option value="">Select Font</option>
+                </select>
+            </div>
         </div>
     </div>
-
-    <!-- Editor -->
-    <div id="editor" contenteditable="true" class="editor"></div>
-    
-    <!-- Display Font File URL -->
-    <div id="fontFileUrl" style="display: none;"></div>
 </div>
+
+<!-- Editor -->
+<div class="container editor-container">
+    <div id="editor" contenteditable="true" class="editor"></div>
+</div>
+
+<!-- Display Font File URL -->
+<div id="fontFileUrl" style="display: none;"></div>
 
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -82,38 +124,38 @@
 
 <!-- Custom JavaScript -->
 <script>
-// Function to prompt for font size
-function promptFontSize() {
-    const fontSize = prompt("Enter font size (1-7):");
-    if (fontSize && fontSize >= 1 && fontSize <= 7) {
-        execCommandWithArg('fontSize', fontSize);
-    } else {
-        alert("Invalid font size. Please enter a number between 1 and 7.");
+    // Function to prompt for font size
+    function promptFontSize() {
+        const fontSize = prompt("Enter font size (1-7):");
+        if (fontSize && fontSize >= 1 && fontSize <= 7) {
+            execCommandWithArg('fontSize', fontSize);
+        } else {
+            alert("Invalid font size. Please enter a number between 1 and 7.");
+        }
     }
-}
 
     // Function to execute commands
     function execCmd(command) {
         document.execCommand(command, false, null);
     }
-    
+
     // Function to execute commands with arguments
     function execCommandWithArg(command, arg) {
         document.execCommand(command, false, arg);
     }
-    
+
     // Function to change font family
     function changeFont(font) {
         if (font !== '') {
             document.execCommand('fontName', false, font);
         }
     }
-    
+
     // Function to print editor content
     function printContent() {
         let selectedFont = document.getElementById('fontSelect').value;
         let fontFileUrl = document.getElementById('fontFileUrl').textContent;
-        
+
         let printWindow = window.open('', '', 'height=600,width=800');
         printWindow.document.write('<html><head><title>Print</title>');
         printWindow.document.write('<style>');
@@ -129,59 +171,103 @@ function promptFontSize() {
         printWindow.document.close();
         printWindow.print();
     }
-</script>
-    <script>
-        let fontsData; // Define fontsData globally to make it accessible
 
-        // Function to fetch JSON data from the URL
-        async function fetchFontsData() {
-            try {
-                const response = await fetch('https://netankur.github.io/home/json/fonts.json');
-                const data = await response.json();
-                return data.items; // Return the 'items' array from JSON
-            } catch (error) {
-                console.error('Error fetching fonts data:', error);
-                return [];
+    // Function to select all text in the editor
+    function selectAllText() {
+        const editor = document.getElementById('editor');
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    // Function to toggle edit mode (enable/disable contenteditable)
+    let editModeEnabled = true; // Initial state
+
+    function toggleEditMode() {
+        const editor = document.getElementById('editor');
+        editModeEnabled = !editModeEnabled;
+
+        if (editModeEnabled) {
+            editor.setAttribute('contenteditable', 'true');
+            document.querySelector('.fa-lock').classList.remove('fa-lock');
+            document.querySelector('.fa-unlock').classList.add('fa-unlock');
+        } else {
+            editor.setAttribute('contenteditable', 'false');
+            document.querySelector('.fa-unlock').classList.remove('fa-unlock');
+            document.querySelector('.fa-lock').classList.add('fa-lock');
+        }
+    }
+
+    // Function to display the regular font file URL when a font family is selected
+    let fontsData; // Define fontsData globally to make it accessible
+
+    // Function to fetch JSON data from the URL
+    async function fetchFontsData() {
+        try {
+            const response = await fetch('https://netankur.github.io/home/json/fonts.json');
+            const data = await response.json();
+            return data.items; // Return the 'items' array from JSON
+        } catch (error) {
+            console.error('Error fetching fonts data:', error);
+            return [];
+        }
+    }
+
+    // Function to populate the font families dropdown
+    async function populateFontFamilies() {
+        fontsData = await fetchFontsData(); // Assign fetched data to global variable
+        const fontSelect = document.getElementById('fontSelect');
+
+        fontsData.forEach(font => {
+            const option = document.createElement('option');
+            option.textContent = font.family;
+            option.value = font.family;
+            fontSelect.appendChild(option);
+        });
+    }
+
+    // Function to display the regular font file URL when a font family is selected
+    function displayRegularFontFile() {
+        const fontSelect = document.getElementById('fontSelect');
+        const fontFileUrlDisplay = document.getElementById('fontFileUrl');
+
+        fontSelect.addEventListener('change', () => {
+            const selectedFamily = fontSelect.value;
+            const selectedFont = fontsData.find(font => font.family === selectedFamily);
+
+            if (selectedFont) {
+                const regularFontFile = selectedFont.files.regular;
+                fontFileUrlDisplay.textContent = regularFontFile.replace(/^http:/, 'https:');
+            } else {
+                fontFileUrlDisplay.textContent = 'Regular font file URL not found.';
             }
-        }
+        });
+    }
 
-        // Function to populate the font families dropdown
-        async function populateFontFamilies() {
-            fontsData = await fetchFontsData(); // Assign fetched data to global variable
-            const fontSelect = document.getElementById('fontSelect');
+    // Call the function to populate the font families dropdown on page load
+    populateFontFamilies();
 
-            fontsData.forEach(font => {
-                const option = document.createElement('option');
-                option.textContent = font.family;
-                option.value = font.family;
-                fontSelect.appendChild(option);
-            });
-        }
+    // Call the function to display the regular font file URL when a font family is selected
+    displayRegularFontFile();
+</script>
+<script>
+    // JavaScript to open color input on button click
+    const colorButton = document.getElementById('colorButton');
+    const colorInput = document.getElementById('colorPicker');
+    const cc = document.getElementById('c');
 
-        // Function to display the regular font file URL when a font family is selected
-        function displayRegularFontFile() {
-            const fontSelect = document.getElementById('fontSelect');
-            const fontFileUrlDisplay = document.getElementById('fontFileUrl');
+    colorButton.addEventListener('click', function() {
+        colorInput.click(); // Simulate a click on the color input
+    });
 
-            fontSelect.addEventListener('change', () => {
-                const selectedFamily = fontSelect.value;
-                const selectedFont = fontsData.find(font => font.family === selectedFamily);
-
-                if (selectedFont) {
-                    const regularFontFile = selectedFont.files.regular;
-                    fontFileUrlDisplay.textContent = regularFontFile.replace(/^http:/, 'https:');
-                } else {
-                    fontFileUrlDisplay.textContent = 'Regular font file URL not found.';
-                }
-            });
-        }
-
-        // Call the function to populate the font families dropdown on page load
-        populateFontFamilies();
-
-        // Call the function to display the regular font file URL when a font family is selected
-        displayRegularFontFile();
-    </script>
-
+    colorInput.addEventListener('input', function() {
+        // You can perform actions here when the user selects a color
+        console.log('Selected color:', colorInput.value);
+        // For example, you could update the button's background color
+        cc.style.color = colorInput.value;
+    });
+</script>
 </body>
 </html>
