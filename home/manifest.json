@@ -1,15 +1,37 @@
 {
   "name": "Ankur",
   "short_name": "Ankur",
+  "description": "A sleek app for Ankur's needs",
   "start_url": "/home/index.html",
   "display": "standalone",
   "background_color": "#2f517a",
   "theme_color": "#3a2f7a",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/home/assets/img/icon.png",
       "sizes": "192x192",
       "type": "image/png"
+    },
+    {
+      "src": "/home/assets/img/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ]
+  ],
+  "splash_pages": null,
+  "shortcuts": [
+    {
+      "name": "Homepage",
+      "url": "/home/index.html",
+      "description": "Go to the main page"
+    }
+  ],
+  "related_applications": [],
+  "scope": "/",
+  "serviceworker": {
+    "src": "/serviceworker.js",
+    "scope": "/"
+  }
 }
