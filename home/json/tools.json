@@ -61,5 +61,12 @@
         "url": "/tool/text-edit.html",
         "description": "Simple Text Editor is a user-friendly web-based text editor that allows you to create and edit text with a variety of fonts. Choose from a diverse selection of typefaces to customize your text to suit your needs.",
         "date": "2024-07-09"
+    },
+    {
+        "title": "Text to Speech",
+        "subtitle": "tools",
+        "url": "/tool/text-to-speech.html",
+        "description": "Text to Speech allows users to convert text into spoken words, with adjustable playback speed. Utilize the intuitive controls to play, pause, and stop speech synthesis, ensuring a seamless experience.",
+        "date": "2024-07-11"
     }
 ]
