@@ -4,7 +4,7 @@
   "description": "A sleek app for Ankur's needs",
   "start_url": "/home/index.html",
   "display": "standalone",
-  "background_color": "#2f517a",
+  "background_color": "#000000",
   "theme_color": "#3a2f7a",
   "orientation": "portrait",
   "prefer_related_applications": false,
