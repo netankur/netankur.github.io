@@ -31,7 +31,7 @@
   "related_applications": [],
   "scope": "/",
   "serviceworker": {
-    "src": "/serviceworker.js",
+    "src": "/service-worker.js",
     "scope": "/"
   }
 }
