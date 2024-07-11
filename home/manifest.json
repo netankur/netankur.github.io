@@ -29,9 +29,9 @@
     }
   ],
   "related_applications": [],
-  "scope": "/",
+  "scope": "/home",
   "serviceworker": {
-    "src": "/service-worker.js",
-    "scope": "/"
+    "src": "/home/service-worker.js",
+    "scope": "/home"
   }
 }
