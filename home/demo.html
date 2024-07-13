@@ -1,177 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="Ankurdxx: Your go-to destination for a wide range of web development tools and features. Explore our collection of tools designed to simplify your web development workflow." />
-    <meta name="author" content="Ankurdxx" />
-    <meta name="keywords" content="Ankur, Ankurdxx, ANKURDXX, Ankurd, Ankurdas">
-    <title>Ankur</title>
-    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
-    <!-- Font Awesome icons (free version)-->
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Google fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700" rel="stylesheet" type="text/css" />
-    <!-- Core theme CSS (includes Bootstrap)-->
-    <link href="css/styles.css" rel="stylesheet" />
-    <link rel="manifest" href="/home/manifest.json">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .navbar {
-            background-color: #1f1f1f;
-            border-bottom: 1px solid #333;
-        }
-        .nav-link {
-            color: #e0e0e0 !important;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #bb86fc;
-        }
-        .resume-section {
-            padding: 60px 0;
-        }
-        .resume-section-content {
-            background-color: #1f1f1f;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        h1, h2, h3 {
-            color: #bb86fc;
-        }
-        .lead {
-            color: #b0b0b0;
-        }
-        .social-icons .social-icon {
-            color: #bb86fc;
-            margin-right: 15px;
-        }
-        .list-inline-item i {
-            color: #bb86fc;
-        }
-        .fa-li i {
-            color: #bb86fc;
-        }
-        a {
-            color: #bb86fc;
-        }
-        a:hover {
-            color: #985eff;
-        }
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        hr {
-            border-color: #333;
-        }
-        .subheading {
-            color: #bb86fc;
-        }
-        .btn-primary {
-            background-color: #bb86fc;
-            border-color: #bb86fc;
-        }
-        .btn-primary:hover {
-            background-color: #985eff;
-            border-color: #985eff;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Data to JSON Endpoint</title>
 </head>
-<body id="page-top">
-    <!-- Navigation-->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="sideNav">
-        <a class="navbar-brand js-scroll-trigger" href="#page-top">ANKUR</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#project">Tools</a></li>
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">About</a></li>
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="/home/contact.html">Contact</a></li>
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#" id="installButton">Install App</a></li>
-            </ul>
-        </div>
-    </nav>
-    <!-- Page Content-->
-    <div class="container-fluid p-0">
-        <!-- About-->
-        <section class="resume-section" id="about">
-            <div class="resume-section-content">
-                <h1 class="mb-0">A<span class="text-primary">NKUR</span></h1>
-                <div class="subheading mb-5">
-                    <a href="#about">Welcome to My Site</a>
-                </div>
-                <p class="lead mb-5">Hi, I'm Ankur, the creator of this site. I love building tools and projects that make everyday life easier. My goal is to offer practical solutions for your day-to-day tasks. Thanks for visiting!</p>
-                <div class="social-icons">
-                    <a class="social-icon" href="#!"><i class="fab fa-github"></i></a>
-                    <a class="social-icon" href="#!"><i class="fab fa-twitter"></i></a>
-                    <a class="social-icon" href="#!"><i class="fab fa-facebook-f"></i></a>
-                </div>
-            </div>
-        </section>
-        <hr class="m-0" />
-        <!-- Tools-->
-        <section class="resume-section" id="project">
-            <div id="tools-container" class="resume-section-content">
-                <h2 class="mb-5">Tools & Projects</h2>
-            </div>
-        </section>
-        <hr class="m-0" />
-        <!-- Skills-->
-        <section class="resume-section" id="program">
-            <div class="resume-section-content">
-                <h2 class="mb-5">Builds</h2>
-                <div class="subheading mb-3">Programming Languages</div>
-                <ul class="list-inline dev-icons">
-                    <li class="list-inline-item"><i class="fab fa-html5"></i></li>
-                    <li class="list-inline-item"><i class="fab fa-css3-alt"></i></li>
-                    <li class="list-inline-item"><i class="fab fa-js-square"></i></li>
-                </ul>
-                <div class="subheading mb-3">Workflow</div>
-                <ul class="fa-ul mb-0">
-                    <li>
-                        <span class="fa-li"><i class="fas fa-check"></i></span>
-                        Mobile-First, Responsive Design
-                    </li>
-                </ul>
-            </div>
-        </section>
-        <hr class="m-0" />
-        <!-- Interests-->
-        <section class="resume-section" id="about">
-            <div class="resume-section-content">
-                <h2 class="mb-5">About</h2>
-                <p>We provide a variety of tools and projects designed to simplify and enhance your day-to-day life. Whether you’re looking for productivity tools, creative projects, or resources to streamline your tasks, you’ll find everything you need right here.</p>
+<body>
+    <h2>Submit Data</h2>
+    <form id="dataForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="message">Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+        
+        <button type="submit">Submit</button>
+    </form>
 
-                <h3>What We Offer:</h3>
-                <ul>
-                    <li><strong>Innovative Tools:</strong> Discover our collection of user-friendly tools to help you stay organized, manage your time, and boost your productivity.</li>
-                    <li><strong>Creative Projects:</strong> Explore our library of creative projects that inspire imagination and help you bring your ideas to life.</li>
-                    <li><strong>Resourceful Guides:</strong> Learn from our guides and tutorials to make the most of our offerings and improve your skills.</li>
-                </ul>
+    <script>
+        // JavaScript to handle form submission
+        document.getElementById("dataForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-                <p>Our mission is to make your life easier and more enjoyable with our practical and innovative solutions. We continuously strive to expand our offerings to bring you the latest in technology and creative projects.</p>
+            // Get form data
+            var formData = new FormData(this);
 
-                <h3>Stay Updated:</h3>
-                <p>Don't miss out on new tools and projects! Subscribe to our newsletter to stay updated with the latest additions to our website.</p>
+            // Convert FormData to JSON object
+            var jsonObject = {};
+            formData.forEach(function(value, key) {
+                jsonObject[key] = value;
+            });
 
-                <h3>Connect with Us:</h3>
-                <p>We value your feedback and are always here to assist you. Feel free to reach out to us with any questions or suggestions. <a href="/contact.html">Contact!</a></p>
+            // Convert JSON object to string
+            var jsonData = JSON.stringify(jsonObject);
 
-                <p>Thank you for visiting! We hope you find our tools and projects helpful in your everyday life.</p>
-            </div>
-        </section>
-    </div>
-    <!-- Bootstrap core JS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="js/scripts.js"></script>
-    <script src="js/tools.js"></script>
-    <script src="/home/app.js"></script>
+            // Send data to server
+            fetch('https://netankur.github.io/home/data.json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Data submitted successfully!');
+                    document.getElementById("dataForm").reset(); // Reset form after successful submission
+                } else {
+                    alert('Failed to submit data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to submit data');
+            });
+        });
+    </script>
 </body>
 </html>
