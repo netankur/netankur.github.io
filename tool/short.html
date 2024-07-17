@@ -92,7 +92,7 @@
             // Make a POST request to create a short URL
             axios.post('https://crudcrud.com/api/1fec2a8d7c814042affd5ba2c8cb28e0/shorturls', { longUrl, shortUrlId })
                 .then(response => {
-                    let shortUrl = window.location.origin + '/short.html#' + shortUrlId;
+                    let shortUrl = window.location.origin + '/tool/short.html#' + shortUrlId;
                     document.getElementById('shortUrl').value = shortUrl;
                     document.getElementById('shortUrlOutput').style.display = 'block';
 
