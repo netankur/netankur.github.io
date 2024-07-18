@@ -9,8 +9,9 @@
     
     <style>
         body {
-            background-color: #2b2b2b;
+            background-color: #aaaaaa;
             color: #ffffff;
+            padding-bottom: 20px;
         }
         
         .form-group label {
@@ -204,6 +205,134 @@
         <button type="button" class="btn btn-primary" onclick="saveData()">Submit</button>
     </form>
 </div>
+
+<script>
+    let qualifications = [];
+    let otherQualifications = [];
+    let workExperiences = [];
+
+    function addQualification() {
+        const qualification = document.getElementById('qualification').value;
+        if (qualification) {
+            qualifications.push(qualification);
+            document.getElementById('qualification').value = '';
+            updateList('qualificationList', qualifications);
+        }
+    }
+
+    function addOtherQualification() {
+        const otherQualification = document.getElementById('otherQualification').value;
+        if (otherQualification) {
+            otherQualifications.push(otherQualification);
+            document.getElementById('otherQualification').value = '';
+            updateList('otherQualificationList', otherQualifications);
+        }
+    }
+
+    function addWorkExperience() {
+        const workExperience = document.getElementById('workExperience').value;
+        if (workExperience) {
+            workExperiences.push(workExperience);
+            document.getElementById('workExperience').value = '';
+            updateList('workExperienceList', workExperiences);
+        }
+    }
+
+    function removeQualification(index) {
+        qualifications.splice(index, 1);
+        updateList('qualificationList', qualifications);
+    }
+
+    function removeOtherQualification(index) {
+        otherQualifications.splice(index, 1);
+        updateList('otherQualificationList', otherQualifications);
+    }
+
+    function removeWorkExperience(index) {
+        workExperiences.splice(index, 1);
+        updateList('workExperienceList', workExperiences);
+    }
+
+    function updateList(listId, items) {
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            
+            // Add remove button
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove';
+            removeButton.className = 'btn btn-outline-danger btn-sm ml-2';
+            removeButton.onclick = function() {
+                if (listId === 'qualificationList') {
+                    removeQualification(index);
+                } else if (listId === 'otherQualificationList') {
+                    removeOtherQualification(index);
+                } else if (listId === 'workExperienceList') {
+                    removeWorkExperience(index);
+                }
+            };
+            
+            li.appendChild(removeButton);
+            list.appendChild(li);
+        });
+    }
+
+    function saveData() {
+        const userData = {
+            heading: document.getElementById('heading').value,
+            name: document.getElementById('name').value,
+            houseNo: document.getElementById('houseNo').value,
+            landmark: document.getElementById('landmark').value,
+            area: document.getElementById('area').value,
+            state: document.getElementById('state').value,
+            pincode: document.getElementById('pincode').value,
+            mobile: document.getElementById('mobile').value,
+            qualifications: qualifications,
+            otherQualifications: otherQualifications,
+            workExperiences: workExperiences,
+            careerObjective: document.getElementById('careerObjective').value,
+            declaration: document.getElementById('declaration').value,
+            gender: document.getElementById('gender').value,
+            fatherName: document.getElementById('fatherName').value,
+            email: document.getElementById('email').value,
+            dob: document.getElementById('dob').value,
+            language: document.getElementById('language').value,
+            nationality: document.getElementById('nationality').value,
+            maritalStatus: document.getElementById('maritalStatus').value,
+            passportImage: '', // Placeholder for image URL
+            signatureImage: '', // Placeholder for image URL
+        };
+
+        // Process and store passport image
+        const passportImageFile = document.getElementById('passportImage').files[0];
+        if (passportImageFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                userData.passportImage = event.target.result; // Set base64 data as image URL
+                localStorage.setItem('userData', JSON.stringify(userData));
+                window.open('display.html', '_blank');
+            };
+            reader.readAsDataURL(passportImageFile);
+        }
+
+        // Process and store signature image
+        const signatureImageFile = document.getElementById('signatureImage').files[0];
+        if (signatureImageFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                userData.signatureImage = event.target.result; // Set base64 data as image URL
+                localStorage.setItem('userData', JSON.stringify(userData));
+                window.open('display.html', '_blank');
+            };
+            reader.readAsDataURL(signatureImageFile);
+        } else {
+            localStorage.setItem('userData', JSON.stringify(userData));
+            window.open('display.html', '_blank');
+        }
+    }
+</script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
