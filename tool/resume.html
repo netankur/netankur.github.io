@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #2b2b2b;
+            color: #ffffff;
+        }
+        
+        .form-group label {
+            color: #ffffff;
+        }
+        
+        .form-control {
+            background-color: #444;
+            color: #ffffff;
+            border-color: #555;
+        }
+        
+        .form-control:focus {
+            background-color: #555;
+            border-color: #888;
+            color: #ffffff;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .btn-outline-secondary {
+            color: #ffffff;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            color: #ffffff;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-outline-danger:hover {
+            color: #ffffff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .input-group-text {
+            background-color: #444;
+            border-color: #555;
+            color: #ffffff;
+        }
+        
+        .input-group-text i {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Resume Builder</h2>
+    <form id="userForm">
+        <div class="form-group">
+            <label for="heading">Heading</label>
+            <input type="text" class="form-control" id="heading">
+        </div>
+        <div class="form-group">
+            <label for="name"><i class="fas fa-user"></i> Enter Your Name</label>
+            <input type="text" class="form-control" id="name">
+        </div>
+        <div class="form-group">
+            <label for="houseNo"><i class="fas fa-home"></i> House No.</label>
+            <input type="text" class="form-control" id="houseNo">
+        </div>
+        <div class="form-group">
+            <label for="landmark"><i class="fas fa-map-marker-alt"></i> Landmark / Near by / Gali no.</label>
+            <input type="text" class="form-control" id="landmark">
+        </div>
+        <div class="form-group">
+            <label for="area"><i class="fas fa-map"></i> Area / Locality</label>
+            <input type="text" class="form-control" id="area">
+        </div>
+        <div class="form-group">
+            <label for="state"><i class="fas fa-map-signs"></i> State / City</label>
+            <input type="text" class="form-control" id="state">
+        </div>
+        <div class="form-group">
+            <label for="pincode"><i class="fas fa-mail-bulk"></i> Pincode</label>
+            <input type="text" class="form-control" id="pincode">
+        </div>
+        <div class="form-group">
+            <label for="mobile"><i class="fas fa-phone"></i> Mobile No.</label>
+            <input type="tel" class="form-control" id="mobile">
+        </div>
+        
+        <div class="form-group">
+            <label for="qualification"><i class="fas fa-graduation-cap"></i> Academic Qualification</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="qualification" placeholder="Qualification">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="addQualification()">+</button>
+                </div>
+            </div>
+            <ul id="qualificationList"></ul>
+        </div>
+
+        <div class="form-group">
+            <label for="otherQualification"><i class="fas fa-user-graduate"></i> Other Qualification</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="otherQualification" placeholder="Other Qualification">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="addOtherQualification()">+</button>
+                </div>
+            </div>
+            <ul id="otherQualificationList"></ul>
+        </div>
+
+        <div class="form-group">
+            <label for="workExperience"><i class="fas fa-briefcase"></i> Work Experience</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="workExperience" placeholder="Work Experience">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="addWorkExperience()">+</button>
+                </div>
+            </div>
+            <ul id="workExperienceList"></ul>
+        </div>
+
+        <div class="form-group">
+            <label for="careerObjective"><i class="fas fa-bullseye"></i> Career Objective</label>
+            <input type="text" class="form-control" id="careerObjective">
+        </div>
+
+        <div class="form-group">
+            <label for="declaration"><i class="fas fa-signature"></i> Declaration</label>
+            <input type="text" class="form-control" id="declaration">
+        </div>
+
+        <div class="form-group">
+            <label for="passportImage"><i class="fas fa-passport"></i> Passport Image *</label>
+            <input type="file" class="form-control-file" id="passportImage" accept="image/*" required>
+        </div>
+
+        <div class="form-group">
+            <label for="signatureImage"><i class="fas fa-signature"></i> Signature Image *</label>
+            <input type="file" class="form-control-file" id="signatureImage" accept="image/*" required>
+        </div>
+
+        <div class="form-group">
+            <label for="gender"><i class="fas fa-venus-mars"></i> Gender</label>
+            <select class="form-control" id="gender">
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fatherName"><i class="fas fa-user-friends"></i> Father's Name</label>
+            <input type="text" class="form-control" id="fatherName">
+        </div>
+        <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email Id</label>
+            <input type="email" class="form-control" id="email">
+        </div>
+        <div class="form-group">
+            <label for="dob"><i class="fas fa-calendar-alt"></i> Date of Birth</label>
+            <input type="date" class="form-control" id="dob">
+        </div>
+        <div class="form-group">
+            <label for="language"><i class="fas fa-language"></i> Language known</label>
+            <input type="text" class="form-control" id="language">
+        </div>
+        <div class="form-group">
+            <label for="nationality"><i class="fas fa-flag"></i> Nationality</label>
+            <input type="text" class="form-control" id="nationality">
+        </div>
+        <div class="form-group">
+            <label for="maritalStatus"><i class="fas fa-heart"></i> Marital status</label>
+            <select class="form-control" id="maritalStatus">
+                <option value="" disabled selected>Select Marital Status</option>
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+                <option value="divorced">Divorced</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveData()">Submit</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
