@@ -312,7 +312,7 @@
             reader.onload = function(event) {
                 userData.passportImage = event.target.result; // Set base64 data as image URL
                 localStorage.setItem('userData', JSON.stringify(userData));
-                window.open('display.html', '_blank');
+                window.open('display-resume.html', '_blank');
             };
             reader.readAsDataURL(passportImageFile);
         }
