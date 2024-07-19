@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display User Data</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .user-image {
-            max-width: 200px;
-            height: auto;
-            margin-top: 10px;
-        }
-    </style>
+<style>
+  h1 {
+    text-align: center
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  h2 {
+    font-style: italic;
+    text-decoration: underline;
+    font-size: 20px;
+  }
+</style>
 </head>
 <body>
 
@@ -26,57 +34,70 @@
     const userData = JSON.parse(localStorage.getItem('userData'));
     if (userData) {
         const userDataDiv = document.getElementById('userData');
-        let htmlContent = `<h4>${userData.heading}</h4>`;
+        let htmlContent = `<h1>${userData.heading}</h1>`;
 
-        if (userData.name) htmlContent += `<p><strong>Name:</strong> ${userData.name}</p>`;
-        if (userData.houseNo) htmlContent += `<p><strong>House No:</strong> ${userData.houseNo}</p>`;
-        if (userData.landmark) htmlContent += `<p><strong>Landmark:</strong> ${userData.landmark}</p>`;
-        if (userData.area) htmlContent += `<p><strong>Area:</strong> ${userData.area}</p>`;
-        if (userData.state) htmlContent += `<p><strong>State/City:</strong> ${userData.state}</p>`;
-        if (userData.pincode) htmlContent += `<p><strong>Pincode:</strong> ${userData.pincode}</p>`;
-        if (userData.mobile) htmlContent += `<p><strong>Mobile No:</strong> ${userData.mobile}</p>`;
+        htmlContent += `<table><tr><td style="width: 90%;">`;
+
+        if (userData.name) htmlContent += `<h3>${userData.name}</h3><br>`;
+        if (userData.houseNo) htmlContent += `${userData.houseNo}, `;
+        if (userData.landmark) htmlContent += `${userData.landmark}<br>`;
+        if (userData.area) htmlContent += `${userData.area}<br>`;
+        if (userData.state) htmlContent += `${userData.state} - `;
+        if (userData.pincode) htmlContent += `${userData.pincode}<br>`;
+        if (userData.mobile) htmlContent += `Mobile No. - ${userData.mobile}<br>`;
+        if (userData.email) htmlContent += `Email Id - ${userData.email}`;
+        htmlContent += `</td>`;
+        if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image"></td>`;
+        htmlContent += `</tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+        if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
         
         // Display qualifications as bullet points
         if (userData.qualifications.length > 0) {
-            htmlContent += `<p><strong>Academic Qualifications:</strong></p>`;
+            htmlContent += `<tr><td colspan="2"><h2>Academic Qualifications</h2>`;
             htmlContent += `<ul>`;
             userData.qualifications.forEach(qualification => {
                 htmlContent += `<li>${qualification}</li>`;
             });
-            htmlContent += `</ul>`;
+            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
         }
 
         // Display other qualifications as bullet points
         if (userData.otherQualifications.length > 0) {
-            htmlContent += `<p><strong>Other Qualifications:</strong></p>`;
+            htmlContent += `<tr><td colspan="2"><h2>Other Qualifications</h2>`;
             htmlContent += `<ul>`;
             userData.otherQualifications.forEach(otherQualification => {
                 htmlContent += `<li>${otherQualification}</li>`;
             });
-            htmlContent += `</ul>`;
+            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
         }
 
         // Display work experiences as bullet points
         if (userData.workExperiences.length > 0) {
-            htmlContent += `<p><strong>Work Experience:</strong></p>`;
+            htmlContent += `<tr><td colspan="2"><h2>Work Experience</h2>`;
             htmlContent += `<ul>`;
             userData.workExperiences.forEach(workExperience => {
                 htmlContent += `<li>${workExperience}</li>`;
             });
-            htmlContent += `</ul>`;
+            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr></table>`;
         }
 
-        if (userData.careerObjective) htmlContent += `<p><strong>Career Objective:</strong> ${userData.careerObjective}</p>`;
-        if (userData.declaration) htmlContent += `<p><strong>Declaration:</strong> ${userData.declaration}</p>`;
-        if (userData.gender) htmlContent += `<p><strong>Gender:</strong> ${userData.gender}</p>`;
-        if (userData.fatherName) htmlContent += `<p><strong>Father's Name:</strong> ${userData.fatherName}</p>`;
-        if (userData.email) htmlContent += `<p><strong>Email Id:</strong> ${userData.email}</p>`;
-        if (userData.dob) htmlContent += `<p><strong>Date of Birth:</strong> ${formatDate(userData.dob)}</p>`;
-        if (userData.language) htmlContent += `<p><strong>Languages Known:</strong> ${userData.language}</p>`;
-        if (userData.nationality) htmlContent += `<p><strong>Nationality:</strong> ${userData.nationality}</p>`;
-        if (userData.maritalStatus) htmlContent += `<p><strong>Marital Status:</strong> ${userData.maritalStatus}</p>`;
-        if (userData.passportImage) htmlContent += `<p><strong>Passport Image:</strong><br><img src="${userData.passportImage}" class="user-image"></p>`;
-        if (userData.signatureImage) htmlContent += `<p><strong>Signature Image:</strong><br><img src="${userData.signatureImage}" class="user-image"></p>`;
+        if (userData.gender) htmlContent += `<table><tr><td colspan="2"><h2>Personal Information</h2></td></tr>`;
+
+        if (userData.fatherName) htmlContent += `<tr><td style="width: 25%;">Father's Name</td><td>: ${userData.fatherName}</td></tr>`;
+        if (userData.motherName) htmlContent += `<tr><td style="width: 25%;">Mother's Name</td><td>: ${userData.motherName}</td></tr>`;
+        if (userData.gender) htmlContent += `<tr><td style="width: 25%;">Gender</td><td>: ${userData.gender}</td></tr>`;
+        if (userData.dob) htmlContent += `<tr><td style="width: 25%;">Date of Birth</td><td>: ${formatDate(userData.dob)}</td></tr>`;
+        if (userData.language) htmlContent += `<tr><td style="width: 25%;">Languages Known:</td><td>: ${userData.language}</td></tr>`;
+        if (userData.nationality) htmlContent += `<tr><td style="width: 25%;">Nationality</td><td>: ${userData.nationality}</td></tr>`;
+        if (userData.maritalStatus) htmlContent += `<tr><td style="width: 25%;">Marital Status</td><td>: ${userData.maritalStatus}</td></tr>`;
+        htmlContent += `<tr style="height:10px;"><td colspan="2"></td></tr></table>`;
+        htmlContent += `<table>`;
+
+        if (userData.declaration) htmlContent += `<tr><td colspan="2"><h2>Declaration</h2>${userData.declaration}</p></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+        if (userData.state) htmlContent += `<tr><td style="width: 90%;">Date :<br>Place :${userData.state}</td>`;
+
+        if (userData.signatureImage) htmlContent += `<td><img src="${userData.signatureImage}" class="user-image"></td></tr>`;
+        htmlContent += `</table>`;
 
         userDataDiv.innerHTML = htmlContent;
     } else {
