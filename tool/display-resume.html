@@ -55,40 +55,24 @@
                          <ul>${userData.workExperiences.map(workExperience => `<li>${workExperience}</li>`).join('')}</ul>`;
             }
 
-            // Render remaining sections if they are not blank
-            if (userData.careerObjective) {
-                html += `<p><strong>Career Objective:</strong> ${userData.careerObjective}</p>`;
+            // Render other fields if they are not blank
+            function renderField(label, value) {
+                if (value) {
+                    html += `<p><strong>${label}:</strong> ${value}</p>`;
+                }
             }
-            if (userData.declaration) {
-                html += `<p><strong>Declaration:</strong> ${userData.declaration}</p>`;
-            }
-            if (userData.gender) {
-                html += `<p><strong>Gender:</strong> ${userData.gender}</p>`;
-            }
-            if (userData.fatherName) {
-                html += `<p><strong>Father's Name:</strong> ${userData.fatherName}</p>`;
-            }
-            if (userData.email) {
-                html += `<p><strong>Email Id:</strong> ${userData.email}</p>`;
-            }
-            if (userData.dob) {
-                html += `<p><strong>Date of Birth:</strong> ${formatDate(userData.dob)}</p>`;
-            }
-            if (userData.language) {
-                html += `<p><strong>Languages Known:</strong> ${userData.language}</p>`;
-            }
-            if (userData.nationality) {
-                html += `<p><strong>Nationality:</strong> ${userData.nationality}</p>`;
-            }
-            if (userData.maritalStatus) {
-                html += `<p><strong>Marital Status:</strong> ${userData.maritalStatus}</p>`;
-            }
-            if (userData.passportImage) {
-                html += `<p><strong>Passport Image:</strong><br><img src="${userData.passportImage}" class="user-image"></p>`;
-            }
-            if (userData.signatureImage) {
-                html += `<p><strong>Signature Image:</strong><br><img src="${userData.signatureImage}" class="user-image"></p>`;
-            }
+
+            renderField("Career Objective", userData.careerObjective);
+            renderField("Declaration", userData.declaration);
+            renderField("Gender", userData.gender);
+            renderField("Father's Name", userData.fatherName);
+            renderField("Email Id", userData.email);
+            renderField("Date of Birth", formatDate(userData.dob));
+            renderField("Languages Known", userData.language);
+            renderField("Nationality", userData.nationality);
+            renderField("Marital Status", userData.maritalStatus);
+            renderField("Passport Image", `<img src="${userData.passportImage}" class="user-image">`);
+            renderField("Signature Image", `<img src="${userData.signatureImage}" class="user-image">`);
 
             userDataDiv.innerHTML = html;
         } else {
@@ -97,6 +81,7 @@
     };
 
     function formatDate(dateString) {
+        if (!dateString) return '';
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
