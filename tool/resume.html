@@ -333,6 +333,44 @@
         }
     }
 </script>
+<script>
+    // Check if there is stored user data
+    const storedUserData = localStorage.getItem('userData');
+    if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        
+        // Populate form fields with stored data
+        document.getElementById('heading').value = userData.heading;
+        document.getElementById('name').value = userData.name;
+        document.getElementById('houseNo').value = userData.houseNo;
+        document.getElementById('landmark').value = userData.landmark;
+        document.getElementById('area').value = userData.area;
+        document.getElementById('state').value = userData.state;
+        document.getElementById('pincode').value = userData.pincode;
+        document.getElementById('mobile').value = userData.mobile;
+        document.getElementById('careerObjective').value = userData.careerObjective;
+        document.getElementById('declaration').value = userData.declaration;
+        document.getElementById('gender').value = userData.gender;
+        document.getElementById('fatherName').value = userData.fatherName;
+        document.getElementById('email').value = userData.email;
+        document.getElementById('dob').value = userData.dob;
+        document.getElementById('language').value = userData.language;
+        document.getElementById('nationality').value = userData.nationality;
+        document.getElementById('maritalStatus').value = userData.maritalStatus;
+
+        // Populate dynamic lists (qualifications, otherQualifications, workExperiences)
+        qualifications = userData.qualifications || [];
+        otherQualifications = userData.otherQualifications || [];
+        workExperiences = userData.workExperiences || [];
+        updateList('qualificationList', qualifications);
+        updateList('otherQualificationList', otherQualifications);
+        updateList('workExperienceList', workExperiences);
+
+        // Optionally, handle image display
+        // Assuming you have a display function in display.html to show resume data
+        // You can add logic here to handle the images if needed
+    }
+</script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
