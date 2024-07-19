@@ -178,6 +178,10 @@
             <input type="text" class="form-control" id="fatherName">
         </div>
         <div class="form-group">
+            <label for="motherName"><i class="fas fa-user-friends"></i> Mother's Name</label>
+            <input type="text" class="form-control" id="motherName">
+        </div>
+        <div class="form-group">
             <label for="email"><i class="fas fa-envelope"></i> Email Id</label>
             <input type="email" class="form-control" id="email">
         </div>
@@ -296,6 +300,7 @@
             declaration: document.getElementById('declaration').value,
             gender: document.getElementById('gender').value,
             fatherName: document.getElementById('fatherName').value,
+            motherName: document.getElementById('motherName').value,
             email: document.getElementById('email').value,
             dob: document.getElementById('dob').value,
             language: document.getElementById('language').value,
@@ -352,6 +357,7 @@
         document.getElementById('declaration').value = userData.declaration;
         document.getElementById('gender').value = userData.gender;
         document.getElementById('fatherName').value = userData.fatherName;
+        document.getElementById('motherName').value = userData.motherName;
         document.getElementById('email').value = userData.email;
         document.getElementById('dob').value = userData.dob;
         document.getElementById('language').value = userData.language;
