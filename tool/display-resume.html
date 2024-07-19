@@ -38,7 +38,7 @@
         if (userData.mobile) htmlContent += `Mobile No. - ${userData.mobile}<br>`;
         if (userData.email) htmlContent += `Email Id - ${userData.email}`;
         htmlContent += `</td>`;
-        if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image"></td>`;
+        if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image" width="130" height="100"></td>`;
         htmlContent += `</tr>`;//
         if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr>`;//
         
@@ -87,7 +87,7 @@
         if (userData.declaration) htmlContent += `<tr><td colspan="2"><h2>Declaration</h2>${userData.declaration}</p></td></tr>`;//
         if (userData.state) htmlContent += `<tr><td style="width: 90%;">Date :<br>Place :${userData.state}</td>`;
 
-        if (userData.signatureImage) htmlContent += `<td><img src="${userData.signatureImage}" class="user-image"></td></tr>`;
+        if (userData.signatureImage) htmlContent += `<td><img src="${userData.signatureImage}" class="user-image" width="110" height="50"></td></tr>`;
         htmlContent += `</table>`;
 
         userDataDiv.innerHTML = htmlContent;
