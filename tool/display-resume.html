@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display User Data</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Resume</title>
 <style>
   h1 {
     text-align: center
@@ -22,13 +20,6 @@
 </style>
 </head>
 <body>
-
-<div class="container mt-5">
-    <h2>User Information</h2>
-    <div id="userData"></div>
-    <a href="resume.html" class="btn btn-primary mt-4">Back to Form</a>
-</div>
-
 <script>
     window.onload = function() {
     const userData = JSON.parse(localStorage.getItem('userData'));
@@ -113,9 +104,5 @@ function formatDate(dateString) {
     return `${day}/${month}/${year}`;
 }
 </script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
