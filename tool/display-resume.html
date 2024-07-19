@@ -85,7 +85,7 @@ printButton.addEventListener('click', printPage);
         htmlContent += `</td>`;
         if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image" width="100" height="130"></td>`;
         htmlContent += `</tr>`;//
-        if (userData.careerObjective) htmlContent += `<hr><tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr>`;//
+        if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr>`;//
         
         // Display qualifications as bullet points
         if (userData.qualifications.length > 0) {
