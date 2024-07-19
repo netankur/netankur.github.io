@@ -23,73 +23,75 @@
 
 <script>
     window.onload = function() {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if (userData) {
-            const userDataDiv = document.getElementById('userData');
-            let html = `
-                <h4>${userData.heading}</h4>
-                <p><strong>Name:</strong> ${userData.name}</p>
-                <p><strong>House No:</strong> ${userData.houseNo}</p>
-                <p><strong>Landmark:</strong> ${userData.landmark}</p>
-                <p><strong>Area:</strong> ${userData.area}</p>
-                <p><strong>State/City:</strong> ${userData.state}</p>
-                <p><strong>Pincode:</strong> ${userData.pincode}</p>
-                <p><strong>Mobile No:</strong> ${userData.mobile}</p>
-            `;
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (userData) {
+        const userDataDiv = document.getElementById('userData');
+        let htmlContent = `<h4>${userData.heading}</h4>`;
 
-            // Render qualifications if exists
-            if (userData.qualifications && userData.qualifications.length > 0) {
-                html += `<p><strong>Academic Qualifications:</strong></p>
-                         <ul>${userData.qualifications.map(qualification => `<li>${qualification}</li>`).join('')}</ul>`;
-            }
-
-            // Render other qualifications if exists
-            if (userData.otherQualifications && userData.otherQualifications.length > 0) {
-                html += `<p><strong>Other Qualifications:</strong></p>
-                         <ul>${userData.otherQualifications.map(otherQualification => `<li>${otherQualification}</li>`).join('')}</ul>`;
-            }
-
-            // Render work experiences if exists
-            if (userData.workExperiences && userData.workExperiences.length > 0) {
-                html += `<p><strong>Work Experience:</strong></p>
-                         <ul>${userData.workExperiences.map(workExperience => `<li>${workExperience}</li>`).join('')}</ul>`;
-            }
-
-            // Render other fields if they are not blank
-            function renderField(label, value) {
-                if (value) {
-                    html += `<p><strong>${label}:</strong> ${value}</p>`;
-                }
-            }
-
-            renderField("Career Objective", userData.careerObjective);
-            renderField("Declaration", userData.declaration);
-            renderField("Gender", userData.gender);
-            renderField("Father's Name", userData.fatherName);
-            renderField("Email Id", userData.email);
-            renderField("Date of Birth", formatDate(userData.dob));
-            renderField("Languages Known", userData.language);
-            renderField("Nationality", userData.nationality);
-            renderField("Marital Status", userData.maritalStatus);
-            renderField("Passport Image", `<img src="${userData.passportImage}" class="user-image">`);
-            renderField("Signature Image", `<img src="${userData.signatureImage}" class="user-image">`);
-
-            userDataDiv.innerHTML = html;
-        } else {
-            document.getElementById('userData').innerText = 'No data found!';
+        if (userData.name) htmlContent += `<p><strong>Name:</strong> ${userData.name}</p>`;
+        if (userData.houseNo) htmlContent += `<p><strong>House No:</strong> ${userData.houseNo}</p>`;
+        if (userData.landmark) htmlContent += `<p><strong>Landmark:</strong> ${userData.landmark}</p>`;
+        if (userData.area) htmlContent += `<p><strong>Area:</strong> ${userData.area}</p>`;
+        if (userData.state) htmlContent += `<p><strong>State/City:</strong> ${userData.state}</p>`;
+        if (userData.pincode) htmlContent += `<p><strong>Pincode:</strong> ${userData.pincode}</p>`;
+        if (userData.mobile) htmlContent += `<p><strong>Mobile No:</strong> ${userData.mobile}</p>`;
+        
+        // Display qualifications as bullet points
+        if (userData.qualifications.length > 0) {
+            htmlContent += `<p><strong>Academic Qualifications:</strong></p>`;
+            htmlContent += `<ul>`;
+            userData.qualifications.forEach(qualification => {
+                htmlContent += `<li>${qualification}</li>`;
+            });
+            htmlContent += `</ul>`;
         }
-    };
 
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
+        // Display other qualifications as bullet points
+        if (userData.otherQualifications.length > 0) {
+            htmlContent += `<p><strong>Other Qualifications:</strong></p>`;
+            htmlContent += `<ul>`;
+            userData.otherQualifications.forEach(otherQualification => {
+                htmlContent += `<li>${otherQualification}</li>`;
+            });
+            htmlContent += `</ul>`;
+        }
+
+        // Display work experiences as bullet points
+        if (userData.workExperiences.length > 0) {
+            htmlContent += `<p><strong>Work Experience:</strong></p>`;
+            htmlContent += `<ul>`;
+            userData.workExperiences.forEach(workExperience => {
+                htmlContent += `<li>${workExperience}</li>`;
+            });
+            htmlContent += `</ul>`;
+        }
+
+        if (userData.careerObjective) htmlContent += `<p><strong>Career Objective:</strong> ${userData.careerObjective}</p>`;
+        if (userData.declaration) htmlContent += `<p><strong>Declaration:</strong> ${userData.declaration}</p>`;
+        if (userData.gender) htmlContent += `<p><strong>Gender:</strong> ${userData.gender}</p>`;
+        if (userData.fatherName) htmlContent += `<p><strong>Father's Name:</strong> ${userData.fatherName}</p>`;
+        if (userData.email) htmlContent += `<p><strong>Email Id:</strong> ${userData.email}</p>`;
+        if (userData.dob) htmlContent += `<p><strong>Date of Birth:</strong> ${formatDate(userData.dob)}</p>`;
+        if (userData.language) htmlContent += `<p><strong>Languages Known:</strong> ${userData.language}</p>`;
+        if (userData.nationality) htmlContent += `<p><strong>Nationality:</strong> ${userData.nationality}</p>`;
+        if (userData.maritalStatus) htmlContent += `<p><strong>Marital Status:</strong> ${userData.maritalStatus}</p>`;
+        if (userData.passportImage) htmlContent += `<p><strong>Passport Image:</strong><br><img src="${userData.passportImage}" class="user-image"></p>`;
+        if (userData.signatureImage) htmlContent += `<p><strong>Signature Image:</strong><br><img src="${userData.signatureImage}" class="user-image"></p>`;
+
+        userDataDiv.innerHTML = htmlContent;
+    } else {
+        document.getElementById('userData').innerText = 'No data found!';
     }
-</script>
+};
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+</script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
