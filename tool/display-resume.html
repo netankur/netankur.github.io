@@ -39,8 +39,8 @@
         if (userData.email) htmlContent += `Email Id - ${userData.email}`;
         htmlContent += `</td>`;
         if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image"></td>`;
-        htmlContent += `</tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
-        if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+        htmlContent += `</tr>`;//
+        if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr>`;//
         
         // Display qualifications as bullet points
         if (userData.qualifications.length > 0) {
@@ -49,7 +49,7 @@
             userData.qualifications.forEach(qualification => {
                 htmlContent += `<li>${qualification}</li>`;
             });
-            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+            htmlContent += `</ul></td></tr>`;//
         }
 
         // Display other qualifications as bullet points
@@ -59,7 +59,7 @@
             userData.otherQualifications.forEach(otherQualification => {
                 htmlContent += `<li>${otherQualification}</li>`;
             });
-            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+            htmlContent += `</ul></td></tr>`;//
         }
 
         // Display work experiences as bullet points
@@ -69,7 +69,7 @@
             userData.workExperiences.forEach(workExperience => {
                 htmlContent += `<li>${workExperience}</li>`;
             });
-            htmlContent += `</ul></td></tr><tr style="height:10px;"><td colspan="2"></td></tr></table>`;
+            htmlContent += `</ul></td></tr></table>`;//
         }
 
         if (userData.gender) htmlContent += `<table><tr><td colspan="2"><h2>Personal Information</h2></td></tr>`;
@@ -81,10 +81,10 @@
         if (userData.language) htmlContent += `<tr><td style="width: 25%;">Languages Known:</td><td>: ${userData.language}</td></tr>`;
         if (userData.nationality) htmlContent += `<tr><td style="width: 25%;">Nationality</td><td>: ${userData.nationality}</td></tr>`;
         if (userData.maritalStatus) htmlContent += `<tr><td style="width: 25%;">Marital Status</td><td>: ${userData.maritalStatus}</td></tr>`;
-        htmlContent += `<tr style="height:10px;"><td colspan="2"></td></tr></table>`;
+        htmlContent += `</table>`;//
         htmlContent += `<table>`;
 
-        if (userData.declaration) htmlContent += `<tr><td colspan="2"><h2>Declaration</h2>${userData.declaration}</p></td></tr><tr style="height:10px;"><td colspan="2"></td></tr>`;
+        if (userData.declaration) htmlContent += `<tr><td colspan="2"><h2>Declaration</h2>${userData.declaration}</p></td></tr>`;//
         if (userData.state) htmlContent += `<tr><td style="width: 90%;">Date :<br>Place :${userData.state}</td>`;
 
         if (userData.signatureImage) htmlContent += `<td><img src="${userData.signatureImage}" class="user-image"></td></tr>`;
