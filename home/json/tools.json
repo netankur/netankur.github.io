@@ -1,5 +1,12 @@
 [
     {
+        "title": "Resume Builder",
+        "subtitle": "tools",
+        "url": "/tool/resume.html",
+        "description": "Your streamlined solution for crafting a polished and comprehensive resume document. It simplifies the process by guiding you through inputting essential details like personal information, academic background, work experience, and other pertinent information into a user-friendly interface.",
+        "date": "2024-07-19"
+    },
+    {
         "title": "Image Resizer",
         "subtitle": "tools",
         "url": "/tool/image-resize.html",
