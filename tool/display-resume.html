@@ -27,7 +27,44 @@
 </style>
 </head>
 <body>
-<div id="userData"></div>
+<div id="userData" contenteditable="false"></div>
+<button id="toggleButton">Toggle Editable</button>
+<button id="printButton">Print Page</button>
+<script>
+// Get references to the div and buttons
+const userDataDiv = document.getElementById('userData');
+const toggleButton = document.getElementById('toggleButton');
+const printButton = document.getElementById('printButton');
+
+// Initial state
+let isEditable = false;
+
+// Function to toggle contenteditable attribute
+function toggleEditable() {
+  isEditable = !isEditable; // Toggle the state
+
+  userDataDiv.contentEditable = isEditable; // Set contenteditable attribute based on state
+
+  if (isEditable) {
+    toggleButton.textContent = 'Disable Editing'; // Change button text based on state
+  } else {
+    toggleButton.textContent = 'Enable Editing';
+  }
+}
+
+// Function to print the entire page
+function printPage() {
+  window.print(); // Print the page
+
+  // Hide both buttons after printing
+  toggleButton.style.display = 'none';
+  printButton.style.display = 'none';
+}
+
+// Event listeners for button clicks
+toggleButton.addEventListener('click', toggleEditable);
+printButton.addEventListener('click', printPage);
+</script>
 <script>
     window.onload = function() {
     const userData = JSON.parse(localStorage.getItem('userData'));
