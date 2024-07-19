@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display User Data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .user-image {
+            max-width: 200px;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>User Information</h2>
+    <div id="userData"></div>
+    <a href="resume.html" class="btn btn-primary mt-4">Back to Form</a>
+</div>
+
+<script>
+    window.onload = function() {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    if (userData) {
+        const userDataDiv = document.getElementById('userData');
+        let htmlContent = `<h4>${userData.heading}</h4>`;
+
+        // Function to format array items into bullet points
+        function formatList(items) {
+            if (!items || items.length === 0) {
+                return 'Not specified';
+            }
+            return `<ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        }
+
+        // Append sections conditionally if data exists
+        if (userData.name) htmlContent += `<p><strong>Name:</strong> ${userData.name}</p>`;
+        if (userData.houseNo) htmlContent += `<p><strong>House No:</strong> ${userData.houseNo}</p>`;
+        if (userData.landmark) htmlContent += `<p><strong>Landmark:</strong> ${userData.landmark}</p>`;
+        if (userData.area) htmlContent += `<p><strong>Area:</strong> ${userData.area}</p>`;
+        if (userData.state) htmlContent += `<p><strong>State/City:</strong> ${userData.state}</p>`;
+        if (userData.pincode) htmlContent += `<p><strong>Pincode:</strong> ${userData.pincode}</p>`;
+        if (userData.mobile) htmlContent += `<p><strong>Mobile No:</strong> ${userData.mobile}</p>`;
+        if (userData.qualifications) htmlContent += `<p><strong>Academic Qualifications:</strong> ${formatList(userData.qualifications)}</p>`;
+        if (userData.otherQualifications) htmlContent += `<p><strong>Other Qualifications:</strong> ${formatList(userData.otherQualifications)}</p>`;
+        if (userData.workExperiences) htmlContent += `<p><strong>Work Experience:</strong> ${formatList(userData.workExperiences)}</p>`;
+        if (userData.careerObjective) htmlContent += `<p><strong>Career Objective:</strong> ${userData.careerObjective}</p>`;
+        if (userData.declaration) htmlContent += `<p><strong>Declaration:</strong> ${userData.declaration}</p>`;
+        if (userData.gender) htmlContent += `<p><strong>Gender:</strong> ${userData.gender}</p>`;
+        if (userData.fatherName) htmlContent += `<p><strong>Father's Name:</strong> ${userData.fatherName}</p>`;
+        if (userData.email) htmlContent += `<p><strong>Email Id:</strong> ${userData.email}</p>`;
+        if (userData.dob) htmlContent += `<p><strong>Date of Birth:</strong> ${formatDate(userData.dob)}</p>`;
+        if (userData.language) htmlContent += `<p><strong>Languages Known:</strong> ${userData.language}</p>`;
+        if (userData.nationality) htmlContent += `<p><strong>Nationality:</strong> ${userData.nationality}</p>`;
+        if (userData.maritalStatus) htmlContent += `<p><strong>Marital Status:</strong> ${userData.maritalStatus}</p>`;
+        if (userData.passportImage) htmlContent += `<p><strong>Passport Image:</strong><br><img src="${userData.passportImage}" class="user-image"></p>`;
+        if (userData.signatureImage) htmlContent += `<p><strong>Signature Image:</strong><br><img src="${userData.signatureImage}" class="user-image"></p>`;
+
+        userDataDiv.innerHTML = htmlContent;
+    } else {
+        document.getElementById('userData').innerText = 'No data found!';
+    }
+};
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
