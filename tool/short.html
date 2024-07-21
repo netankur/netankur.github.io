@@ -23,7 +23,7 @@
         </div>
         <div id="redirectInfo" class="text-center" style="display:none;">
             <h2>Redirecting...</h2>
-            <p>You will be redirected shortly.</p>
+            <p id="redirectMessage">You will be redirected shortly.</p>
         </div>
     </div>
 
@@ -35,6 +35,39 @@
             const shortenedUrlContainer = document.getElementById('shortenedUrlContainer');
             const shortenedUrlAnchor = document.getElementById('shortenedUrl');
             const redirectInfo = document.getElementById('redirectInfo');
+            const redirectMessage = document.getElementById('redirectMessage');
+
+            // Check if there is a hash in the URL indicating a unique ID
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1); // Get unique ID from URL hash
+                const apiUrl = `https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/url`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data[id]) {
+                            redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in 5 seconds...`;
+                            redirectInfo.style.display = 'block';
+                            setTimeout(function() {
+                                window.location.href = data[id];
+                            }, 5000); // Redirect after 5 seconds
+                        } else {
+                            redirectMessage.textContent = 'URL not found. Redirecting to homepage in 5 seconds...';
+                            redirectInfo.style.display = 'block';
+                            setTimeout(function() {
+                                window.location.href = 'https://example.com'; // Replace with your homepage URL
+                            }, 5000); // Redirect after 5 seconds
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        redirectMessage.textContent = 'Error fetching data. Redirecting to homepage in 5 seconds...';
+                        redirectInfo.style.display = 'block';
+                        setTimeout(function() {
+                            window.location.href = 'https://example.com'; // Replace with your homepage URL
+                        }, 5000); // Redirect after 5 seconds
+                    });
+            }
 
             buttonShorten.addEventListener('click', function() {
                 const originalUrl = originalUrlInput.value.trim();
