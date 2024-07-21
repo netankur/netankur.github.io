@@ -8,27 +8,79 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS for Dark Mode -->
     <style>
-        /* Optional: CSS to hide form section during redirection */
-        .form-section {
-            display: block; /* Adjust as needed */
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        .input-group-append button {
+            border-color: #4CAF50;
+            background-color: #4CAF50;
+        }
+
+        .input-group-append button:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+
+        .form-control {
+            background-color: #333;
+            color: #fff;
+            border-color: #333;
+        }
+
+        .form-control:focus {
+            background-color: #444;
+            border-color: #4CAF50;
+            color: #fff;
+        }
+
+        .alert-success {
+            background-color: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
         }
 
         .redirecting-section {
-            display: none; /* Hidden by default */
+            display: none; /* Initially hidden */
+        }
+
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            animation: countdown 1s linear infinite;
+        }
+
+        @keyframes countdown {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">URL Shortener</h1>
-
         <!-- Form Section -->
         <div class="form-section">
+        <h1 class="mb-4">URL Shortener</h1>
+
             <div class="input-group mb-3">
                 <input type="text" id="originalUrl" class="form-control" placeholder="Enter your URL" aria-label="URL to shorten" aria-describedby="button-shorten">
                 <div class="input-group-append">
-                    <button class="btn btn-primary" type="button" id="button-shorten">Shorten</button>
+                    <button class="btn btn-primary" type="button" id="button-shorten"><i class="fas fa-link"></i> Shorten</button>
                 </div>
             </div>
             <div class="alert alert-success" id="shortenedUrlContainer" style="display:none;">
@@ -40,6 +92,7 @@
         <div id="redirectInfo" class="text-center redirecting-section">
             <h2>Redirecting...</h2>
             <p id="redirectMessage">You will be redirected shortly.</p>
+            <div class="countdown" id="countdown"></div>
         </div>
     </div>
 
@@ -52,6 +105,7 @@
             const shortenedUrlAnchor = document.getElementById('shortenedUrl');
             const redirectInfo = document.getElementById('redirectInfo');
             const redirectMessage = document.getElementById('redirectMessage');
+            const countdown = document.getElementById('countdown');
 
             // Check if there is a hash in the URL indicating a unique ID
             if (window.location.hash) {
@@ -62,29 +116,23 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data[id]) {
-                            redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in 5 seconds...`;
+                            redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in <span id="countdownText">5</span> seconds...`;
                             redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
-                            setTimeout(function() {
-                                window.location.href = data[id];
-                            }, 5000); // Redirect after 5 seconds
+                            startCountdown(5, data[id]);
                         } else {
-                            redirectMessage.textContent = 'URL not found. Redirecting to homepage in 5 seconds...';
+                            redirectMessage.textContent = 'URL not found. Redirecting to homepage in <span id="countdownText">5</span> seconds...';
                             redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
-                            setTimeout(function() {
-                                window.location.href = 'https://example.com'; // Replace with your homepage URL
-                            }, 5000); // Redirect after 5 seconds
+                            startCountdown(5, 'https://netankur.github.io/tool/short.html'); // Replace with your homepage URL
                         }
                     })
                     .catch(error => {
                         console.error('Error fetching data:', error);
-                        redirectMessage.textContent = 'Error fetching data. Redirecting to homepage in 5 seconds...';
+                        redirectMessage.textContent = 'Error fetching data. Redirecting to homepage in <span id="countdownText">5</span> seconds...';
                         redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                         redirectInfo.style.display = 'block';
-                        setTimeout(function() {
-                            window.location.href = 'https://example.com'; // Replace with your homepage URL
-                        }, 5000); // Redirect after 5 seconds
+                        startCountdown(5, 'https://netankur.github.io/tool/short.html'); // Replace with your homepage URL
                     });
 
                 // Hide form section during redirection
@@ -148,6 +196,20 @@
                     },
                     body: JSON.stringify(data)
                 });
+            }
+
+            function startCountdown(seconds, redirectUrl) {
+                let timer = seconds;
+                countdown.textContent = timer;
+
+                const interval = setInterval(() => {
+                    timer--;
+                    countdown.textContent = timer;
+                    if (timer <= 0) {
+                        clearInterval(interval);
+                        window.location.href = redirectUrl;
+                    }
+                }, 1000);
             }
         });
     </script>
