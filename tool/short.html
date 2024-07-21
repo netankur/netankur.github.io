@@ -104,7 +104,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const buttonShorten = document.getElementById('button-shorten');
-            const originalUrlInput = document.getElementById('originalUrl');
+            const originalUrlInput = btoa(document.getElementById('originalUrl'));
             const shortenedUrlContainer = document.getElementById('shortenedUrlContainer');
             const shortenedUrlAnchor = document.getElementById('shortenedUrl');
             const redirectInfo = document.getElementById('redirectInfo');
@@ -119,7 +119,7 @@
                 fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
-                        if (data[id]) {
+                        if atob(data[id]) {
                             redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in <span id="countdownText">5</span> seconds...`;
                             redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
