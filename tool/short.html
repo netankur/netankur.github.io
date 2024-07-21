@@ -49,13 +49,21 @@
                 // Generate a unique identifier (you can use any method you prefer, such as a random string or timestamp)
                 const uniqueId = generateUniqueId();
 
-                // Construct shortened URL
-                const shortenedUrl = `${window.location.origin}/short.html#${uniqueId}`;
+                // Save to Pantry Cloud (you should replace this with your backend API)
+                saveToPantry(uniqueId, originalUrl)
+                    .then(() => {
+                        // Construct shortened URL
+                        const shortenedUrl = `${window.location.origin}/tool/short.html#${uniqueId}`;
 
-                // Display shortened URL
-                shortenedUrlAnchor.href = shortenedUrl;
-                shortenedUrlAnchor.textContent = shortenedUrl;
-                shortenedUrlContainer.style.display = 'block';
+                        // Display shortened URL
+                        shortenedUrlAnchor.href = shortenedUrl;
+                        shortenedUrlAnchor.textContent = shortenedUrl;
+                        shortenedUrlContainer.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error saving URL:', error);
+                        alert('Error saving URL. Please try again later.');
+                    });
             }
 
             function generateUniqueId() {
@@ -63,45 +71,28 @@
                 return Math.random().toString(36).substr(2, 8); // Generates a random 8-character alphanumeric string
             }
 
-            // Handle redirection logic if short URL is visited
-            if (window.location.hash) {
-                const id = window.location.hash.substring(1); // Get unique ID from URL hash
+            async function saveToPantry(uniqueId, originalUrl) {
                 const apiUrl = `https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/url`;
 
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data[id]) {
-                            redirectInfo.innerHTML = `
-                                <h2>Redirecting...</h2>
-                                <p>Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in 5 seconds...</p>
-                            `;
-                            redirectInfo.style.display = 'block';
-                            setTimeout(function() {
-                                window.location.href = data[id];
-                            }, 5000); // Redirect after 5 seconds
-                        } else {
-                            redirectInfo.innerHTML = `
-                                <h2>Redirecting...</h2>
-                                <p>URL not found. Redirecting to homepage in 5 seconds...</p>
-                            `;
-                            redirectInfo.style.display = 'block';
-                            setTimeout(function() {
-                                window.location.href = 'https://example.com'; // Replace with your homepage URL
-                            }, 5000); // Redirect after 5 seconds
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        redirectInfo.innerHTML = `
-                            <h2>Redirecting...</h2>
-                            <p>Error fetching data. Redirecting to homepage in 5 seconds...</p>
-                        `;
-                        redirectInfo.style.display = 'block';
-                        setTimeout(function() {
-                            window.location.href = 'https://example.com'; // Replace with your homepage URL
-                        }, 5000); // Redirect after 5 seconds
-                    });
+                // Fetch current data from Pantry
+                let data = await fetch(apiUrl)
+                                .then(response => response.json())
+                                .catch(error => {
+                                    console.error('Error fetching data:', error);
+                                    throw error;
+                                });
+
+                // Update data with new URL mapping
+                data[uniqueId] = originalUrl;
+
+                // Save updated data back to Pantry
+                await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
             }
         });
     </script>
