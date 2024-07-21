@@ -70,6 +70,13 @@
         "date": "2024-07-09"
     },
     {
+        "title": "QuickLink: Url Shortener",
+        "subtitle": "tools",
+        "url": "/tool/short.html",
+        "description": "QuickLink is a convenient tool to shorten URLs instantly. Easily generate compact links for sharing and tracking, with built-in redirection timers for smooth navigation. Simplify your links with QuickLink today!",
+        "date": "2024-07-21"
+    },
+    {
         "title": "Text to Speech",
         "subtitle": "tools",
         "url": "/tool/text-to-speech.html",
