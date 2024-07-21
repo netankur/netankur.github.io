@@ -8,20 +8,36 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Optional: CSS to hide form section during redirection */
+        .form-section {
+            display: block; /* Adjust as needed */
+        }
+
+        .redirecting-section {
+            display: none; /* Hidden by default */
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">URL Shortener</h1>
-        <div class="input-group mb-3">
-            <input type="text" id="originalUrl" class="form-control" placeholder="Enter your URL" aria-label="URL to shorten" aria-describedby="button-shorten">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="button-shorten">Shorten</button>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <div class="input-group mb-3">
+                <input type="text" id="originalUrl" class="form-control" placeholder="Enter your URL" aria-label="URL to shorten" aria-describedby="button-shorten">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="button-shorten">Shorten</button>
+                </div>
+            </div>
+            <div class="alert alert-success" id="shortenedUrlContainer" style="display:none;">
+                <strong>Shortened URL:</strong> <a href="#" id="shortenedUrl" target="_blank"></a>
             </div>
         </div>
-        <div class="alert alert-success" id="shortenedUrlContainer" style="display:none;">
-            <strong>Shortened URL:</strong> <a href="#" id="shortenedUrl" target="_blank"></a>
-        </div>
-        <div id="redirectInfo" class="text-center" style="display:none;">
+
+        <!-- Redirecting Section (Initially Hidden) -->
+        <div id="redirectInfo" class="text-center redirecting-section">
             <h2>Redirecting...</h2>
             <p id="redirectMessage">You will be redirected shortly.</p>
         </div>
@@ -47,12 +63,14 @@
                     .then(data => {
                         if (data[id]) {
                             redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in 5 seconds...`;
+                            redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
                             setTimeout(function() {
                                 window.location.href = data[id];
                             }, 5000); // Redirect after 5 seconds
                         } else {
                             redirectMessage.textContent = 'URL not found. Redirecting to homepage in 5 seconds...';
+                            redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
                             setTimeout(function() {
                                 window.location.href = 'https://example.com'; // Replace with your homepage URL
@@ -62,11 +80,15 @@
                     .catch(error => {
                         console.error('Error fetching data:', error);
                         redirectMessage.textContent = 'Error fetching data. Redirecting to homepage in 5 seconds...';
+                        redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                         redirectInfo.style.display = 'block';
                         setTimeout(function() {
                             window.location.href = 'https://example.com'; // Replace with your homepage URL
                         }, 5000); // Redirect after 5 seconds
                     });
+
+                // Hide form section during redirection
+                document.querySelector('.form-section').style.display = 'none';
             }
 
             buttonShorten.addEventListener('click', function() {
