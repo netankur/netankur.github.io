@@ -99,12 +99,11 @@
             <div class="countdown" id="countdown"></div>
         </div>
     </div>
-
     <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const buttonShorten = document.getElementById('button-shorten');
-            const originalUrlInput = btoa(document.getElementById('originalUrl'));
+            const originalUrlInput = document.getElementById('originalUrl');
             const shortenedUrlContainer = document.getElementById('shortenedUrlContainer');
             const shortenedUrlAnchor = document.getElementById('shortenedUrl');
             const redirectInfo = document.getElementById('redirectInfo');
@@ -119,11 +118,14 @@
                 fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
-                        if atob(data[id]) {
-                            redirectMessage.innerHTML = `Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in <span id="countdownText">5</span> seconds...`;
+                        if (data[id]) {
+                            // Decode Base64 encoded URL
+                            const decodedUrl = atob(data[id]);
+
+                            redirectMessage.innerHTML = `Redirecting to <a href="${decodedUrl}" target="_blank">${decodedUrl}</a> in <span id="countdownText">5</span> seconds...`;
                             redirectInfo.classList.remove('redirecting-section'); // Show redirection section
                             redirectInfo.style.display = 'block';
-                            startCountdown(5, data[id]);
+                            startCountdown(5, decodedUrl);
                         } else {
                             redirectMessage.textContent = 'URL not found. Redirecting to homepage in <span id="countdownText">5</span> seconds...';
                             redirectInfo.classList.remove('redirecting-section'); // Show redirection section
@@ -181,6 +183,9 @@
             async function saveToPantry(uniqueId, originalUrl) {
                 const apiUrl = `https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/url`;
 
+                // Encode originalUrl to Base64
+                const encodedUrl = base64EncodeUrl(originalUrl);
+
                 // Fetch current data from Pantry
                 let data = await fetch(apiUrl)
                                 .then(response => response.json())
@@ -189,8 +194,8 @@
                                     throw error;
                                 });
 
-                // Update data with new URL mapping
-                data[uniqueId] = originalUrl;
+                // Update data with new URL mapping (use encodedUrl instead of originalUrl)
+                data[uniqueId] = encodedUrl;
 
                 // Save updated data back to Pantry
                 await fetch(apiUrl, {
@@ -200,6 +205,11 @@
                     },
                     body: JSON.stringify(data)
                 });
+            }
+
+            function base64EncodeUrl(url) {
+                // Encode URL to Base64 format
+                return btoa(url);
             }
 
             function startCountdown(seconds, redirectUrl) {
