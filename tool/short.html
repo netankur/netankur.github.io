@@ -3,137 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Short URL Generator</title>
+    <title>URL Shortener</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Custom CSS for Dark Mode -->
-    <style>
-        body {
-            background-color: #212529;
-            color: #fff;
-        }
-        .container {
-            max-width: 500px;
-        }
-        .form-control, .btn {
-            background-color: #343a40;
-            border-color: #343a40;
-            color: #fff;
-        }
-        .form-control:focus {
-            background-color: #495057;
-            border-color: #495057;
-            color: #fff;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0069d9;
-            border-color: #0062cc;
-        }
-        .btn-copy {
-            cursor: pointer;
-        }
-    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Short URL Generator</h1>
-        <form id="urlForm">
-            <div class="form-group">
-                <label for="longUrl">Enter Long URL:</label>
-                <input type="url" class="form-control" id="longUrl" required>
+        <h1 class="mb-4">URL Shortener</h1>
+        <div class="input-group mb-3">
+            <input type="text" id="originalUrl" class="form-control" placeholder="Enter your URL" aria-label="URL to shorten" aria-describedby="button-shorten">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="button-shorten">Shorten</button>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-link"></i> Generate Short URL</button>
-        </form>
-        <div id="shortUrlOutput" class="mt-4" style="display: none;">
-            <label for="shortUrl">Your Short URL:</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="shortUrl" readonly>
-                <div class="input-group-append">
-                    <button class="btn btn-primary btn-copy" type="button" data-toggle="tooltip" data-placement="top" title="Copy to Clipboard"><i class="fas fa-copy"></i></button>
-                </div>
-            </div>
+        </div>
+        <div class="alert alert-success" id="shortenedUrlContainer" style="display:none;">
+            <strong>Shortened URL:</strong> <a href="#" id="shortenedUrl" target="_blank"></a>
+        </div>
+        <div id="redirectInfo" class="text-center" style="display:none;">
+            <h2>Redirecting...</h2>
+            <p>You will be redirected shortly.</p>
         </div>
     </div>
 
-    <!-- Bootstrap JS and jQuery (required for Bootstrap) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Axios for making HTTP requests -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Clipboard.js for copying text to clipboard -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-    <!-- Custom JavaScript -->
+    <!-- JavaScript -->
     <script>
-        // Function to generate random alphanumeric string
-        function generateRandomString(length) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttonShorten = document.getElementById('button-shorten');
+            const originalUrlInput = document.getElementById('originalUrl');
+            const shortenedUrlContainer = document.getElementById('shortenedUrlContainer');
+            const shortenedUrlAnchor = document.getElementById('shortenedUrl');
+            const redirectInfo = document.getElementById('redirectInfo');
+
+            buttonShorten.addEventListener('click', function() {
+                const originalUrl = originalUrlInput.value.trim();
+                if (originalUrl !== '') {
+                    shortenUrl(originalUrl);
+                } else {
+                    alert('Please enter a valid URL.');
+                }
+            });
+
+            function shortenUrl(originalUrl) {
+                // Generate a unique identifier (you can use any method you prefer, such as a random string or timestamp)
+                const uniqueId = generateUniqueId();
+
+                // Construct shortened URL
+                const shortenedUrl = `${window.location.origin}/short.html#${uniqueId}`;
+
+                // Display shortened URL
+                shortenedUrlAnchor.href = shortenedUrl;
+                shortenedUrlAnchor.textContent = shortenedUrl;
+                shortenedUrlContainer.style.display = 'block';
             }
-            return result;
-        }
 
-        // Function to handle form submission and redirection
-        document.getElementById('urlForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let longUrl = document.getElementById('longUrl').value.trim();
-
-            // Generate a random 6-character alphanumeric string for short URL ID
-            let shortUrlId = generateRandomString(6);
-
-            // Make a POST request to create a short URL
-            axios.post('https://crudcrud.com/api/1fec2a8d7c814042affd5ba2c8cb28e0/shorturls', { longUrl, shortUrlId })
-                .then(response => {
-                    let shortUrl = window.location.origin + '/tool/short.html#' + shortUrlId;
-                    document.getElementById('shortUrl').value = shortUrl;
-                    document.getElementById('shortUrlOutput').style.display = 'block';
-
-                    // Automatically redirect to the short URL after generation
-                    window.location.href = shortUrl;
-                })
-                .catch(error => {
-                    console.error('Error creating short URL:', error);
-                    alert('Error creating short URL. Please try again later.');
-                });
-        });
-
-        // Check if the URL has a hash (short URL ID) for redirection
-        if (window.location.hash) {
-            let shortUrlId = window.location.hash.substring(1); // Remove the '#'
-
-            // Make a GET request to fetch the original URL
-            axios.get('https://crudcrud.com/api/1fec2a8d7c814042affd5ba2c8cb28e0/shorturls/' + shortUrlId)
-                .then(response => {
-                    let originalUrl = response.data.longUrl;
-                    window.location.href = originalUrl; // Redirect to the original URL
-
-                    // Remove the short URL hash from the URL
-                    history.replaceState({}, document.title, window.location.pathname);
-                })
-                .catch(error => {
-                    console.error('Error fetching original URL:', error);
-                    alert('Error redirecting. Please try again later.');
-                });
-        }
-
-        // Initialize Clipboard.js for copying short URL to clipboard
-        new ClipboardJS('.btn-copy', {
-            text: function() {
-                return document.getElementById('shortUrl').value;
+            function generateUniqueId() {
+                // Example of generating a simple unique ID (for demonstration purposes)
+                return Math.random().toString(36).substr(2, 8); // Generates a random 8-character alphanumeric string
             }
-        });
 
-        // Tooltip initialization (optional)
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            // Handle redirection logic if short URL is visited
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1); // Get unique ID from URL hash
+                const apiUrl = `https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/url`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data[id]) {
+                            redirectInfo.innerHTML = `
+                                <h2>Redirecting...</h2>
+                                <p>Redirecting to <a href="${data[id]}" target="_blank">${data[id]}</a> in 5 seconds...</p>
+                            `;
+                            redirectInfo.style.display = 'block';
+                            setTimeout(function() {
+                                window.location.href = data[id];
+                            }, 5000); // Redirect after 5 seconds
+                        } else {
+                            redirectInfo.innerHTML = `
+                                <h2>Redirecting...</h2>
+                                <p>URL not found. Redirecting to homepage in 5 seconds...</p>
+                            `;
+                            redirectInfo.style.display = 'block';
+                            setTimeout(function() {
+                                window.location.href = 'https://example.com'; // Replace with your homepage URL
+                            }, 5000); // Redirect after 5 seconds
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        redirectInfo.innerHTML = `
+                            <h2>Redirecting...</h2>
+                            <p>Error fetching data. Redirecting to homepage in 5 seconds...</p>
+                        `;
+                        redirectInfo.style.display = 'block';
+                        setTimeout(function() {
+                            window.location.href = 'https://example.com'; // Replace with your homepage URL
+                        }, 5000); // Redirect after 5 seconds
+                    });
+            }
         });
     </script>
 </body>
