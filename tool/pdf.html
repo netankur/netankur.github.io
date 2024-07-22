@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Generator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #292b2c; /* Dark background color */
+      color: #ffffff; /* Light text color */
+    }
+
+    .container {
+      max-width: 600px;
+      margin-top: 50px;
+    }
+
+    .tool {
+      background-color: #343a40; /* Darker background for tool */
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .tool-title {
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tool-title i {
+      margin-right: 10px;
+      font-size: 32px;
+    }
+
+    .form-group label {
+      color: #ffffff; /* Light text color for labels */
+    }
+
+    .form-control {
+      background-color: #454d55; /* Darker background for input fields */
+      color: #ffffff; /* Light text color for input fields */
+      border-color: #5a6268; /* Border color for input fields */
+    }
+
+    .form-check-label {
+      color: #ffffff; /* Light text color for checkboxes */
+    }
+
+    .btn-primary {
+      background-color: #007bff; /* Primary button color */
+      border-color: #007bff; /* Primary button border color */
+    }
+
+    .btn-primary:hover {
+      background-color: #0069d9; /* Darker hover color */
+      border-color: #0062cc; /* Darker hover border color */
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="tool">
+    <div class="tool-title">
+      <i class="fas fa-file-pdf"></i> PDF Generator
+    </div>
+    <form id="content">
+      <div class="form-group">
+        <label for="fontSize">Content Font Size:</label>
+        <input type="number" class="form-control" id="fontSize" name="fontSize" placeholder="Enter font size" value="12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="boldContent" name="boldContent">
+          <label class="form-check-label" for="boldContent">
+            Bold
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="italicContent" name="italicContent">
+          <label class="form-check-label" for="italicContent">
+            Italic
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="contentFont">Content Font:</label>
+          <select class="form-control" id="contentFont" name="contentFont">
+            <option value="times">Times</option>
+            <option value="helvetica">Helvetica</option>
+            <option value="courier">Courier</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <textarea class="form-control" name="text" id="contentText" rows="10" placeholder="Type here"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Generate PDF</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
+<script>
+  document.getElementById('content').addEventListener('submit', onSubmit);
+
+  function onSubmit(e) {
+    e.preventDefault();
+
+    // Get form values
+    var content = document.getElementById('contentText').value;
+    var contentFontSize = parseInt(document.getElementById('fontSize').value);
+    var boldContent = document.getElementById('boldContent').checked;
+    var italicContent = document.getElementById('italicContent').checked;
+    var contentFont = document.getElementById('contentFont').value;
+
+    // Generate PDF
+    var pdf = new jsPDF();
+
+    // Content settings
+    pdf.setFont(contentFont || 'times'); // Default content font or user input
+    pdf.setFontSize(contentFontSize || 12); // Default content font size or user input
+    pdf.setFontType("normal");
+    if (boldContent && italicContent) pdf.setFontStyle('bolditalic');
+    else if (boldContent) pdf.setFontType('bold');
+    else if (italicContent) pdf.setFontStyle('italic');
+
+    var d = new Date();
+    var num1 = d.getFullYear() + "" + (d.getMonth() + 1) + "" + d.getDate() + "" + d.getHours() + "" + d.getMinutes() + "" + d.getSeconds();
+
+    // Handle page/line wrapping
+    var width = 210, // width of A4 in mm
+        height = 297, // height of A4 in mm
+        lMargin = 15,
+        rMargin = 15,
+        tMargin = 15,
+        bMargin = 15;
+
+    var lineHeight = pdf.getTextDimensions('X').h / 3,
+        page = 1,
+        top = tMargin;
+
+    var addFooter = function() {
+      pdf.text('' + page, width - 8 - pdf.getTextDimensions('' + page).w / 2, height - 8);
+      pdf.text('', width - 200, height - 1);
+    };
+
+    var addPage = function() {
+      pdf.addPage();
+      top = tMargin;
+      page++;
+      addFooter();
+    };
+
+    addFooter();
+
+    var options = { }; // Removed align option
+
+    var lines = pdf.splitTextToSize(content, (width - lMargin - rMargin));
+    for (var i = 0; i < lines.length; i++) {
+      if (top + bMargin > height) {
+        addPage();
+      }
+      pdf.text(lines[i], lMargin, top, options);
+      top += lineHeight;
+    }
+
+    pdf.save('PDF ' + num1 + '.pdf');
+  }
+
+  // Local Storage Functions (unchanged)
+  const LocalData = document.getElementById('content');
+  const formInputs = LocalData.querySelectorAll('input, textarea');
+
+  formInputs.forEach(function(input) {
+    input.addEventListener('input', function() {
+      saveFormDataToLocalStorage();
+    });
+  });
+
+  function saveFormDataToLocalStorage() {
+    const formData = {};
+
+    formInputs.forEach(function(input) {
+      formData[input.name] = input.value;
+    });
+
+    localStorage.setItem('PdfData', JSON.stringify(formData));
+  }
+
+  function loadFormDataFromLocalStorage() {
+    const savedData = localStorage.getItem('PdfData');
+
+    if (savedData) {
+      const formData = JSON.parse(savedData);
+      formInputs.forEach(function(input) {
+        input.value = formData[input.name] || '';
+      });
+    }
+  }
+
+  loadFormDataFromLocalStorage();
+
+</script>
+
+</body>
+</html>
