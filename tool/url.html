@@ -113,7 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        saveLink(url)
+        const encodedUrl = btoa(url); // Encode URL to Base64
+
+        saveLink(encodedUrl)
             .then(response => {
                 resultId.textContent = response.id; // Display ID in result container
                 resultContainer.style.display = 'block'; // Show result container
@@ -140,8 +142,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (links && links.length > 0) {
                     resultContent.innerHTML = ''; // Clear previous results
                     links.forEach(link => {
-                        const linkElement = document.createElement('p');
-                        linkElement.textContent = link;
+                        const decodedLink = atob(link); // Decode Base64 URL
+                        const linkElement = document.createElement('a');
+                        linkElement.href = decodedLink;
+                        linkElement.textContent = decodedLink;
+                        linkElement.target = '_blank'; // Open link in new tab
+                        linkElement.style.display = 'block'; // Display each link on a new line
                         resultContent.appendChild(linkElement);
                     });
                     resultId.textContent = id;
@@ -159,14 +165,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Copy button click handler
     copyButton.addEventListener('click', function() {
-        const links = Array.from(resultContent.querySelectorAll('p')).map(p => p.textContent);
+        const links = Array.from(resultContent.querySelectorAll('a')).map(a => a.href);
         const textToCopy = links.join('\n');
         copyToClipboard(textToCopy);
         alert('Copied to clipboard!');
     });
 
     // Function to save a link to Pantry Cloud
-    async function saveLink(url) {
+    async function saveLink(encodedUrl) {
         const apiUrl = 'https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/link';
 
         try {
@@ -183,9 +189,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Add new URL to the array or initialize array if empty
             if (!data[randomId]) {
-                data[randomId] = [url];
+                data[randomId] = [encodedUrl];
             } else {
-                data[randomId].push(url);
+                data[randomId].push(encodedUrl);
             }
 
             // Update data in Pantry Cloud
