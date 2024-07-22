@@ -14,6 +14,13 @@
         "date": "2024-07-06"
     },
     {
+        "title": "Tic Tac Toe",
+        "subtitle": "games",
+        "url": "/tool/tic-tac-toe.html",
+        "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself. Perfect for quick matches and endless fun!",
+        "date": "2024-07-06"
+    },
+    {
         "title": "Words Counter",
         "subtitle": "tools",
         "url": "/tool/word-courter.html",
