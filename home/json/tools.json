@@ -4,13 +4,20 @@
         "subtitle": "tools",
         "url": "/tool/resume.html",
         "description": "Your streamlined solution for crafting a polished and comprehensive resume document. It simplifies the process by guiding you through inputting essential details like personal information, academic background, work experience, and other pertinent information into a user-friendly interface.",
-        "date": "2024-07-19"
+        "date": "2024-07-05"
     },
     {
         "title": "Image Resizer",
         "subtitle": "tools",
         "url": "/tool/image-resize.html",
         "description": "Image Resize Tool: Resize Images Easily, Quickly adjust the dimensions of your images with our Image Resize Tool.",
+        "date": "2024-07-06"
+    },
+    {
+        "title": "Pdf Generator",
+        "subtitle": "tools",
+        "url": "/tool/pdf.html",
+        "description": "Create professional PDF documents effortlessly with our PDF Generator tool. Customize fonts, styles to suit your needs.",
         "date": "2024-07-06"
     },
     {
@@ -81,7 +88,7 @@
         "subtitle": "tools",
         "url": "/tool/short.html",
         "description": "QuickLink is a convenient tool to shorten URLs instantly. Easily generate compact links for sharing and tracking, with built-in redirection timers for smooth navigation. Simplify your links with QuickLink today!",
-        "date": "2024-07-21"
+        "date": "2024-07-10"
     },
     {
         "title": "Text to Speech",
