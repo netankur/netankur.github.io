@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Saver</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #444;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        .result-container pre {
+            margin-bottom: 0;
+            color: #ccc;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .copy-button {
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Link Save & Retrieve Tool</h1>
+
+        <!-- Save Link Section -->
+        <div class="form-group">
+            <label for="saveUrlInput">Enter URL to Save:</label>
+            <div class="input-group">
+                <input type="text" id="saveUrlInput" class="form-control" placeholder="Enter URL">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="saveButton">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retrieve Link Section -->
+        <div class="form-group">
+            <label for="retrieveIdInput">Enter ID to Retrieve:</label>
+            <div class="input-group">
+                <input type="text" id="retrieveIdInput" class="form-control" placeholder="Enter ID">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="retrieveButton">Retrieve</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container" id="resultContainer" style="display:none;">
+            <p><strong>Result:</strong></p>
+            <p><strong>ID:</strong> <span id="resultId"></span></p>
+            <pre id="resultContent"></pre>
+            <button class="btn btn-primary mt-3 copy-button" id="copyButton">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- Your custom JavaScript -->
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const saveButton = document.getElementById('saveButton');
+    const retrieveButton = document.getElementById('retrieveButton');
+    const saveUrlInput = document.getElementById('saveUrlInput');
+    const retrieveIdInput = document.getElementById('retrieveIdInput');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultContent = document.getElementById('resultContent');
+    const resultId = document.getElementById('resultId');
+    const copyButton = document.getElementById('copyButton');
+
+    // Save button click handler
+    saveButton.addEventListener('click', function() {
+        const url = saveUrlInput.value.trim();
+        if (!isValidUrl(url)) {
+            alert('Please enter a valid URL.');
+            return;
+        }
+
+        saveLink(url)
+            .then(response => {
+                resultId.textContent = response.id; // Display ID in result container
+                resultContainer.style.display = 'block'; // Show result container
+                alert(`Link saved with ID: ${response.id}`);
+                saveUrlInput.value = '';
+                retrieveIdInput.value = ''; // Clear retrieve ID input
+            })
+            .catch(error => {
+                console.error('Error saving link:', error);
+                alert('Failed to save link. Please try again later.');
+            });
+    });
+
+    // Retrieve button click handler
+    retrieveButton.addEventListener('click', function() {
+        const id = retrieveIdInput.value.trim();
+        if (id === '') {
+            alert('Please enter a valid ID.');
+            return;
+        }
+
+        retrieveLink(id)
+            .then(links => {
+                if (links && links.length > 0) {
+                    resultContent.innerHTML = ''; // Clear previous results
+                    links.forEach(link => {
+                        const linkElement = document.createElement('p');
+                        linkElement.textContent = link;
+                        resultContent.appendChild(linkElement);
+                    });
+                    resultId.textContent = id;
+                    resultContainer.style.display = 'block';
+                } else {
+                    resultContainer.style.display = 'none';
+                    alert('Links not found for the ID. Please check and try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error retrieving links:', error);
+                alert('Failed to retrieve links. Please try again later.');
+            });
+    });
+
+    // Copy button click handler
+    copyButton.addEventListener('click', function() {
+        const links = Array.from(resultContent.querySelectorAll('p')).map(p => p.textContent);
+        const textToCopy = links.join('\n');
+        copyToClipboard(textToCopy);
+        alert('Copied to clipboard!');
+    });
+
+    // Function to save a link to Pantry Cloud
+    async function saveLink(url) {
+        const apiUrl = 'https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/link';
+
+        try {
+            const response = await fetch(apiUrl);
+            let data = await response.json();
+
+            // Initialize empty array if data[id] does not exist
+            if (!data) {
+                data = {};
+            }
+
+            // Generate random ID
+            const randomId = generateRandomId();
+
+            // Add new URL to the array or initialize array if empty
+            if (!data[randomId]) {
+                data[randomId] = [url];
+            } else {
+                data[randomId].push(url);
+            }
+
+            // Update data in Pantry Cloud
+            const saveResponse = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!saveResponse.ok) {
+                throw new Error('Failed to save link.');
+            }
+
+            return { id: randomId };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Function to retrieve links from Pantry Cloud
+    async function retrieveLink(id) {
+        const apiUrl = 'https://getpantry.cloud/apiv1/pantry/b90e087a-ffd1-4146-ad94-364b86b11ae0/basket/link';
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            if (data && data[id]) {
+                return data[id];
+            } else {
+                return [];
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Function to generate a random ID
+    function generateRandomId() {
+        return Math.random().toString(36).substr(2, 8); // Generates a random 8-character alphanumeric string
+    }
+
+    // Function to validate URL
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // Function to copy text to clipboard
+    function copyToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+});
+</script>
+</body>
+</html>
