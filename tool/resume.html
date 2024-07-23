@@ -149,7 +149,7 @@
         </div>
 
         <div class="form-group">
-            <label for="skills"><i class="fas fa-briefcase"></i> Skills</label>
+            <label for="skills"><i class="fas fa-code"></i> Skills</label>
             <div class="input-group mb-2">
                 <input type="text" class="form-control" id="skills" placeholder="Skills">
                 <div class="input-group-append">
@@ -157,6 +157,17 @@
                 </div>
             </div>
             <ul id="skillsList"></ul>
+        </div>
+
+        <div class="form-group">
+            <label for="hobbies"><i class="fas fa-heart"></i> Hobbies</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="hobbies" placeholder="Hobbies">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="addHobbies()">+</button>
+                </div>
+            </div>
+            <ul id="hobbiesList"></ul>
         </div>
 
         <div class="form-group">
@@ -231,6 +242,7 @@ let qualifications = [];
 let otherQualifications = [];
 let workExperiences = [];
 let skills = [];
+let hobbies = [];
 
 // Function to add qualification
 function addQualification() {
@@ -272,6 +284,16 @@ function addSkills() {
     }
 }
 
+// Function to add hobbies
+function addHobbies() {
+    const hobby = document.getElementById('hobbies').value;
+    if (hobby) {
+        hobbies.push(hobby);
+        document.getElementById('hobbies').value = '';
+        updateList('hobbiesList', hobbies);
+    }
+}
+
 // Function to remove qualification
 function removeQualification(index) {
     qualifications.splice(index, 1);
@@ -296,20 +318,28 @@ function removeSkills(index) {
     updateList('skillsList', skills);
 }
 
-// Function to update displayed lists
+// Function to remove hobby
+function removeHobby(index) {
+    hobbies.splice(index, 1);
+    updateList('hobbiesList', hobbies);
+}
+
+// Update the updateList function to handle hobbies
 function updateList(listId, items) {
     const list = document.getElementById(listId);
     list.innerHTML = '';
     items.forEach((item, index) => {
         const li = document.createElement('li');
         li.textContent = item;
-        
+
         // Add remove button
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.className = 'btn btn-outline-danger btn-sm ml-2';
         removeButton.onclick = function() {
-            if (listId === 'qualificationList') {
+            if (listId === 'hobbiesList') {
+                removeHobby(index);
+            } else if (listId === 'qualificationList') {
                 removeQualification(index);
             } else if (listId === 'otherQualificationList') {
                 removeOtherQualification(index);
@@ -340,6 +370,7 @@ function saveData() {
         otherQualifications: otherQualifications,
         workExperiences: workExperiences,
         skills: skills,
+        hobbies: hobbies,
         careerObjective: document.getElementById('careerObjective').value,
         declaration: document.getElementById('declaration').value,
         gender: document.getElementById('gender').value,
@@ -407,19 +438,17 @@ if (storedUserData) {
     document.getElementById('nationality').value = userData.nationality;
     document.getElementById('maritalStatus').value = userData.maritalStatus;
 
-    // Populate dynamic lists (qualifications, otherQualifications, workExperiences, skills)
+    // Populate dynamic lists (qualifications, otherQualifications, workExperiences, skills, hobbies)
     qualifications = userData.qualifications || [];
     otherQualifications = userData.otherQualifications || [];
     workExperiences = userData.workExperiences || [];
     skills = userData.skills || [];
+    hobbies = userData.hobbies || [];
     updateList('qualificationList', qualifications);
     updateList('otherQualificationList', otherQualifications);
     updateList('workExperienceList', workExperiences);
     updateList('skillsList', skills);
-
-    // Optionally, handle image display
-    // Assuming you have a display function in display.html or display-resume.html to show resume data
-    // You can add logic here to handle the images if needed
+    updateList('hobbiesList', hobbies);
 }
 
 </script>
