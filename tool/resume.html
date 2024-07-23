@@ -153,7 +153,7 @@
             <div class="input-group mb-2">
                 <input type="text" class="form-control" id="skills" placeholder="Skills">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" onclick="addskills()">+</button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="addSkills()">+</button>
                 </div>
             </div>
             <ul id="skillsList"></ul>
@@ -258,7 +258,7 @@
         }
     }
 
-    function addskills() {
+    function addSkills() {
         const skills = document.getElementById('skills').value;
         if (skills) {
             skills.push(skills);
