@@ -149,6 +149,17 @@
         </div>
 
         <div class="form-group">
+            <label for="skills"><i class="fas fa-briefcase"></i> Skills</label>
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" id="skills" placeholder="Skills">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="addskills()">+</button>
+                </div>
+            </div>
+            <ul id="skillsList"></ul>
+        </div>
+
+        <div class="form-group">
             <label for="careerObjective"><i class="fas fa-bullseye"></i> Career Objective</label>
             <textarea class="form-control" id="careerObjective">To make contribution in the organization with best of my ability and also to Develop new skills during the interaction to achieve new heights.</textarea>
         </div>
@@ -218,6 +229,7 @@
     let qualifications = [];
     let otherQualifications = [];
     let workExperiences = [];
+    let skills = [];
 
     function addQualification() {
         const qualification = document.getElementById('qualification').value;
@@ -246,6 +258,15 @@
         }
     }
 
+    function addskills() {
+        const skills = document.getElementById('skills').value;
+        if (skills) {
+            skills.push(skills);
+            document.getElementById('skills').value = '';
+            updateList('skillsList', skills);
+        }
+    }
+
     function removeQualification(index) {
         qualifications.splice(index, 1);
         updateList('qualificationList', qualifications);
@@ -259,6 +280,11 @@
     function removeWorkExperience(index) {
         workExperiences.splice(index, 1);
         updateList('workExperienceList', workExperiences);
+    }
+
+    function removeskills(index) {
+        skills.splice(index, 1);
+        updateList('skillsList', skills);
     }
 
     function updateList(listId, items) {
@@ -279,6 +305,8 @@
                     removeOtherQualification(index);
                 } else if (listId === 'workExperienceList') {
                     removeWorkExperience(index);
+                } else if (listId === 'skillsList') {
+                    removeskills(index);
                 }
             };
             
@@ -300,6 +328,7 @@
             qualifications: qualifications,
             otherQualifications: otherQualifications,
             workExperiences: workExperiences,
+            skills: skills,
             careerObjective: document.getElementById('careerObjective').value,
             declaration: document.getElementById('declaration').value,
             gender: document.getElementById('gender').value,
@@ -372,9 +401,11 @@
         qualifications = userData.qualifications || [];
         otherQualifications = userData.otherQualifications || [];
         workExperiences = userData.workExperiences || [];
+        skills = userData.skills || [];
         updateList('qualificationList', qualifications);
         updateList('otherQualificationList', otherQualifications);
         updateList('workExperienceList', workExperiences);
+        updateList('skillsList', skills);
 
         // Optionally, handle image display
         // Assuming you have a display function in display.html to show resume data
