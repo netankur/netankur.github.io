@@ -127,6 +127,16 @@ printButton.addEventListener('click', printPage);
             htmlContent += `</ul></td></tr></table>`;//
         }
 
+        // Display hobbies as bullet points
+        if (userData.hobbies.length > 0) {
+            htmlContent += `<tr><td colspan="2"><h2>Hobbies</h2>`;
+            htmlContent += `<ul>`;
+            userData.hobbies.forEach(hobbies => {
+                htmlContent += `<li>${hobbies}</li>`;
+            });
+            htmlContent += `</ul></td></tr></table>`;//
+        }
+
         if (userData.gender) htmlContent += `<table><tr><td colspan="2"><h2>Personal Information</h2></td></tr>`;
 
         if (userData.fatherName) htmlContent += `<tr><td style="width: 25%;">Father's Name</td><td>: ${userData.fatherName}</td></tr>`;
@@ -140,7 +150,7 @@ printButton.addEventListener('click', printPage);
         htmlContent += `<table>`;
 
         if (userData.declaration) htmlContent += `<tr><td colspan="2"><h2>Declaration</h2>${userData.declaration}</p></td></tr>`;//
-        if (userData.state) htmlContent += `<tr><td style="width: 90%;">Date :<br>Place :${userData.state}</td>`;
+        if (userData.state) htmlContent += `<tr><td style="width: 90%;">Date : ${userData.dated}<br>Place : ${userData.state}</td>`;
 
         if (userData.signatureImage) htmlContent += `<td><img src="${userData.signatureImage}" class="user-image" width="120" height="50"></td></tr>`;
         htmlContent += `</table>`;
