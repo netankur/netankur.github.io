@@ -117,6 +117,16 @@ printButton.addEventListener('click', printPage);
             htmlContent += `</ul></td></tr></table>`;//
         }
 
+        // Display skills as bullet points
+        if (userData.skills.length > 0) {
+            htmlContent += `<tr><td colspan="2"><h2>Skills</h2>`;
+            htmlContent += `<ul>`;
+            userData.skills.forEach(skills => {
+                htmlContent += `<li>${skills}</li>`;
+            });
+            htmlContent += `</ul></td></tr></table>`;//
+        }
+
         if (userData.gender) htmlContent += `<table><tr><td colspan="2"><h2>Personal Information</h2></td></tr>`;
 
         if (userData.fatherName) htmlContent += `<tr><td style="width: 25%;">Father's Name</td><td>: ${userData.fatherName}</td></tr>`;
