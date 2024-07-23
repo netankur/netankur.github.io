@@ -83,7 +83,7 @@ printButton.addEventListener('click', printPage);
         if (userData.mobile) htmlContent += `Mobile No. - ${userData.mobile}<br>`;
         if (userData.email) htmlContent += `Email Id - ${userData.email}`;
         htmlContent += `</td>`;
-        if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image" width="100" height="130"></td>`;
+        if (userData.passportImage) htmlContent += `<td><img src="${userData.passportImage}" class="user-image" width="100" height="130" style="border: 2px solid"></td>`;
         htmlContent += `</tr>`;//
         if (userData.careerObjective) htmlContent += `<tr><td colspan="2"><h2>Career Objective</h2>${userData.careerObjective}</td></tr>`;//
         
