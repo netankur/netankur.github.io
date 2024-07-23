@@ -226,191 +226,202 @@
 </div>
 
 <script>
-    let qualifications = [];
-    let otherQualifications = [];
-    let workExperiences = [];
-    let skills = [];
+// Define arrays for qualifications, otherQualifications, workExperiences, and skills
+let qualifications = [];
+let otherQualifications = [];
+let workExperiences = [];
+let skills = [];
 
-    function addQualification() {
-        const qualification = document.getElementById('qualification').value;
-        if (qualification) {
-            qualifications.push(qualification);
-            document.getElementById('qualification').value = '';
-            updateList('qualificationList', qualifications);
-        }
-    }
-
-    function addOtherQualification() {
-        const otherQualification = document.getElementById('otherQualification').value;
-        if (otherQualification) {
-            otherQualifications.push(otherQualification);
-            document.getElementById('otherQualification').value = '';
-            updateList('otherQualificationList', otherQualifications);
-        }
-    }
-
-    function addWorkExperience() {
-        const workExperience = document.getElementById('workExperience').value;
-        if (workExperience) {
-            workExperiences.push(workExperience);
-            document.getElementById('workExperience').value = '';
-            updateList('workExperienceList', workExperiences);
-        }
-    }
-
-    function addSkills() {
-        const skills = document.getElementById('skills').value;
-        if (skills) {
-            skills.push(skills);
-            document.getElementById('skills').value = '';
-            updateList('skillsList', skills);
-        }
-    }
-
-    function removeQualification(index) {
-        qualifications.splice(index, 1);
+// Function to add qualification
+function addQualification() {
+    const qualification = document.getElementById('qualification').value;
+    if (qualification) {
+        qualifications.push(qualification);
+        document.getElementById('qualification').value = '';
         updateList('qualificationList', qualifications);
     }
+}
 
-    function removeOtherQualification(index) {
-        otherQualifications.splice(index, 1);
+// Function to add other qualification
+function addOtherQualification() {
+    const otherQualification = document.getElementById('otherQualification').value;
+    if (otherQualification) {
+        otherQualifications.push(otherQualification);
+        document.getElementById('otherQualification').value = '';
         updateList('otherQualificationList', otherQualifications);
     }
+}
 
-    function removeWorkExperience(index) {
-        workExperiences.splice(index, 1);
+// Function to add work experience
+function addWorkExperience() {
+    const workExperience = document.getElementById('workExperience').value;
+    if (workExperience) {
+        workExperiences.push(workExperience);
+        document.getElementById('workExperience').value = '';
         updateList('workExperienceList', workExperiences);
     }
+}
 
-    function removeskills(index) {
-        skills.splice(index, 1);
+// Function to add skills
+function addSkills() {
+    const skill = document.getElementById('skills').value;
+    if (skill) {
+        skills.push(skill);
+        document.getElementById('skills').value = '';
         updateList('skillsList', skills);
     }
+}
 
-    function updateList(listId, items) {
-        const list = document.getElementById(listId);
-        list.innerHTML = '';
-        items.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            
-            // Add remove button
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Remove';
-            removeButton.className = 'btn btn-outline-danger btn-sm ml-2';
-            removeButton.onclick = function() {
-                if (listId === 'qualificationList') {
-                    removeQualification(index);
-                } else if (listId === 'otherQualificationList') {
-                    removeOtherQualification(index);
-                } else if (listId === 'workExperienceList') {
-                    removeWorkExperience(index);
-                } else if (listId === 'skillsList') {
-                    removeskills(index);
-                }
-            };
-            
-            li.appendChild(removeButton);
-            list.appendChild(li);
-        });
-    }
+// Function to remove qualification
+function removeQualification(index) {
+    qualifications.splice(index, 1);
+    updateList('qualificationList', qualifications);
+}
 
-    function saveData() {
-        const userData = {
-            heading: document.getElementById('heading').value,
-            name: document.getElementById('name').value,
-            houseNo: document.getElementById('houseNo').value,
-            landmark: document.getElementById('landmark').value,
-            area: document.getElementById('area').value,
-            state: document.getElementById('state').value,
-            pincode: document.getElementById('pincode').value,
-            mobile: document.getElementById('mobile').value,
-            qualifications: qualifications,
-            otherQualifications: otherQualifications,
-            workExperiences: workExperiences,
-            skills: skills,
-            careerObjective: document.getElementById('careerObjective').value,
-            declaration: document.getElementById('declaration').value,
-            gender: document.getElementById('gender').value,
-            fatherName: document.getElementById('fatherName').value,
-            motherName: document.getElementById('motherName').value,
-            email: document.getElementById('email').value,
-            dob: document.getElementById('dob').value,
-            language: document.getElementById('language').value,
-            nationality: document.getElementById('nationality').value,
-            maritalStatus: document.getElementById('maritalStatus').value,
-            passportImage: '', // Placeholder for image URL
-            signatureImage: '', // Placeholder for image URL
+// Function to remove other qualification
+function removeOtherQualification(index) {
+    otherQualifications.splice(index, 1);
+    updateList('otherQualificationList', otherQualifications);
+}
+
+// Function to remove work experience
+function removeWorkExperience(index) {
+    workExperiences.splice(index, 1);
+    updateList('workExperienceList', workExperiences);
+}
+
+// Function to remove skill
+function removeSkills(index) {
+    skills.splice(index, 1);
+    updateList('skillsList', skills);
+}
+
+// Function to update displayed lists
+function updateList(listId, items) {
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+    items.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        
+        // Add remove button
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.className = 'btn btn-outline-danger btn-sm ml-2';
+        removeButton.onclick = function() {
+            if (listId === 'qualificationList') {
+                removeQualification(index);
+            } else if (listId === 'otherQualificationList') {
+                removeOtherQualification(index);
+            } else if (listId === 'workExperienceList') {
+                removeWorkExperience(index);
+            } else if (listId === 'skillsList') {
+                removeSkills(index);
+            }
         };
+        
+        li.appendChild(removeButton);
+        list.appendChild(li);
+    });
+}
 
-        // Process and store passport image
-        const passportImageFile = document.getElementById('passportImage').files[0];
-        if (passportImageFile) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                userData.passportImage = event.target.result; // Set base64 data as image URL
-                localStorage.setItem('userData', JSON.stringify(userData));
-                window.open('display-resume.html', '_blank');
-            };
-            reader.readAsDataURL(passportImageFile);
-        }
+// Function to save data to local storage
+function saveData() {
+    const userData = {
+        heading: document.getElementById('heading').value,
+        name: document.getElementById('name').value,
+        houseNo: document.getElementById('houseNo').value,
+        landmark: document.getElementById('landmark').value,
+        area: document.getElementById('area').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value,
+        mobile: document.getElementById('mobile').value,
+        qualifications: qualifications,
+        otherQualifications: otherQualifications,
+        workExperiences: workExperiences,
+        skills: skills,
+        careerObjective: document.getElementById('careerObjective').value,
+        declaration: document.getElementById('declaration').value,
+        gender: document.getElementById('gender').value,
+        fatherName: document.getElementById('fatherName').value,
+        motherName: document.getElementById('motherName').value,
+        email: document.getElementById('email').value,
+        dob: document.getElementById('dob').value,
+        language: document.getElementById('language').value,
+        nationality: document.getElementById('nationality').value,
+        maritalStatus: document.getElementById('maritalStatus').value,
+        passportImage: '', // Placeholder for image URL
+        signatureImage: '', // Placeholder for image URL
+    };
 
-        // Process and store signature image
-        const signatureImageFile = document.getElementById('signatureImage').files[0];
-        if (signatureImageFile) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                userData.signatureImage = event.target.result; // Set base64 data as image URL
-                localStorage.setItem('userData', JSON.stringify(userData));
-                window.open('display.html', '_blank');
-            };
-            reader.readAsDataURL(signatureImageFile);
-        } else {
+    // Process and store passport image
+    const passportImageFile = document.getElementById('passportImage').files[0];
+    if (passportImageFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            userData.passportImage = event.target.result; // Set base64 data as image URL
             localStorage.setItem('userData', JSON.stringify(userData));
             window.open('display-resume.html', '_blank');
-        }
+        };
+        reader.readAsDataURL(passportImageFile);
     }
-</script>
-<script>
-    // Check if there is stored user data
-    const storedUserData = localStorage.getItem('userData');
-    if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
-        
-        // Populate form fields with stored data
-        document.getElementById('heading').value = userData.heading;
-        document.getElementById('name').value = userData.name;
-        document.getElementById('houseNo').value = userData.houseNo;
-        document.getElementById('landmark').value = userData.landmark;
-        document.getElementById('area').value = userData.area;
-        document.getElementById('state').value = userData.state;
-        document.getElementById('pincode').value = userData.pincode;
-        document.getElementById('mobile').value = userData.mobile;
-        document.getElementById('careerObjective').value = userData.careerObjective;
-        document.getElementById('declaration').value = userData.declaration;
-        document.getElementById('gender').value = userData.gender;
-        document.getElementById('fatherName').value = userData.fatherName;
-        document.getElementById('motherName').value = userData.motherName;
-        document.getElementById('email').value = userData.email;
-        document.getElementById('dob').value = userData.dob;
-        document.getElementById('language').value = userData.language;
-        document.getElementById('nationality').value = userData.nationality;
-        document.getElementById('maritalStatus').value = userData.maritalStatus;
 
-        // Populate dynamic lists (qualifications, otherQualifications, workExperiences)
-        qualifications = userData.qualifications || [];
-        otherQualifications = userData.otherQualifications || [];
-        workExperiences = userData.workExperiences || [];
-        skills = userData.skills || [];
-        updateList('qualificationList', qualifications);
-        updateList('otherQualificationList', otherQualifications);
-        updateList('workExperienceList', workExperiences);
-        updateList('skillsList', skills);
-
-        // Optionally, handle image display
-        // Assuming you have a display function in display.html to show resume data
-        // You can add logic here to handle the images if needed
+    // Process and store signature image
+    const signatureImageFile = document.getElementById('signatureImage').files[0];
+    if (signatureImageFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            userData.signatureImage = event.target.result; // Set base64 data as image URL
+            localStorage.setItem('userData', JSON.stringify(userData));
+            window.open('display.html', '_blank');
+        };
+        reader.readAsDataURL(signatureImageFile);
+    } else {
+        localStorage.setItem('userData', JSON.stringify(userData));
+        window.open('display-resume.html', '_blank');
     }
+}
+
+// Check if there is stored user data
+const storedUserData = localStorage.getItem('userData');
+if (storedUserData) {
+    const userData = JSON.parse(storedUserData);
+    
+    // Populate form fields with stored data
+    document.getElementById('heading').value = userData.heading;
+    document.getElementById('name').value = userData.name;
+    document.getElementById('houseNo').value = userData.houseNo;
+    document.getElementById('landmark').value = userData.landmark;
+    document.getElementById('area').value = userData.area;
+    document.getElementById('state').value = userData.state;
+    document.getElementById('pincode').value = userData.pincode;
+    document.getElementById('mobile').value = userData.mobile;
+    document.getElementById('careerObjective').value = userData.careerObjective;
+    document.getElementById('declaration').value = userData.declaration;
+    document.getElementById('gender').value = userData.gender;
+    document.getElementById('fatherName').value = userData.fatherName;
+    document.getElementById('motherName').value = userData.motherName;
+    document.getElementById('email').value = userData.email;
+    document.getElementById('dob').value = userData.dob;
+    document.getElementById('language').value = userData.language;
+    document.getElementById('nationality').value = userData.nationality;
+    document.getElementById('maritalStatus').value = userData.maritalStatus;
+
+    // Populate dynamic lists (qualifications, otherQualifications, workExperiences, skills)
+    qualifications = userData.qualifications || [];
+    otherQualifications = userData.otherQualifications || [];
+    workExperiences = userData.workExperiences || [];
+    skills = userData.skills || [];
+    updateList('qualificationList', qualifications);
+    updateList('otherQualificationList', otherQualifications);
+    updateList('workExperienceList', workExperiences);
+    updateList('skillsList', skills);
+
+    // Optionally, handle image display
+    // Assuming you have a display function in display.html or display-resume.html to show resume data
+    // You can add logic here to handle the images if needed
+}
+
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
