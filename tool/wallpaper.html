@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Wallpaper</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom right, #000000, #ffffff); /* Fallback */
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  </style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <!-- Buttons for changing and downloading gradient -->
+  <div style="position: fixed; top: 20px; right: 20px;">
+    <button id="changeButton" class="btn btn-primary mr-2">
+      Change
+    </button>
+    <button id="downloadButton" class="btn btn-success">
+      Download
+    </button>
+  </div>
+
+  <!-- JavaScript libraries -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script>
+    let currentGradientCanvas = null;
+
+    // Function to generate a random gradient
+    function generateRandomGradient() {
+      const canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Random number of colors (2 to 5)
+      const numColors = Math.floor(Math.random() * 4) + 2;
+      const colors = [];
+      for (let i = 0; i < numColors; i++) {
+        colors.push(`rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`);
+      }
+
+      // Random gradient direction
+      const directions = [
+        "to top", "to right", "to bottom", "to left",
+        "to top right", "to top left", "to bottom right", "to bottom left"
+      ];
+      const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+
+      // Create linear gradient
+      const gradient = ctx.createLinearGradient(0, 0, 
+        randomDirection.includes("right") ? canvas.width : 0,
+        randomDirection.includes("bottom") ? canvas.height : 0
+      );
+      colors.forEach((color, index) => {
+        gradient.addColorStop(index / (colors.length - 1), color);
+      });
+
+      // Fill rectangle with gradient
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Store the current gradient canvas
+      currentGradientCanvas = canvas;
+
+      return canvas;
+    }
+
+    // Function to handle changing the gradient
+    function changeGradient() {
+      const canvas = generateRandomGradient();
+      document.body.style.background = `url(${canvas.toDataURL('image/png')}) no-repeat center center fixed`;
+      document.body.style.backgroundSize = 'cover';
+    }
+
+    // Event listener for the change button
+    document.getElementById('changeButton').addEventListener('click', changeGradient);
+
+    // Function to download the current gradient as a JPEG image
+    function downloadCurrentGradient() {
+      if (currentGradientCanvas) {
+        const link = document.createElement('a');
+        link.download = `gradient_${Math.floor(Math.random() * 1000000)}.jpg`;
+        currentGradientCanvas.toBlob(function(blob) {
+          link.href = URL.createObjectURL(blob);
+          link.click();
+        }, 'image/jpeg');
+      } else {
+        alert("No gradient to download. Generate a gradient first.");
+      }
+    }
+
+    // Event listener for the download button
+    document.getElementById('downloadButton').addEventListener('click', downloadCurrentGradient);
+  </script>
+</body>
+</html>
