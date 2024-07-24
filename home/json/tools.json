@@ -103,5 +103,12 @@
         "url": "/tool/url.html",
         "description": "Save and retrieve links effortlessly with our URL Saver Tool. This tool allows users to securely store URLs and access them later using unique IDs generated for each link. Ideal for organizing bookmarks, sharing links, and ensuring easy access to important URLs across devices.",
         "date": "2024-07-22"
+    },
+    {
+        "title": "Gradient WallGen",
+        "subtitle": "tools",
+        "url": "/tool/wallpaper.html",
+        "description": "Explore an endless array of vibrant gradients with Gradient WallGen. This tool generates unique wallpapers on-the-fly, allowing you to download your favorite designs instantly. Perfect for adding a splash of color to your desktop or mobile device!",
+        "date": "2024-07-24"
     }
 ]
