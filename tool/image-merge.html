@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Merge multiple images into one with our easy-to-use Image Merge Tool. Choose between horizontal or vertical layouts, adjust sizes automatically, and download your merged image with custom file size options. Perfect for creating collages or combining images for presentations and projects." />
+    <meta name="author" content="Netankur" />
+    <meta name="keywords" content="Image Resize">
+    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+    <title>Image Merger</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            margin-top: 50px; /* Adjusted margin for better view */
+        }
+        .form-control {
+            background-color: #393939;
+            color: #ffffff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .btn-dark {
+            background-color: #343a40;
+            border-color: #343a40;
+        }
+        .btn-dark:hover {
+            background-color: #23272b;
+            border-color: #1d2124;
+        }
+        .container {
+            max-width: 800px; /* Adjusted max-width for better responsiveness */
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group-prepend .input-group-text {
+            background-color: #6c757d;
+            color: #ffffff;
+            border-color: #6c757d;
+        }
+        .input-group-prepend .input-group-text:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Image Merge Tool</h1>
+        
+        <div class="input-group mb-3">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="imageFiles" multiple>
+                <label class="custom-file-label" for="imageFiles">Choose files</label>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="mergeDirection">Merge Direction</label>
+                    </div>
+                    <select class="custom-select" id="mergeDirection">
+                        <option value="horizontal">Horizontal</option>
+                        <option value="vertical">Vertical</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="autoAdjust">Auto Adjust Size</label>
+                    </div>
+                    <select class="custom-select" id="autoAdjust">
+                        <option value="true">On</option>
+                        <option value="false">Off</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="imageSizeLimit">Max File Size (KB)</label>
+                    </div>
+                    <input type="number" class="form-control" id="imageSizeLimit" value="400">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="imageGap">Image Gap (px)</label>
+                    </div>
+                    <input type="number" class="form-control" id="imageGap" value="0">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary" onclick="mergeImages()"><i class="fas fa-images"></i> Merge Images</button>
+                <button class="btn btn-success ml-2" onclick="downloadMergedImage()"><i class="fas fa-download"></i> Download JPG</button>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Merged Image:</h3>
+                <img id="mergedImage" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> <!-- For image processing, if needed -->
+    <script>
+        function mergeImages() {
+            const inputFiles = document.getElementById('imageFiles').files;
+            const mergeDirection = document.getElementById('mergeDirection').value;
+            const autoAdjust = document.getElementById('autoAdjust').value === 'true';
+            const imageGap = parseInt(document.getElementById('imageGap').value) || 0;
+            const maxSizeKB = parseInt(document.getElementById('imageSizeLimit').value) || 0; // Maximum file size limit in KB
+
+            if (inputFiles.length < 2) {
+                alert('Please select at least two images to merge.');
+                return;
+            }
+
+            // Create a new canvas element
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Array to hold loaded image objects
+            const images = [];
+
+            // Function to load each image and store in array
+            function loadImage(file, index) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        images[index] = {
+                            img: img,
+                            width: img.width,
+                            height: img.height
+                        };
+
+                        // Determine maximum dimensions for auto adjust
+                        let maxWidth = 0;
+                        let maxHeight = 0;
+
+                        if (autoAdjust) {
+                            images.forEach(image => {
+                                maxWidth = Math.max(maxWidth, image.width);
+                                maxHeight = Math.max(maxHeight, image.height);
+                            });
+                        }
+
+                        // Update image dimensions based on auto adjust setting
+                        images.forEach(image => {
+                            if (autoAdjust) {
+                                image.width = maxWidth;
+                                image.height = maxHeight;
+                            }
+                            // Here you can add additional logic for adjusting dimensions as needed
+                        });
+
+                        // Update merged image dimensions
+                        let mergedWidth = 0;
+                        let mergedHeight = 0;
+
+                        if (mergeDirection === 'horizontal') {
+                            mergedWidth = images.reduce((totalWidth, image) => totalWidth + image.width, 0) + (images.length - 1) * imageGap;
+                            mergedHeight = Math.max(...images.map(image => image.height));
+                        } else { // vertical
+                            mergedWidth = Math.max(...images.map(image => image.width));
+                            mergedHeight = images.reduce((totalHeight, image) => totalHeight + image.height, 0) + (images.length - 1) * imageGap;
+                        }
+
+                        // Set canvas dimensions
+                        canvas.width = mergedWidth;
+                        canvas.height = mergedHeight;
+
+                        // Clear canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        // Draw images onto canvas
+                        let currentX = 0;
+                        let currentY = 0;
+
+                        images.forEach((image, idx) => {
+                            if (mergeDirection === 'horizontal') {
+                                ctx.drawImage(image.img, currentX, (mergedHeight - image.height) / 2, image.width, image.height);
+                                currentX += image.width + imageGap;
+                            } else { // vertical
+                                ctx.drawImage(image.img, (mergedWidth - image.width) / 2, currentY, image.width, image.height);
+                                currentY += image.height + imageGap;
+                            }
+                        });
+
+                        // Display the merged image
+                        const mergedImage = document.getElementById('mergedImage');
+                        mergedImage.src = canvas.toDataURL('image/jpeg', calculateQuality(canvas, maxSizeKB)); // Adjust quality based on size limit
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Load each selected image
+            for (let i = 0; i < inputFiles.length; i++) {
+                loadImage(inputFiles[i], i);
+            }
+        }
+
+        // Function to calculate JPEG quality based on desired size limit
+        function calculateQuality(canvas, maxSizeKB) {
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            const fileSizeBytes = dataUrl.length * (3/4); // Base64-encoded data is roughly 3/4 of original binary size
+            const maxSizeBytes = maxSizeKB * 1024;
+
+            if (fileSizeBytes <= maxSizeBytes) {
+                return 1.0; // If already within limit, maintain maximum quality
+            } else {
+                return maxSizeBytes / fileSizeBytes; // Adjust quality to meet size limit
+            }
+        }
+
+        function downloadMergedImage() {
+            const mergedImage = document.getElementById('mergedImage');
+            const link = document.createElement('a');
+            link.download = 'merged_image_' + generateRandomNumber() + '.jpg'; // Random number filename
+            link.href = mergedImage.src;
+            link.click();
+        }
+
+        // Function to generate a random number for file name
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * 1000000);
+        }
+    </script>
+</body>
+</html>
