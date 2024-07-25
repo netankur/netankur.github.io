@@ -28,6 +28,13 @@
         "date": "2024-07-06"
     },
     {
+        "title": "Image Merger",
+        "subtitle": "tools",
+        "url": "/tool/image-merge.html",
+        "description": "Merge multiple images into one with our easy-to-use Image Merge Tool. Choose between horizontal or vertical layouts, adjust sizes automatically, and download your merged image with custom file size options. Perfect for creating collages or combining images for presentations and projects.",
+        "date": "2024-07-06"
+    },
+    {
         "title": "Tic Tac Toe",
         "subtitle": "games",
         "url": "/tool/tic-tac-toe.html",
