@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name="description" content="Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly. Ideal for creating PDF portfolios, reports, and more with ease." />
+    <meta name="author" content="Netankur" />
+    <meta name="keywords" content="image to pdf">
+    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+    <title>Image to PDF Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Poppins, sans-serif;
+            background-color: #121212;
+            line-height: 1.6;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            padding: 2rem;
+            margin-bottom: 2em;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+        }
+
+        .grid {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .gridItem {
+            flex: 1 1 0px;
+        }
+
+        button,
+        select {
+            font-family: inherit;
+            width: 100%;
+            padding: .75rem;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        select:first-child {
+            margin-top: 0;
+        }
+
+        .dragList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dragList li {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            background-color: #333;
+        }
+
+        .dragList li .drag-handle {
+            cursor: move;
+            margin-right: 10px;
+            color: #ffffff;
+        }
+
+        .dragList li .dragged-image {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .dragList li .file-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #ffffff;
+        }
+
+        .dragList li .file-delete {
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .preview {
+            border: 1px solid #333;
+            text-align: center;
+            height: 400px;
+        }
+
+        .pdfPreview {
+            overflow-y: scroll;
+            display: none;
+        }
+
+        .preview img {
+            width: auto;
+            max-height: 400px;
+            padding: .5rem;
+            display: block;
+            margin: auto;
+        }
+
+        .custom-file {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .custom-file-input {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: calc(2.25rem + 2px);
+            margin: 0;
+            opacity: 0;
+        }
+
+        .custom-file-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1;
+            height: calc(2.25rem + 2px);
+            padding: .375rem .75rem;
+            line-height: 1.5;
+            color: #ffffff;
+            background-color: #333;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+        }
+
+        .custom-file-label::after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3;
+            display: block;
+            height: calc(calc(2.25rem + 2px) - 1px * 2);
+            padding: .375rem .75rem;
+            line-height: 1.5;
+            color: #ffffff;
+            content: "Browse";
+            background-color: #555;
+            border-left: inherit;
+            border-radius: 0 .25rem .25rem 0;
+        }
+
+        @media only screen and (max-width: 680px) {
+            .container {
+                padding: 1rem;
+                margin-bottom: 1em;
+            }
+
+            .grid {
+                display: block;
+            }
+
+            .preview {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container grid">
+        <div class="gridItem">
+            <select id="pdfQuality" class="form-control">
+                <option disabled selected value="0">-- Select PDF Quality --</option>
+                <option value="0.5">Low</option>
+                <option value="0.7">Medium</option>
+                <option value="">Default</option>
+            </select>
+
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="file" onchange="loadFile(event)" name="file" accept=".png, .jpg, .jpeg" multiple>
+                <label class="custom-file-label" for="file">Choose file</label>
+            </div>
+
+            <ul id="selectedFilesList" class="dragList"></ul>
+
+            <button onclick="pdfDown()" type="button" class="btn btn-primary"><i class="fas fa-download"></i> Download PDF</button>
+        </div>
+
+        <div class="preview gridItem pdfPreview">
+            <img src="/img/preview.png" alt="Preview Image" id="showImg" width="400" height="564">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+    <script>
+        var images = []; // Array to store the selected images
+
+        function loadFile(event) {
+            var files = event.target.files;
+            images = []; // Reset the images array when new files are selected
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+
+                // Check if the file is an image.
+                if (file && file.type.startsWith("image/")) {
+                    var imageObj = {
+                        file: file,
+                        src: URL.createObjectURL(file),
+                    };
+
+                    images.push(imageObj);
+                } else {
+                    alert("Please select valid image files (PNG, JPG, or JPEG).");
+                }
+            }
+
+            // Display previews of all selected images
+            var previewContainer = document.querySelector(".preview");
+            previewContainer.innerHTML = ""; // Clear previous previews
+
+            images.forEach(function (imageObj) {
+                var img = new Image();
+                img.src = imageObj.src;
+                img.width = 400;
+                img.height = 564;
+                previewContainer.appendChild(img);
+            });
+
+            // Update the file list when new files are selected
+            updateFileList();
+        }
+
+        function updateFileList() {
+            var selectedFilesList = document.getElementById("selectedFilesList");
+            selectedFilesList.innerHTML = "";
+
+            images.forEach(function (imageObj, index) {
+                var listItem = document.createElement("li");
+                listItem.setAttribute("data-index", index);
+                listItem.draggable = true;
+
+                // Drag handle
+                var dragHandle = document.createElement("div");
+                dragHandle.innerHTML = '<i class="fas fa-grip-lines"></i>';
+                dragHandle.classList.add("drag-handle");
+                listItem.appendChild(dragHandle);
+
+                // Image preview
+                var img = new Image();
+                img.src = imageObj.src;
+                img.classList.add("dragged-image");
+                listItem.appendChild(img);
+
+                // File name
+                var fileNameSpan = document.createElement("span");
+                fileNameSpan.textContent = imageObj.file.name;
+                fileNameSpan.classList.add("file-name");
+                listItem.appendChild(fileNameSpan);
+
+                // Delete button
+                var deleteButton = document.createElement("span");
+                deleteButton.innerHTML = '<i class="fas fa-times"></i>';
+                deleteButton.classList.add("file-delete");
+                deleteButton.addEventListener("click", function (event) {
+                    deleteFile(index);
+                });
+                listItem.appendChild(deleteButton);
+
+                // Drag and drop events
+                listItem.addEventListener("dragstart", dragStartHandler);
+                listItem.addEventListener("dragover", dragOverHandler);
+                listItem.addEventListener("drop", dropHandler);
+
+                selectedFilesList.appendChild(listItem);
+            });
+
+            // Update the preview image to show the first image initially
+            if (images.length > 0) {
+                var previewImg = document.getElementById("showImg");
+                previewImg.src = images[0].src; // Show the first image initially
+            }
+        }
+
+        function moveFileUp(index) {
+            if (index > 0) {
+                // Swap the current item with the one above it in the 'images' array.
+                var temp = images[index];
+                images[index] = images[index - 1];
+                images[index - 1] = temp;
+
+                // Update the file list to reflect the new order.
+                updateFileList();
+
+                // Ensure the preview image moves along with the list item.
+                var previewImg = document.getElementById("showImg");
+                previewImg.src = images[index].src;
+            }
+        }
+
+        function deleteFile(index) {
+            images.splice(index, 1);
+            updateFileList();
+        }
+
+        function dragStartHandler(event) {
+            event.dataTransfer.setData("text/plain", event.target.getAttribute("data-index"));
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            var fromIndex = parseInt(event.dataTransfer.getData("text/plain"));
+            var toIndex = parseInt(event.target.getAttribute("data-index"));
+
+            if (fromIndex !== toIndex) {
+                // Rearrange the images array by swapping the positions of the dragged item and the drop target
+                var temp = images[fromIndex];
+                images.splice(fromIndex, 1);
+                images.splice(toIndex, 0, temp);
+
+                // Update the file list to reflect the new order
+                updateFileList();
+
+                // Ensure the preview image moves along with the list item.
+                var previewImg = document.getElementById("showImg");
+                previewImg.src = images[toIndex].src;
+            }
+        }
+
+        function pdfDown() {
+            // Get the selected PDF quality from the dropdown.
+            var selectedQuality = parseFloat(document.getElementById("pdfQuality").value);
+
+            if (selectedQuality === 0) {
+                alert("Please select a PDF quality level before generating the PDF.");
+                return; // Stop further execution if no quality level is selected.
+            }
+
+            console.log(selectedQuality);
+
+            if (images.length === 0) {
+                alert("Please select images before generating the PDF.");
+                return;
+            }
+
+            var doc = new jsPDF("p", "pt", "a4"); // Set PDF page size to A4.
+
+            function addImageToPDF(index) {
+                var imageObj = images[index];
+                var newImage = new Image();
+                newImage.src = imageObj.src;
+
+                // Set the maximum width and height for the image to fit within the A4 page.
+                var maxWidth = doc.internal.pageSize.width - 40; // 20 units left and right margin.
+                var maxHeight = doc.internal.pageSize.height - 40; // 20 units top and bottom margin.
+
+                // Calculate the proportional width and height based on the original image aspect ratio.
+                var aspectRatio = newImage.width / newImage.height;
+                var imgWidth = Math.min(maxWidth, newImage.width);
+                var imgHeight = imgWidth / aspectRatio;
+
+                // If the image height exceeds the maximum height, adjust the height and width accordingly.
+                if (imgHeight > maxHeight) {
+                    imgHeight = maxHeight;
+                    imgWidth = imgHeight * aspectRatio;
+                }
+
+                // Center the image horizontally and vertically on the page.
+                var x = (doc.internal.pageSize.width - imgWidth) / 2;
+                var y = (doc.internal.pageSize.height - imgHeight) / 2;
+
+                // Create a canvas element to draw the image.
+                var canvas = document.createElement("canvas");
+                canvas.width = imgWidth;
+                canvas.height = imgHeight;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(newImage, 0, 0, imgWidth, imgHeight);
+
+                // Convert the canvas image to a data URL with the specified quality (adjust as needed).
+                var dataUrl = canvas.toDataURL("image/jpeg", selectedQuality); // 0.7 is the quality (adjust as needed).
+
+                // Add the image to the PDF with the calculated dimensions.
+                if (index !== 0) {
+                    doc.addPage(); // Add a new page for each subsequent image.
+                }
+
+                doc.addImage(dataUrl, "JPEG", x, y, imgWidth, imgHeight);
+
+                // Generate a random PDF file name
+                var fileNameWithoutExt = "PDF_" + Math.random().toString(36).substr(2, 9);
+
+                // If this is the last image, save the PDF.
+                if (index === images.length - 1) {
+                    doc.save(fileNameWithoutExt + ".pdf");
+                }
+            }
+
+            // Add each image to the PDF one by one
+            for (var i = 0; i < images.length; i++) {
+                addImageToPDF(i);
+            }
+        }
+    </script>
+</body>
+</html>
