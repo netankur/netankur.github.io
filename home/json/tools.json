@@ -7,6 +7,13 @@
         "date": "2024-07-05"
     },
     {
+        "title": "Image to Pdf",
+        "subtitle": "tools",
+        "url": "/tool/image-to-pdf.html",
+        "description": "Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly. Ideal for creating PDF portfolios, reports, and more with ease.",
+        "date": "2024-07-06"
+    },
+    {
         "title": "Image Resizer",
         "subtitle": "tools",
         "url": "/tool/image-resize.html",
