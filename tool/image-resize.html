@@ -10,6 +10,85 @@
     <title>Image Resize Tool</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .container {
+            background-color: #000;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #f0ad4e;
+        }
+
+        label {
+            color: #f0ad4e;
+        }
+
+        .form-control {
+            background-color: #555;
+            color: #fff;
+            border: 1px solid #888;
+        }
+
+        .form-control-file {
+            color: #fff;
+        }
+
+        .form-check-input:checked {
+            background-color: #f0ad4e;
+        }
+
+        .btn-primary {
+            background-color: #f0ad4e;
+            border-color: #f0ad4e;
+        }
+
+        .btn-primary:hover {
+            background-color: #eea236;
+            border-color: #eea236;
+        }
+
+        .btn-success {
+            background-color: #5cb85c;
+            border-color: #5cb85c;
+        }
+
+        .btn-success:hover {
+            background-color: #4cae4c;
+            border-color: #4cae4c;
+        }
+
+        #output {
+            background-color: #555;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #imageDetails {
+            color: #f0ad4e;
+            font-size: 16px;
+        }
+
+        #downloadLink {
+            background-color: #5cb85c;
+            border-color: #5cb85c;
+            color: #fff;
+        }
+
+        #downloadLink:hover {
+            background-color: #4cae4c;
+            border-color: #4cae4c;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -21,18 +100,27 @@
                     <input type="file" class="form-control-file" id="imageInput" accept="image/*" onchange="loadImage(event)">
                 </div>
                 <div class="form-group">
-                    <label for="widthInput">Width (px)</label>
+                    <label for="widthInput">Width</label>
                     <input type="number" class="form-control" id="widthInput" placeholder="Enter width" oninput="updateHeight()">
                 </div>
                 <div class="form-group">
-                    <label for="heightInput">Height (px)</label>
+                    <label for="heightInput">Height</label>
                     <input type="number" class="form-control" id="heightInput" placeholder="Enter height" oninput="updateWidth()">
+                </div>
+                <div class="form-group">
+                    <label for="unitSelect">Unit</label>
+                    <select class="form-control" id="unitSelect" onchange="updateDimensions()">
+                        <option value="px">Pixels (px)</option>
+                        <option value="cm">Centimeters (cm)</option>
+                        <option value="mm">Millimeters (mm)</option>
+                        <option value="in">Inches (in)</option>
+                    </select>
                 </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="aspectRatioLock" checked>
                     <label class="form-check-label" for="aspectRatioLock">Lock Aspect Ratio</label>
                 </div>
-                <button class="btn btn-primary btn-block" onclick="resizeImage()">Resize Image</button>
+                <button class="btn btn-primary btn-block" onclick="resizeImage()">Resize Image <i class="fas fa-compress"></i></button>
                 <a id="downloadLink" class="btn btn-success btn-block mt-2" style="display: none;" download><i class="fas fa-download"></i> Download Image</a>
                 <div id="output" class="mt-4 text-center">
                     <p id="noImageText">No image uploaded.</p>
@@ -45,6 +133,7 @@
     </div>
     <script>
         let originalAspectRatio = 1;
+        let selectedUnit = 'px';
 
         function loadImage(event) {
             const fileInput = document.getElementById('imageInput');
@@ -70,12 +159,33 @@
             reader.readAsDataURL(fileInput.files[0]);
         }
 
+        function updateDimensions() {
+            const unitSelect = document.getElementById('unitSelect');
+            selectedUnit = unitSelect.value;
+            updateHeight();
+            updateWidth();
+        }
+
         function updateHeight() {
             const widthInput = document.getElementById('widthInput');
             const heightInput = document.getElementById('heightInput');
             const aspectRatioLock = document.getElementById('aspectRatioLock');
             if (aspectRatioLock.checked) {
-                heightInput.value = Math.round(widthInput.value / originalAspectRatio);
+                const width = parseInt(widthInput.value);
+                const ratio = originalAspectRatio;
+                switch (selectedUnit) {
+                    case 'cm':
+                        heightInput.value = Math.round((width / ratio) * 2.54);
+                        break;
+                    case 'mm':
+                        heightInput.value = Math.round((width / ratio) * 25.4);
+                        break;
+                    case 'in':
+                        heightInput.value = Math.round(width / ratio);
+                        break;
+                    default:
+                        heightInput.value = Math.round(width / ratio);
+                }
             }
         }
 
@@ -84,7 +194,21 @@
             const heightInput = document.getElementById('heightInput');
             const aspectRatioLock = document.getElementById('aspectRatioLock');
             if (aspectRatioLock.checked) {
-                widthInput.value = Math.round(heightInput.value * originalAspectRatio);
+                const height = parseInt(heightInput.value);
+                const ratio = originalAspectRatio;
+                switch (selectedUnit) {
+                    case 'cm':
+                        widthInput.value = Math.round(height * ratio / 2.54);
+                        break;
+                    case 'mm':
+                        widthInput.value = Math.round(height * ratio / 25.4);
+                        break;
+                    case 'in':
+                        widthInput.value = Math.round(height * ratio);
+                        break;
+                    default:
+                        widthInput.value = Math.round(height * ratio);
+                }
             }
         }
 
@@ -98,6 +222,26 @@
             const imageDetails = document.getElementById('imageDetails');
             const downloadLink = document.getElementById('downloadLink');
 
+            let canvasWidth, canvasHeight;
+
+            switch (selectedUnit) {
+                case 'cm':
+                    canvasWidth = widthInput * 96 / 2.54; // Convert cm to px (assuming 1 inch = 96 px)
+                    canvasHeight = heightInput * 96 / 2.54;
+                    break;
+                case 'mm':
+                    canvasWidth = widthInput * 96 / 25.4; // Convert mm to px (assuming 1 inch = 96 px)
+                    canvasHeight = heightInput * 96 / 25.4;
+                    break;
+                case 'in':
+                    canvasWidth = widthInput * 96; // Convert inches to px (assuming 1 inch = 96 px)
+                    canvasHeight = heightInput * 96;
+                    break;
+                default:
+                    canvasWidth = widthInput;
+                    canvasHeight = heightInput;
+            }
+
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
@@ -105,8 +249,8 @@
                     img.src = e.target.result;
                     img.onload = function () {
                         const canvas = document.createElement('canvas');
-                        canvas.width = widthInput || img.width;
-                        canvas.height = heightInput || img.height;
+                        canvas.width = canvasWidth || img.width;
+                        canvas.height = canvasHeight || img.height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         const resizedDataUrl = canvas.toDataURL('image/jpeg');
