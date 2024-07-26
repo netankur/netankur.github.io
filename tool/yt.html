@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Embed and watch YouTube videos with our sleek, dark-themed player. Enjoy a responsive design that adapts perfectly to any device for an optimal viewing experience." />
+<meta name="author" content="Netankur" />
+<meta name="keywords" content="YouTube">
+<link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+<title>YouTube Embed Player</title>
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+  /* Custom Dark UI CSS */
+  body {
+    background-color: #343a40;
+    color: #fff;
+    padding: 5px;
+  }
+
+  .container {
+    max-width: 800px;
+    padding: 20px;
+    background-color: #454d55;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .form-control, .btn-primary {
+    background-color: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
+  }
+
+  .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .btn-primary:hover {
+    background-color: #495057;
+    border-color: #495057;
+  }
+
+  #player-wrapper {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 aspect ratio (for responsive video) */
+  }
+
+  #player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: #454555;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>YouTube Embed Player</h1>
+    <div class="input-group mb-3">
+      <input type="text" id="videoUrl" class="form-control" placeholder="Enter YouTube Video URL">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="button" onclick="loadVideo()"><i class="fas fa-play"></i> Load Video</button>
+      </div>
+    </div>
+    <div id="player-wrapper" class="embed-responsive embed-responsive-16by9">
+      <div id="player"></div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- YouTube Player Script -->
+  <script>
+    function loadVideo() {
+      var videoUrl = document.getElementById('videoUrl').value;
+      var videoId = extractVideoId(videoUrl);
+      if (!videoId) {
+        alert('Please enter a valid YouTube video URL');
+        return;
+      }
+
+      var playerDiv = document.getElementById('player');
+      playerDiv.innerHTML = ''; // Clear previous player
+
+      var player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 1,
+          'controls': 1,
+          'rel': 0,
+          'showinfo': 0,
+          'modestbranding': 1,
+          'iv_load_policy': 3,
+          'fs': 1,
+          'autohide': 1,
+          'vq': 'small'  // Default quality to 240p
+        },
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+
+    function extractVideoId(url) {
+      // Regex to get YouTube video ID from URL
+      var regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+      var match = url.match(regExp);
+      return match ? match[1] : null;
+    }
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+
+    // Load YouTube iframe API asynchronously
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
+</body>
+</html>
