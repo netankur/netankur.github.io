@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Font Example</title>
+  <style>
+    body {
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 20px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Heading 1</h1>
+  <p>This is a paragraph of text using the default font.</p>
+  <h2>Heading 2</h2>
+  <p>Another paragraph to demonstrate font changes.</p>
+  <h3>Heading 3</h3>
+  <p>Yet another paragraph to show different font styles.</p>
+  <h4>Heading 4</h4>
+  <p>One more paragraph for good measure.</p>
+
+  <!-- JavaScript to apply random font -->
+  <script>
+    function applyRandomFont() {
+      fetch('https://netankur.github.io/home/json/fonts.json') // Replace with your HTTPS JSON URL
+        .then(response => response.json())
+        .then(data => {
+          // Extract font families and regular variants
+          const fonts = data.items.map(item => ({
+            family: item.family,
+            regular: item.files.regular.replace('http://', 'https://') // Change HTTP to HTTPS
+          }));
+
+          // Randomly select a font
+          const randomIndex = Math.floor(Math.random() * fonts.length);
+          const randomFont = fonts[randomIndex];
+
+          // Apply the font to body and headers
+          const style = document.createElement('style');
+          style.textContent = `
+            body {
+              font-family: '${randomFont.family}', sans-serif;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              font-family: '${randomFont.family}', sans-serif;
+            }
+          `;
+          document.head.appendChild(style);
+
+          // Preload the font file for better performance
+          const preloadLink = document.createElement('link');
+          preloadLink.href = randomFont.regular;
+          preloadLink.rel = 'preload';
+          preloadLink.as = 'font';
+          preloadLink.type = 'font/ttf';
+          preloadLink.crossOrigin = 'anonymous';
+          document.head.appendChild(preloadLink);
+        })
+        .catch(error => {
+          console.error('Error fetching font data:', error);
+        });
+    }
+
+    // Call the function to apply the font when the page loads
+    applyRandomFont();
+  </script>
+</body>
+</html>
