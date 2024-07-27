@@ -3,24 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications." />
-    <meta name="author" content="Netankur" />
-    <meta name="keywords" content="Qr Code Generator">
-    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+  <meta name="description" content="Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications." />
+  <meta name="author" content="Netankur" />
+  <meta name="keywords" content="Qr Code Generator">
+  <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
   <title>QR Code Generator</title>
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <!-- QRCode.js -->
-  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+  
   <style>
-    /* Custom styles for padding around the QR code and white background */
-    #qrcode {
-      padding: 10px; /* Increased padding for better visibility */
-      background-color: #ffffff; /* White background */
-      display: inline-block;
-      border: 1px solid #ccc; /* Optional: Add a border for better separation */
+    body {
+      background-color: #212529; /* Dark background color */
+      color: #ffffff; /* Light text color */
+    }
+    .form-control {
+      background-color: #343a40; /* Dark form background */
+      color: #ffffff; /* Light form text color */
+      border-color: #ffffff; /* Light form border color */
+    }
+    .btn-primary {
+      background-color: #007bff; /* Bootstrap primary color */
+      border-color: #007bff; /* Bootstrap primary border color */
+    }
+    .btn-primary:hover {
+      background-color: #0056b3; /* Darker hover color */
+      border-color: #0056b3; /* Darker hover border color */
+    }
+    .btn-success {
+      background-color: #28a745; /* Bootstrap success color */
+      border-color: #28a745; /* Bootstrap success border color */
+    }
+    .btn-success:hover {
+      background-color: #218838; /* Darker hover color */
+      border-color: #218838; /* Darker hover border color */
     }
   </style>
 </head>
@@ -28,7 +45,7 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-md-6 mx-auto">
-        <h2 class="text-center mb-4">QR Code Generator</h2>
+        <h2 class="text-center mb-4"><i class="fas fa-qrcode"></i> QR Code Generator</h2>
         <div class="form-group">
           <label for="qr-input">Text/URL:</label>
           <textarea class="form-control" id="qr-input" rows="3" placeholder="Enter text or URL"></textarea>
@@ -37,33 +54,33 @@
           <label>Options:</label>
           <div class="row">
             <div class="col-md-6">
-              <label for="qr-width">Width:</label>
-              <input type="number" id="qr-width" class="form-control" value="128">
-            </div>
-            <div class="col-md-6">
-              <label for="qr-height">Height:</label>
-              <input type="number" id="qr-height" class="form-control" value="128">
+              <label for="qr-size">Size:</label>
+              <input type="number" id="qr-size" class="form-control" value="250">
             </div>
           </div>
           <div class="row mt-2">
             <div class="col-md-6">
-              <label for="qr-color-dark">Dark Color:</label>
-              <input type="color" id="qr-color-dark" class="form-control" value="#000000">
+              <label for="qr-background">Background Color:</label>
+              <input type="color" id="qr-background" class="form-control" value="#ffffff">
             </div>
             <div class="col-md-6">
-              <label for="qr-color-light">Light Color:</label>
-              <input type="color" id="qr-color-light" class="form-control" value="#ffffff">
+              <label for="qr-foreground">Foreground Color:</label>
+              <input type="color" id="qr-foreground" class="form-control" value="#000000">
             </div>
           </div>
           <div class="row mt-2">
             <div class="col-md-6">
-              <label for="qr-correct-level">Correction Level:</label>
-              <select id="qr-correct-level" class="form-control">
-                <option value="H">High</option>
-                <option value="Q">Quartile</option>
-                <option value="M">Medium</option>
+              <label for="qr-level">Correction Level:</label>
+              <select id="qr-level" class="form-control">
                 <option value="L">Low</option>
+                <option value="M">Medium</option>
+                <option value="Q">Quartile</option>
+                <option value="H">High</option>
               </select>
+            </div>
+            <div class="col-md-6">
+              <label for="qr-padding">Padding:</label>
+              <input type="number" id="qr-padding" class="form-control" value="20">
             </div>
           </div>
         </div>
@@ -72,43 +89,59 @@
           <button class="btn btn-success ml-2" onclick="downloadQR()"><i class="fas fa-download"></i> Download QR</button>
         </div>
         <div class="text-center">
-          <div id="qrcode"></div>
+          <img id="qrious" src="" alt="Generated QR Code">
         </div>
       </div>
     </div>
   </div>
 
   <!-- JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script>
-    function generateQR() {
-      var text = document.getElementById("qr-input").value;
-      var width = document.getElementById("qr-width").value;
-      var height = document.getElementById("qr-height").value;
-      var colorDark = document.getElementById("qr-color-dark").value;
-      var colorLight = document.getElementById("qr-color-light").value;
-      var correctLevel = document.getElementById("qr-correct-level").value;
+    var generateQR = function() {
+      var text = document.getElementById('qr-input').value;
+      var size = document.getElementById('qr-size').value;
+      var background = document.getElementById('qr-background').value;
+      var foreground = document.getElementById('qr-foreground').value;
+      var level = document.getElementById('qr-level').value;
+      var padding = document.getElementById('qr-padding').value;
 
-      var qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: text,
-        width: parseInt(width),
-        height: parseInt(height),
-        colorDark: colorDark,
-        colorLight: colorLight,
-        correctLevel: QRCode.CorrectLevel[correctLevel]
+      var qr = new QRious({
+        element: document.getElementById('qrious'),
+        value: text,
+        size: size,
+        background: background,
+        foreground: foreground,
+        level: level,
+        padding: padding
       });
-    }
+    };
 
-    function downloadQR() {
-      var canvas = document.querySelector("#qrcode canvas");
-      var url = canvas.toDataURL("image/png");
+    var downloadQR = function() {
+      var img = document.getElementById('qrious');
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
 
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'qr-code.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      // Convert canvas to data URL
+      var dataURL = canvas.toDataURL("image/png");
+
+      // Create a temporary link element
+      var link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'QRCode.png';
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+    };
   </script>
 </body>
 </html>
