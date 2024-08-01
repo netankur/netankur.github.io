@@ -131,5 +131,12 @@
         "url": "/tool/yt.html",
         "description": "Embed and watch YouTube videos with our sleek, dark-themed player. Enjoy a responsive design that adapts perfectly to any device for an optimal viewing experience.",
         "date": "2024-07-24"
+    },
+    {
+        "title": "Excel File Viewer",
+        "subtitle": "tools",
+        "url": "/tool/xls.html",
+        "description": "An easy-to-use tool for viewing XLS and XLSX files. Open and browse Excel spreadsheets quickly without needing any software. Perfect for quickly accessing and reviewing spreadsheet data on any device.",
+        "date": "2024-08-01"
     }
 ]
