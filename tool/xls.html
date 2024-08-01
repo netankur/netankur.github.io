@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLSX/XLS Viewer</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome CSS for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS for styling -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            color: #212529; /* Dark text color */
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+            background-color: #fff; /* White background for table */
+            color: #212529; /* Dark text color */
+            border-collapse: collapse;
+            font-size: 14px; /* Adjust font size for better readability */
+        }
+        table th,
+        table td {
+            padding: 0.75rem;
+            vertical-align: middle; /* Adjust vertical alignment as needed */
+            border-top: 1px solid #dee2e6;
+        }
+        table th {
+            vertical-align: middle; /* Adjust vertical alignment as needed */
+            border-bottom: 2px solid #dee2e6;
+            background-color: #f8f9fa; /* Light gray background for headers */
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa; /* Light gray background for odd rows */
+        }
+        .table-striped tbody tr:hover {
+            background-color: #e9ecef; /* Lighter gray background on hover */
+        }
+        .table-striped tbody td {
+            border-top-color: #dee2e6; /* Ensure border color contrasts well */
+        }
+        .table-striped tbody tr:hover td {
+            background-color: #e9ecef; /* Lighter gray background on hover */
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="upload-title" class="text-center mb-4">XLSX/XLS Viewer</h2>
+        
+        <!-- File upload button -->
+        <div id="upload-section" class="text-center mb-4">
+            <label for="upload" class="btn btn-primary">
+                <i class="fas fa-file-upload"></i> Upload XLSX/XLS File
+            </label>
+            <input type="file" id="upload" accept=".xlsx, .xls" style="display:none;">
+        </div>
+        
+        <!-- Sheets container (hidden initially) -->
+        <div id="sheets-container" class="table-responsive" style="display:none;">
+            <table id="excel-table" class="table table-bordered table-striped">
+                <!-- Table content will be inserted dynamically -->
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- XLSX Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+    <!-- Custom JavaScript for handling file upload and displaying sheets -->
+    <script>
+        document.getElementById('upload').addEventListener('change', handleFile);
+
+        function handleFile(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            const file = files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                displaySheet(workbook);
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function displaySheet(workbook) {
+            const sheetName = workbook.SheetNames[0]; // Display the first sheet
+            const sheet = workbook.Sheets[sheetName];
+            const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const table = document.getElementById('excel-table');
+            table.innerHTML = ''; // Clear any existing table content
+
+            // Generate table headers
+            const headers = sheetData[0];
+            let headerHTML = '<thead><tr>';
+            headers.forEach(header => {
+                headerHTML += `<th>${header}</th>`;
+            });
+            headerHTML += '</tr></thead>';
+            table.innerHTML += headerHTML;
+
+            // Generate table rows
+            let bodyHTML = '<tbody>';
+            for (let i = 1; i < sheetData.length; i++) {
+                bodyHTML += '<tr>';
+                const rowData = sheetData[i];
+                rowData.forEach(cell => {
+                    bodyHTML += `<td>${cell}</td>`;
+                });
+                bodyHTML += '</tr>';
+            }
+            bodyHTML += '</tbody>';
+            table.innerHTML += bodyHTML;
+
+            // Hide upload section and title
+            document.getElementById('upload-title').style.display = 'none';
+            document.getElementById('upload-section').style.display = 'none';
+
+            // Display the sheets container
+            document.getElementById('sheets-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
