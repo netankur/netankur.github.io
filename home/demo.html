@@ -1,70 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Font Example</title>
-  <style>
-    body {
-      font-size: 16px;
-      line-height: 1.6;
-      margin: 20px;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin: 10px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STUDENT VERIFICATION</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        .input-group-text {
+            background-color: #333;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+        .form-control {
+            background-color: #bfdcf2;
+            border: 1px solid #00bcd4;
+            color: #000000;
+            border-radius: 5px;
+        }
+        .form-control:focus {
+            background-color: #37474f;
+            border-color: #ff9800;
+            color: #fff;
+        }
+        .btn-primary {
+            background-color: #00bcd4;
+            border: none;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: #008c9e;
+        }
+        .result-card {
+            background-color: #1f1f1f;
+            border: 2px solid #00bcd4;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+        }
+        .result-header {
+            background-color: #00bcd4;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            color: #fff;
+        }
+        .result-body {
+            padding: 20px;
+            background-color: #2e2e2e;
+            border-radius: 0 0 10px 10px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #555;
+        }
+        .result-item strong {
+            flex-basis: 35%;
+            color: #ff9800;
+        }
+        .result-item span {
+            flex-basis: 60%;
+            text-align: right;
+            color: #e0e0e0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Example Heading 1</h1>
-  <p>This is an example paragraph.</p>
-  <h2>Example Heading 2</h2>
-  <p>Another paragraph to demonstrate the font change.</p>
-  
-  <!-- JavaScript to apply random font -->
-  <script>
-    function applyRandomFont() {
-      fetch('https://netankur.github.io/home/json/fonts.json')
-        .then(response => response.json())
-        .then(data => {
-          // Extract font families and regular variants
-          const fonts = data.items.map(item => ({
-            family: item.family,
-            regular: item.files.regular.replace('http://', 'https://')
-          }));
+    <div class="container">
+        <h2 class="text-center">STUDENT VERIFICATION</h2>
+        <div class="input-group mb-3">
+            <span class="input-group-text" style="color: #bfdcf2;"><i class="fa-solid fa-id-badge"></i> Reg. No.</span>
+            <input type="text" id="regNoInput" class="form-control" placeholder="Enter Registration Number">
+            <button class="btn btn-primary" onclick="searchData()">Search</button>
+        </div>
 
-          // Randomly select a font
-          const randomIndex = Math.floor(Math.random() * fonts.length);
-          const randomFont = fonts[randomIndex];
+        <div id="resultDiv">
+            <!-- Search results will appear here -->
+        </div>
+    </div>
 
-          // Apply the font to body and headers
-          const style = document.createElement('style');
-          style.textContent = `
-            body {
-              font-family: '${randomFont.family}', sans-serif;
-            }
-            h1, h2, h3, h4, h5, h6 {
-              font-family: '${randomFont.family}', sans-serif;
-            }
-          `;
-          document.head.appendChild(style);
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-          // Preload the font file for better performance
-          const preloadLink = document.createElement('link');
-          preloadLink.href = randomFont.regular;
-          preloadLink.rel = 'preload';
-          preloadLink.as = 'font';
-          preloadLink.type = 'font/ttf';
-          preloadLink.crossOrigin = 'anonymous';
-          document.head.appendChild(preloadLink);
-        })
-        .catch(error => {
-          console.error('Error fetching font data:', error);
-        });
-    }
-
-    // Call the function to apply the font when the page loads
-    applyRandomFont();
-  </script>
+    <script>
+function _0x3096(_0x301f86,_0x1c9c1d){const _0x1b2fa2=_0x1b2f();return _0x3096=function(_0x3096ae,_0x3932f5){_0x3096ae=_0x3096ae-0x94;let _0x36548d=_0x1b2fa2[_0x3096ae];return _0x36548d;},_0x3096(_0x301f86,_0x1c9c1d);}(function(_0x5056c6,_0x2ec0eb){const _0x305ccc=_0x3096,_0x1a5b87=_0x5056c6();while(!![]){try{const _0x41b808=parseInt(_0x305ccc(0xa4))/0x1+-parseInt(_0x305ccc(0xb3))/0x2*(-parseInt(_0x305ccc(0xb0))/0x3)+parseInt(_0x305ccc(0xb9))/0x4*(parseInt(_0x305ccc(0xb1))/0x5)+-parseInt(_0x305ccc(0xab))/0x6+parseInt(_0x305ccc(0xae))/0x7*(-parseInt(_0x305ccc(0xb4))/0x8)+parseInt(_0x305ccc(0x95))/0x9+-parseInt(_0x305ccc(0xa5))/0xa;if(_0x41b808===_0x2ec0eb)break;else _0x1a5b87['push'](_0x1a5b87['shift']());}catch(_0x5df562){_0x1a5b87['push'](_0x1a5b87['shift']());}}}(_0x1b2f,0xb363c));async function fetchData(){const _0x50853d=_0x3096,_0x47c74b=await fetch(_0x50853d(0x9b));if(!_0x47c74b['ok'])throw new Error(_0x50853d(0xb5));const _0x51fa7d=await _0x47c74b[_0x50853d(0xa8)]();return _0x51fa7d;}async function searchData(){const _0x2c623d=_0x3096,_0x4c93ed=document[_0x2c623d(0xb7)](_0x2c623d(0x94))['value'][_0x2c623d(0xa6)](),_0x545fe1=document[_0x2c623d(0xb7)](_0x2c623d(0x9f));_0x545fe1[_0x2c623d(0xa9)]='';if(!_0x4c93ed){Swal['fire']({'icon':_0x2c623d(0x9d),'title':_0x2c623d(0xb8),'text':'Please\x20enter\x20a\x20valid\x20Reg.\x20No.','confirmButtonColor':'#00bcd4'});return;}try{const _0x46f608=await fetchData(),_0x8206bf=_0x46f608[_0x2c623d(0xac)]('\x0a')[_0x2c623d(0xad)](_0x1b611d=>_0x1b611d[_0x2c623d(0xac)](',')),_0x50ae35=_0x8206bf[0x0],_0xa2a89a=_0x8206bf['find'](_0x536e2d=>_0x536e2d[0x1]===_0x4c93ed);if(_0xa2a89a){Swal[_0x2c623d(0x9e)]({'icon':_0x2c623d(0x99),'title':'Student\x20Verified!','text':'Data\x20for\x20Reg.\x20No:\x20'+_0xa2a89a[0x1]+_0x2c623d(0xb6),'confirmButtonColor':_0x2c623d(0x98)});const _0x1ad74d=_0x2c623d(0x9c)+_0xa2a89a[0x1]+_0x2c623d(0x96)+generateCardContent(_0x50ae35,_0xa2a89a)+_0x2c623d(0xa0);_0x545fe1[_0x2c623d(0xa9)]=_0x1ad74d;}else Swal['fire']({'icon':'info','title':_0x2c623d(0xb2),'text':_0x2c623d(0xaf),'confirmButtonColor':'#00bcd4'});}catch(_0x59d231){Swal[_0x2c623d(0x9e)]({'icon':_0x2c623d(0x9a),'title':_0x2c623d(0xa1),'text':_0x59d231[_0x2c623d(0xa2)],'confirmButtonColor':_0x2c623d(0x98)});}}function generateCardContent(_0x5e8651,_0x41a51d){const _0x2fde37=_0x3096;return _0x5e8651[_0x2fde37(0xad)]((_0x15d402,_0x568c9b)=>{const _0x268034=_0x2fde37;if(_0x568c9b===0x0)return'';return _0x268034(0x97)+_0x15d402+_0x268034(0xa7)+_0x41a51d[_0x568c9b]+_0x268034(0xa3);})[_0x2fde37(0xaa)]('');}function _0x1b2f(){const _0x3193c6=['warning','fire','resultDiv','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Error','message','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','763583mptZnH','7563510TxIMan','trim',':</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','text','innerHTML','join','1875954dUkqEH','split','map','161lmOnER','No\x20data\x20found\x20for\x20the\x20given\x20Reg.\x20No.','3200592gMxYwF','5725Nldotr','No\x20Data\x20Found','2EMMIAM','314248urzuoJ','Failed\x20to\x20fetch\x20data','\x20has\x20been\x20successfully\x20retrieved.','getElementById','Oops...','2816AEXNtV','regNoInput','636534UlXxen','</h5>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22result-body\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22result-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>','#00bcd4','success','error','https://docs.google.com/spreadsheets/d/1SF05uRFCrLdUxuX7dmCokvcdM_c0ub88qEezSyXiZDk/export?format=csv&id=1SF05uRFCrLdUxuX7dmCokvcdM_c0ub88qEezSyXiZDk','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22result-card\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22result-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h5>Result\x20for\x20Reg.\x20No:\x20'];_0x1b2f=function(){return _0x3193c6;};return _0x1b2f();}
+    </script>
 </body>
 </html>
