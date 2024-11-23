@@ -1,202 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself. Perfect for quick matches and endless fun!" />
-    <meta name="author" content="Netankur" />
-    <meta name="keywords" content="Tic Tac Toe">
-    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
-    <title>Tic Tac Toe</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        body {
-            background-color: #333;
-            color: #fff;
-            font-family: Arial, sans-serif;
-        }
-        .board-container {
-            text-align: center;
-            padding: 20px;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            gap: 5px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            background-color: #444;
-            border: 1px solid #555;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .cell:hover {
-            background-color: #555;
-        }
-        .cell.X {
-            color: #ff5722;
-        }
-        .cell.O {
-            color: #03a9f4;
-        }
-        .highlight {
-            background-color: #76c7c0 !important;
-            color: #fff !important;
-        }
-        #status {
-            margin: 20px 0;
-            font-size: 1.2rem;
-        }
-        .reset-button {
-            margin-top: 20px;
-            background-color: #ff5722;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .reset-button:hover {
-            background-color: #e64a19;
-        }
-        #scoreboard {
-            font-size: 1.2rem;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiplayer Tic Tac Toe</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background-color: #f0f8ff;
+      color: #333;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 10px;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .cell:hover {
+      background-color: #f1f3f5;
+      transform: scale(1.05);
+    }
+
+    .cell.taken {
+      cursor: not-allowed;
+    }
+
+    .cell.winning {
+      background-color: #4caf50;
+      color: white;
+      animation: highlight 1s infinite alternate;
+    }
+
+    @keyframes highlight {
+      0% { background-color: #4caf50; }
+      100% { background-color: #66bb6a; }
+    }
+
+    .scoreboard {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #d1c4e9;
+      border-radius: 8px;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .btn-connect {
+      margin-top: 10px;
+    }
+
+    #restart {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="board-container">
-            <h1>Tic Tac Toe</h1>
-            <div class="board">
-                <div class="cell" data-index="0"></div>
-                <div class="cell" data-index="1"></div>
-                <div class="cell" data-index="2"></div>
-                <div class="cell" data-index="3"></div>
-                <div class="cell" data-index="4"></div>
-                <div class="cell" data-index="5"></div>
-                <div class="cell" data-index="6"></div>
-                <div class="cell" data-index="7"></div>
-                <div class="cell" data-index="8"></div>
-            </div>
-            <div id="status"></div>
-            <button id="reset" class="reset-button">Reset Game</button>
-            <div id="scoreboard">X: 0 | O: 0</div>
-        </div>
+  <div class="container text-center">
+    <h1 class="mb-4"><i class="fas fa-gamepad text-primary"></i> Multiplayer Tic Tac Toe</h1>
+
+    <!-- Connection Section -->
+    <div id="connection">
+      <p class="mb-2">Your Peer ID: <span id="peer-id" class="text-primary fw-bold">Fetching...</span></p>
+      <div class="input-group mb-3">
+        <input type="text" id="connect-id" class="form-control" placeholder="Enter Peer ID to connect">
+        <button id="connect-btn" class="btn btn-primary btn-connect">Connect</button>
+      </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        const cells = document.querySelectorAll('.cell');
-        const statusDiv = document.getElementById('status');
-        const resetButton = document.getElementById('reset');
-        const scoreboardDiv = document.getElementById('scoreboard');
+    <!-- Game Section -->
+    <div id="game" style="display:none;">
+      <div class="board">
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+      </div>
 
-        let board = ['', '', '', '', '', '', '', '', ''];
-        let currentPlayer = 'X';
-        let gameActive = true;
-        let scores = { X: 0, O: 0 };
+      <!-- Scoreboard -->
+      <div class="scoreboard d-flex justify-content-between px-3 py-2">
+        <div class="score" id="player-x-score">Player X: 0</div>
+        <div class="score" id="player-o-score">Player O: 0</div>
+      </div>
 
-        const winConditions = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
+      <!-- Status -->
+      <p id="status" class="status">Waiting for opponent...</p>
 
-        function checkWin() {
-            for (const condition of winConditions) {
-                const [a, b, c] = condition;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return condition;
-                }
-            }
-            return board.includes('') ? null : 'Draw';
+      <!-- Restart Button -->
+      <button id="restart" class="btn btn-success" style="display:none;"><i class="fas fa-redo"></i> Restart Game</button>
+    </div>
+  </div>
+
+  <!-- PeerJS -->
+  <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+  <script>
+    const peer = new Peer();
+    const cells = document.querySelectorAll('[data-cell]');
+    const statusDisplay = document.getElementById('status');
+    const peerIdDisplay = document.getElementById('peer-id');
+    const connectBtn = document.getElementById('connect-btn');
+    const connectIdInput = document.getElementById('connect-id');
+    const restartButton = document.getElementById('restart');
+    const gameContainer = document.getElementById('game');
+    const connectionContainer = document.getElementById('connection');
+    const playerXScoreDisplay = document.getElementById('player-x-score');
+    const playerOScoreDisplay = document.getElementById('player-o-score');
+
+    let conn;
+    let isGameActive = false;
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let playerSymbol;
+    let scores = { X: 0, O: 0 };
+
+    peer.on('open', id => {
+      peerIdDisplay.textContent = id;
+      statusDisplay.textContent = "Share your Peer ID with another player.";
+    });
+
+    connectBtn.addEventListener('click', () => {
+      const remoteId = connectIdInput.value.trim();
+      if (remoteId) {
+        conn = peer.connect(remoteId);
+        setupConnection('host');
+      }
+    });
+
+    peer.on('connection', connection => {
+      conn = connection;
+      setupConnection('guest');
+    });
+
+    function setupConnection(role) {
+      conn.on('open', () => {
+        isGameActive = true;
+        playerSymbol = role === 'host' ? 'X' : 'O';
+        connectionContainer.style.display = 'none';
+        gameContainer.style.display = 'block';
+        statusDisplay.textContent = `You are "${playerSymbol}". ${playerSymbol === 'X' ? "Your turn!" : "Opponent's turn..."}`;
+      });
+
+      conn.on('data', handleIncomingData);
+
+      conn.on('close', () => {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Opponent Disconnected',
+          text: 'The game has ended. Refresh to start a new session!',
+          confirmButtonText: 'OK'
+        });
+        isGameActive = false;
+      });
+    }
+
+    function handleIncomingData(data) {
+      if (data.type === 'move') {
+        board[data.index] = data.symbol;
+        updateBoard();
+        checkGameStatus();
+        currentPlayer = playerSymbol;
+        statusDisplay.textContent = 'Your turn!';
+      }
+    }
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener('click', () => {
+        if (isGameActive && board[index] === '' && currentPlayer === playerSymbol) {
+          board[index] = currentPlayer;
+          updateBoard();
+          checkGameStatus();
+
+          conn.send({ type: 'move', index, symbol: currentPlayer });
+
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          statusDisplay.textContent = "Opponent's turn...";
         }
+      });
+    });
 
-        function highlightWinningCells(line) {
-            cells.forEach(cell => cell.classList.remove('highlight'));
-            line.forEach(index => cells[index].classList.add('highlight'));
+    function updateBoard() {
+      cells.forEach((cell, index) => {
+        cell.textContent = board[index];
+        cell.classList.toggle('taken', board[index] !== '');
+      });
+    }
+
+    function checkGameStatus() {
+      const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
+
+      let roundWon = false;
+      let winningCombination = null;
+
+      for (const condition of winningCombinations) {
+        const [a, b, c] = condition;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          roundWon = true;
+          winningCombination = condition;
+          break;
         }
+      }
 
-        function updateBoard() {
-            cells.forEach((cell, index) => {
-                cell.textContent = board[index];
-                cell.className = `cell ${board[index]}`;
-            });
-        }
+      if (roundWon) {
+        winningCombination.forEach(index => {
+          cells[index].classList.add('winning');
+        });
 
-        function handleClick(event) {
-            const index = event.target.getAttribute('data-index');
-            if (board[index] || !gameActive) return;
+        Swal.fire({
+          icon: 'success',
+          title: `${currentPlayer} Wins!`,
+          confirmButtonText: 'Play Again'
+        }).then(resetGame);
 
-            board[index] = currentPlayer;
-            const result = checkWin();
+        updateScore(currentPlayer);
+        isGameActive = false;
+        return;
+      }
 
-            if (result) {
-                if (result === 'Draw') {
-                    Swal.fire({
-                        title: 'Draw!',
-                        text: 'It\'s a draw!',
-                        icon: 'info',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    Swal.fire({
-                        title: `Player ${currentPlayer} Wins!`,
-                        text: 'Congratulations!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        highlightWinningCells(result);
-                    });
-                    scores[currentPlayer]++;
-                    gameActive = false;
-                }
-            } else {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                statusDiv.textContent = `Player ${currentPlayer}'s Turn`;
-            }
+      if (!board.includes('')) {
+        Swal.fire({
+          icon: 'info',
+          title: `It's a Draw!`,
+          confirmButtonText: 'Play Again'
+        }).then(resetGame);
 
-            updateBoard();
-            updateScoreboard();
-        }
+        isGameActive = false;
+      }
+    }
 
-        function updateScoreboard() {
-            scoreboardDiv.textContent = `X: ${scores.X} | O: ${scores.O}`;
-        }
+    function updateScore(player) {
+      scores[player]++;
+      playerXScoreDisplay.textContent = `Player X: ${scores.X}`;
+      playerOScoreDisplay.textContent = `Player O: ${scores.O}`;
+    }
 
-        function resetGame() {
-            board = ['', '', '', '', '', '', '', '', ''];
-            currentPlayer = 'X';
-            gameActive = true;
-            statusDiv.textContent = `Player ${currentPlayer}'s Turn`;
-            cells.forEach(cell => cell.classList.remove('highlight'));
-            updateBoard();
-        }
-
-        cells.forEach(cell => cell.addEventListener('click', handleClick));
-        resetButton.addEventListener('click', resetGame);
-
-        resetGame();  // Initialize game
-    </script>
+    function resetGame() {
+      board = ['', '', '', '', '', '', '', '', ''];
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('taken', 'winning');
+      });
+      currentPlayer = 'X';
+      isGameActive = true;
+      statusDisplay.textContent = `${playerSymbol === 'X' ? "Your turn!" : "Opponent's turn..."}`;
+    }
+  </script>
 </body>
 </html>
