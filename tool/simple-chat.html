@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+  <style>
+    body {
+      background-color: #f4f4f9;
+      margin: 0;
+      height: 95vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    #setup-container {
+      text-align: center;
+      padding: 20px;
+      flex-grow: 1;
+    }
+
+    #chat-container {
+      display: none;
+      flex-direction: column;
+      height: 95vh;
+      justify-content: flex-start;
+      position: relative;
+    }
+
+    #chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      background: #fff;
+      display: flex;
+      flex-direction: column; /* New messages appear below older messages */
+    }
+
+    .message {
+      margin: 10px;
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .message.sent {
+      background-color: #dcf8c6; /* Sent message background color (light green) */
+      align-self: flex-end; /* Sent messages aligned to the right */
+      color: #000;
+    }
+
+    .message.received {
+      background-color: #fff;
+      align-self: flex-start; /* Received messages aligned to the left */
+      color: #000;
+      border: 1px solid #ddd;
+    }
+
+    #chat-input-container {
+      padding: 10px;
+      background: #fff;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      padding-bottom: 15px;
+      justify-content: space-between;
+    }
+
+    textarea {
+      width: 85%;
+      height: 50px;
+      resize: none;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 10px;
+    }
+
+    .send-btn {
+      width: 12%;
+      height: 50px;
+      background-color: #25D366; /* WhatsApp green */
+      border-radius: 20px;
+      color: white;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .send-btn:hover {
+      background-color: #128C7E;
+    }
+
+    /* Media Queries for Mobile */
+    @media screen and (max-width: 767px) {
+      #chat-input-container {
+        position: absolute;
+        bottom: 10px;
+      }
+
+      #chat-box {
+        padding-bottom: 100px; /* To make room for the keyboard */
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="setup-container">
+  <h1 class="mb-3"><i class="fa-solid fa-comments"></i> Simple Chat</h1>
+  <button class="btn btn-primary mb-3" id="generate-peer-id">Generate Peer ID</button>
+  <p id="my-peer-id">Your ID: <span class="text-muted">Not generated yet</span></p>
+  <div class="input-group mb-3">
+    <input type="text" id="remote-peer-id" class="form-control" placeholder="Enter Peer ID to connect">
+    <button class="btn btn-success" id="connect-btn"><i class="fa-solid fa-plug"></i> Connect</button>
+  </div>
+</div>
+
+<div id="chat-container">
+  <div id="chat-box" class="d-flex flex-column"></div>
+  <div id="chat-input-container">
+    <textarea id="chat-message" placeholder="Type a message..."></textarea>
+    <button class="send-btn" id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script>
+  const peer = new Peer();
+  let conn;
+
+  // Local Storage Setup with "mychat" key
+  const saveMessage = (message, type) => {
+    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+    chatHistory.push({ message, type, timestamp: new Date().toISOString() });
+    localStorage.setItem('mychat', JSON.stringify(chatHistory));
+  };
+
+  const loadMessages = () => {
+    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+    chatHistory.forEach(({ message, type }) => appendMessage(message, type));
+  };
+
+  // Generate Peer ID
+  document.getElementById("generate-peer-id").addEventListener("click", () => {
+    peer.on("open", (id) => {
+      document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${id}</strong>`;
+      Swal.fire({
+        icon: "success",
+        title: "Peer ID Generated",
+        text: `Your Peer ID is ${id}`,
+      });
+    });
+  });
+
+  // Connect to Peer
+  document.getElementById("connect-btn").addEventListener("click", () => {
+    const remoteId = document.getElementById("remote-peer-id").value.trim();
+    if (!remoteId) {
+      Swal.fire("Error", "Please enter a valid Peer ID", "error");
+      return;
+    }
+    conn = peer.connect(remoteId);
+    conn.on("open", () => {
+      Swal.fire("Connected", `You are now connected to ${remoteId}`, "success");
+      setupConnection(remoteId);
+      switchToChatView();
+    });
+    conn.on("error", (err) => {
+      Swal.fire("Error", err.message, "error");
+    });
+  });
+
+  // Setup Connection
+  function setupConnection(remoteId) {
+    conn.on("data", (data) => {
+      appendMessage(data, "received");
+      saveMessage(data, "received");
+    });
+  }
+
+  // Append Message
+  function appendMessage(msg, type) {
+    const chatBox = document.getElementById("chat-box");
+    const messageElem = document.createElement("div");
+    messageElem.className = `message ${type}`;
+    messageElem.innerText = msg;
+    chatBox.appendChild(messageElem);
+    chatBox.scrollTop = chatBox.scrollHeight;  // Ensure the latest message is visible
+  }
+
+  // Send Message
+  document.getElementById("send-btn").addEventListener("click", () => {
+    const message = document.getElementById("chat-message").value.trim();
+    if (!message || !conn) return;
+
+    conn.send(message);
+    appendMessage(message, "sent");
+    saveMessage(message, "sent");
+    document.getElementById("chat-message").value = "";
+  });
+
+  // Switch to Chat View
+  function switchToChatView() {
+    document.getElementById("setup-container").style.display = "none";
+    document.getElementById("chat-container").style.display = "flex";
+    loadMessages();
+  }
+
+  // Listen for incoming connections
+  peer.on("connection", (connection) => {
+    conn = connection;
+    conn.on("data", (data) => {
+      appendMessage(data, "received");
+      saveMessage(data, "received");
+    });
+    Swal.fire("New Connection", `You are now connected with ${conn.peer}`, "info");
+    switchToChatView();
+  });
+</script>
+
+</body>
+</html>
