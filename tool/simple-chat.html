@@ -135,30 +135,36 @@
 </div>
 
 <script>
-  const peer = new Peer();
-  let conn;
+  // Check if a Peer ID is already stored in localStorage
+  var peerId = localStorage.getItem('peerId');
+  const peer = peerId ? new Peer(peerId) : new Peer();
 
-  // Local Storage Setup with "mychat" key
-  const saveMessage = (message, type) => {
-    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
-    chatHistory.push({ message, type, timestamp: new Date().toISOString() });
-    localStorage.setItem('mychat', JSON.stringify(chatHistory));
-  };
-
-  const loadMessages = () => {
-    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
-    chatHistory.forEach(({ message, type }) => appendMessage(message, type));
-  };
-
-  // Generate Peer ID
-  document.getElementById("generate-peer-id").addEventListener("click", () => {
-    peer.on("open", (id) => {
+  // When the Peer object is opened, set the Peer ID in localStorage (if not already set)
+  peer.on('open', function(id) {
+    if (!peerId) {
+      localStorage.setItem('peerId', id);  // Store the Peer ID
       document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${id}</strong>`;
       Swal.fire({
         icon: "success",
         title: "Peer ID Generated",
         text: `Your Peer ID is ${id}`,
       });
+    } else {
+      document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${peerId}</strong>`;
+    }
+  });
+
+  // Generate Peer ID button
+  document.getElementById("generate-peer-id").addEventListener("click", () => {
+    peer.on("open", (id) => {
+      if (!peerId) {
+        localStorage.setItem('peerId', id);
+        Swal.fire({
+          icon: "success",
+          title: "Peer ID Generated",
+          text: `Your Peer ID is ${id}`,
+        });
+      }
     });
   });
 
@@ -215,6 +221,18 @@
     document.getElementById("chat-container").style.display = "flex";
     loadMessages();
   }
+
+  // Local Storage Setup with "mychat" key
+  const saveMessage = (message, type) => {
+    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+    chatHistory.push({ message, type, timestamp: new Date().toISOString() });
+    localStorage.setItem('mychat', JSON.stringify(chatHistory));
+  };
+
+  const loadMessages = () => {
+    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+    chatHistory.forEach(({ message, type }) => appendMessage(message, type));
+  };
 
   // Listen for incoming connections
   peer.on("connection", (connection) => {
