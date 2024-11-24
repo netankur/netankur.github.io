@@ -138,5 +138,26 @@
         "url": "/tool/xls.html",
         "description": "An easy-to-use tool for viewing XLS and XLSX files. Open and browse Excel spreadsheets quickly without needing any software. Perfect for quickly accessing and reviewing spreadsheet data on any device.",
         "date": "2024-08-01"
+    },
+    {
+        "title": "Messaging App",
+        "subtitle": "tools",
+        "url": "/tool/chat.html",
+        "description": "A peer-to-peer (P2P) chat app enables direct communication between users without needing a central server. This approach ensures secure, efficient, and scalable messaging by connecting users directly to exchange text, media, and files. Ideal for private conversations, group chats, and real-time collaboration.",
+        "date": "2024-11-01"
+    },
+    {
+        "title": "Simple Chat",
+        "subtitle": "tools",
+        "url": "/tool/simple-chat.html",
+        "description": "A P2P chat app allows users to communicate directly, without a central server, for secure and efficient messaging.",
+        "date": "2024-11-01"
+    },
+    {
+        "title": "Whiteboard",
+        "subtitle": "tools",
+        "url": "/tool/whiteboard.html",
+        "description": "A whiteboard app provides a collaborative digital space where users can draw, write, and share ideas in real time. Ideal for brainstorming, teaching, and team meetings.",
+        "date": "2024-11-01"
     }
 ]
