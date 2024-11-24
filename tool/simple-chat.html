@@ -139,115 +139,120 @@
 </div>
 
 <script>
-  // Check if a Peer ID is already stored in localStorage
-  var peerId = localStorage.getItem('peerId');
-  const peer = peerId ? new Peer(peerId) : new Peer();
+// Check if a Peer ID is already stored in localStorage
+var peerId = localStorage.getItem('peerId');
+const peer = peerId ? new Peer(peerId) : new Peer();
+let conn; // Connection object to handle peer-to-peer communication
 
-  // When the Peer object is opened, set the Peer ID in localStorage (if not already set)
-  peer.on('open', function(id) {
+// When the Peer object is opened, set the Peer ID in localStorage (if not already set)
+peer.on('open', function (id) {
+  if (!peerId) {
+    localStorage.setItem('peerId', id); // Store the Peer ID
+    document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${id}</strong>`;
+    Swal.fire({
+      icon: "success",
+      title: "Peer ID Generated",
+      text: `Your Peer ID is ${id}`,
+    });
+  } else {
+    document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${peerId}</strong>`;
+  }
+});
+
+// Generate Peer ID button
+document.getElementById("generate-peer-id").addEventListener("click", () => {
+  peer.on("open", (id) => {
     if (!peerId) {
-      localStorage.setItem('peerId', id);  // Store the Peer ID
-      document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${id}</strong>`;
+      localStorage.setItem('peerId', id);
       Swal.fire({
         icon: "success",
         title: "Peer ID Generated",
         text: `Your Peer ID is ${id}`,
       });
-    } else {
-      document.getElementById("my-peer-id").innerHTML = `Your ID: <strong>${peerId}</strong>`;
     }
   });
+});
 
-  // Generate Peer ID button
-  document.getElementById("generate-peer-id").addEventListener("click", () => {
-    peer.on("open", (id) => {
-      if (!peerId) {
-        localStorage.setItem('peerId', id);
-        Swal.fire({
-          icon: "success",
-          title: "Peer ID Generated",
-          text: `Your Peer ID is ${id}`,
-        });
-      }
-    });
-  });
-
-  // Connect to Peer
-  document.getElementById("connect-btn").addEventListener("click", () => {
-    const remoteId = document.getElementById("remote-peer-id").value.trim();
-    if (!remoteId) {
-      Swal.fire("Error", "Please enter a valid Peer ID", "error");
-      return;
-    }
-    conn = peer.connect(remoteId);
-    conn.on("open", () => {
-      Swal.fire("Connected", `You are now connected to ${remoteId}`, "success");
-      setupConnection(remoteId);
-      switchToChatView();
-    });
-    conn.on("error", (err) => {
-      Swal.fire("Error", err.message, "error");
-    });
-  });
-
-  // Setup Connection
-  function setupConnection(remoteId) {
-    conn.on("data", (data) => {
-      appendMessage(data, "received");
-      saveMessage(data, "received");
-    });
+// Connect to Peer
+document.getElementById("connect-btn").addEventListener("click", () => {
+  const remoteId = document.getElementById("remote-peer-id").value.trim();
+  if (!remoteId) {
+    Swal.fire("Error", "Please enter a valid Peer ID", "error");
+    return;
   }
+  conn = peer.connect(remoteId);
 
-  // Append Message
-  function appendMessage(msg, type) {
-    const chatBox = document.getElementById("chat-box");
-    const messageElem = document.createElement("div");
-    messageElem.className = `message ${type}`;
-    messageElem.innerText = msg;
-    chatBox.appendChild(messageElem);
-    chatBox.scrollTop = chatBox.scrollHeight;  // Ensure the latest message is visible
-  }
-
-  // Send Message
-  document.getElementById("send-btn").addEventListener("click", () => {
-    const message = document.getElementById("chat-message").value.trim();
-    if (!message || !conn) return;
-
-    conn.send(message);
-    appendMessage(message, "sent");
-    saveMessage(message, "sent");
-    document.getElementById("chat-message").value = "";
-  });
-
-  // Switch to Chat View
-  function switchToChatView() {
-    document.getElementById("setup-container").style.display = "none";
-    document.getElementById("chat-container").style.display = "flex";
-    loadMessages();
-  }
-
-  // Local Storage Setup with "mychat" key
-  const saveMessage = (message, type) => {
-    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
-    chatHistory.push({ message, type, timestamp: new Date().toISOString() });
-    localStorage.setItem('mychat', JSON.stringify(chatHistory));
-  };
-
-  const loadMessages = () => {
-    const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
-    chatHistory.forEach(({ message, type }) => appendMessage(message, type));
-  };
-
-  // Listen for incoming connections
-  peer.on("connection", (connection) => {
-    conn = connection;
-    conn.on("data", (data) => {
-      appendMessage(data, "received");
-      saveMessage(data, "received");
-    });
-    Swal.fire("New Connection", `You are now connected with ${conn.peer}`, "info");
+  conn.on("open", () => {
+    Swal.fire("Connected", `You are now connected to ${remoteId}`, "success");
+    setupConnection(conn); // Pass the connection object
     switchToChatView();
   });
+
+  conn.on("error", (err) => {
+    Swal.fire("Error", err.message, "error");
+  });
+});
+
+// Setup Connection
+function setupConnection(connection) {
+  // Remove existing listeners (if any) to avoid duplicates
+  connection.off("data");
+
+  connection.on("data", (data) => {
+    appendMessage(data, "received");
+    saveMessage(data, "received");
+  });
+}
+
+// Append Message
+function appendMessage(msg, type) {
+  const chatBox = document.getElementById("chat-box");
+  const messageElem = document.createElement("div");
+  messageElem.className = `message ${type}`;
+  messageElem.innerText = msg;
+  chatBox.appendChild(messageElem);
+  chatBox.scrollTop = chatBox.scrollHeight; // Ensure the latest message is visible
+}
+
+// Send Message
+document.getElementById("send-btn").addEventListener("click", () => {
+  const message = document.getElementById("chat-message").value.trim();
+  if (!message || !conn) return;
+
+  conn.send(message);
+  appendMessage(message, "sent");
+  saveMessage(message, "sent");
+  document.getElementById("chat-message").value = "";
+});
+
+// Switch to Chat View
+function switchToChatView() {
+  document.getElementById("setup-container").style.display = "none";
+  document.getElementById("chat-container").style.display = "flex";
+  loadMessages();
+}
+
+// Local Storage Setup with "mychat" key
+const saveMessage = (message, type) => {
+  const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+  chatHistory.push({ message, type, timestamp: new Date().toISOString() });
+  localStorage.setItem('mychat', JSON.stringify(chatHistory));
+};
+
+const loadMessages = () => {
+  const chatHistory = JSON.parse(localStorage.getItem('mychat')) || [];
+  chatHistory.forEach(({ message, type }) => appendMessage(message, type));
+};
+
+// Listen for incoming connections
+peer.on("connection", (connection) => {
+  conn = connection;
+
+  setupConnection(conn); // Pass the connection object
+
+  Swal.fire("New Connection", `You are now connected with ${conn.peer}`, "info");
+  switchToChatView();
+});
 </script>
 
 </body>
