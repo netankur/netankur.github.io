@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
         body, html {
             margin: 0;
@@ -81,6 +81,9 @@
                 <i class="fas fa-user"></i> Create Peer ID
             </button>
             <input type="text" id="peer-id" class="form-control mt-3" placeholder="Your Peer ID" readonly>
+            <button id="share-url-btn" class="btn btn-primary btn-block mt-3" style="display:none;">
+                <i class="fa-solid fa-share"></i> Share URL
+            </button>
             <input type="text" id="connect-id" class="form-control mt-3" placeholder="Enter Peer ID to Connect">
             <button id="connect" class="btn btn-success btn-block mt-3">
                 <i class="fas fa-link"></i> Connect
@@ -105,6 +108,16 @@
                 <label for="pencil-color">Brush Color</label>
                 <input type="color" id="pencil-color" value="#000000">
             </div>
+            <div class="mb-3">
+                <label for="rubber-size">Rubber Size</label>
+                <input type="range" class="form-control-range" id="rubber-size" min="5" max="50" value="10">
+            </div>
+            <div class="mb-3">
+                <button id="toggle-rubber" class="btn btn-secondary">Use Rubber</button>
+            </div>
+            <div class="mb-3">
+                <button id="clear-board" class="btn btn-danger">Clear Whiteboard</button>
+            </div>
         </div>
 
         <!-- Whiteboard Canvas -->
@@ -123,17 +136,23 @@ const peerIdInput = document.getElementById('peer-id');
 const connectIdInput = document.getElementById('connect-id');
 const connectBtn = document.getElementById('connect');
 const createPeerIdBtn = document.getElementById('create-peer-id');
+const shareUrlBtn = document.getElementById('share-url-btn');
 const connectionSection = document.getElementById('connection-section');
 const whiteboardSection = document.getElementById('whiteboard-section');
 const settingsToggle = document.getElementById('settings-toggle');
 const settingsPanel = document.getElementById('settings-panel');
 const pencilSizeInput = document.getElementById('pencil-size');
 const pencilColorInput = document.getElementById('pencil-color');
+const rubberSizeInput = document.getElementById('rubber-size');
+const toggleRubberBtn = document.getElementById('toggle-rubber');
+const clearBoardBtn = document.getElementById('clear-board');
 
 // Whiteboard State
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let isRubberActive = false; // To toggle between pencil and rubber
+let rubberSize = 10; // Default rubber size
 
 // Resize canvas to fit the screen
 function resizeCanvas() {
@@ -141,6 +160,14 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 window.addEventListener('resize', resizeCanvas);
+
+// Check if there's a peer-id in the URL hash on page load
+window.addEventListener('load', () => {
+    const peerIdFromURL = window.location.hash.replace('#', ''); // Get Peer ID from the URL
+    if (peerIdFromURL) {
+        connectIdInput.value = peerIdFromURL; // Populate the connect input field with Peer ID
+    }
+});
 
 // Create a Peer ID
 createPeerIdBtn.addEventListener('click', () => {
@@ -153,6 +180,20 @@ createPeerIdBtn.addEventListener('click', () => {
     peer.on('open', (id) => {
         peerIdInput.value = id;
         Swal.fire('Peer ID Created!', `Your Peer ID: ${id}`, 'success');
+
+        // Generate URL with Peer ID and update the address bar
+        const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}#${id}`;
+        window.history.pushState({ path: newUrl }, '', newUrl); // Update the URL with the Peer ID
+
+        // Show the "Share URL" button
+        shareUrlBtn.style.display = 'inline-block';
+
+        // When the "Share URL" button is clicked, copy the URL to clipboard
+        shareUrlBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(newUrl)
+                .then(() => Swal.fire('URL Copied!', 'You can now share the URL with others.', 'success'))
+                .catch((err) => Swal.fire('Error', 'Failed to copy URL to clipboard', 'error'));
+        });
     });
 });
 
@@ -203,6 +244,23 @@ settingsToggle.addEventListener('click', () => {
     }
 });
 
+// Toggle between pencil and rubber tool
+toggleRubberBtn.addEventListener('click', () => {
+    isRubberActive = !isRubberActive;
+    toggleRubberBtn.textContent = isRubberActive ? 'Use Pencil' : 'Use Rubber'; // Change button text
+});
+
+// Clear Whiteboard
+clearBoardBtn.addEventListener('click', () => {
+    // Clear the local whiteboard
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Send the "clear" action to the peer
+    if (conn && conn.open) {
+        conn.send({ action: 'clear' }); // Notify the peer to clear the whiteboard
+    }
+});
+
 // Drawing functionality
 canvas.addEventListener('mousedown', (e) => startDrawing(e.offsetX, e.offsetY));
 canvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
@@ -235,14 +293,21 @@ function draw(x, y) {
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
-    ctx.strokeStyle = pencilColorInput.value;
-    ctx.lineWidth = pencilSizeInput.value;
+
+    if (isRubberActive) {
+        ctx.strokeStyle = 'white'; // Eraser is white to "erase" the drawing
+        ctx.lineWidth = rubberSizeInput.value; // Use the rubber size
+    } else {
+        ctx.strokeStyle = pencilColorInput.value;
+        ctx.lineWidth = pencilSizeInput.value;
+    }
+
     ctx.stroke();
     ctx.closePath();
 
     // Share drawing with peer
     if (conn && conn.open) {
-        conn.send({ x1: lastX, y1: lastY, x2: x, y2: y, color: ctx.strokeStyle, size: ctx.lineWidth });
+        conn.send({ x1: lastX, y1: lastY, x2: x, y2: y, color: ctx.strokeStyle, size: ctx.lineWidth, action: isRubberActive ? 'erase' : 'draw' });
     }
     lastX = x;
     lastY = y;
@@ -255,7 +320,7 @@ function stopDrawing() {
 function setupConnectionEvents() {
     conn.on('data', (data) => {
         if (data && data.x1 !== undefined) {
-            const { x1, y1, x2, y2, color, size } = data;
+            const { x1, y1, x2, y2, color, size, action } = data;
             ctx.strokeStyle = color;
             ctx.lineWidth = size;
             ctx.beginPath();
@@ -263,11 +328,24 @@ function setupConnectionEvents() {
             ctx.lineTo(x2, y2);
             ctx.stroke();
             ctx.closePath();
+
+            // Handle the clear action from the peer
+            if (action === 'clear') {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the whiteboard
+            }
         }
     });
 
     conn.on('close', () => Swal.fire('Disconnected!', 'The connection was closed.', 'info'));
 }
+
+// Check URL for peer ID and populate the connect field
+window.addEventListener('load', () => {
+    const peerIdFromURL = window.location.hash.replace('#', '');
+    if (peerIdFromURL) {
+        connectIdInput.value = peerIdFromURL;
+    }
+});
 </script>
 </body>
 </html>
