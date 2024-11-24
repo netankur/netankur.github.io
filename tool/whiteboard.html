@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            touch-action: none; /* Disable scrolling and zooming on touch */
+        }
+        .hidden {
+            display: none;
+        }
+        /* Floating settings button */
+        .settings-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .settings-btn:focus {
+            outline: none;
+        }
+        /* Settings panel */
+        .settings-panel {
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+        }
+        .settings-panel label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .settings-panel input[type="range"] {
+            width: 100%;
+        }
+        .settings-panel input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Section -->
+    <div id="connection-section">
+        <div class="container text-center mt-4">
+            <h3>Real-Time Whiteboard</h3>
+            <button id="create-peer-id" class="btn btn-primary btn-block">
+                <i class="fas fa-user"></i> Create Peer ID
+            </button>
+            <input type="text" id="peer-id" class="form-control mt-3" placeholder="Your Peer ID" readonly>
+            <input type="text" id="connect-id" class="form-control mt-3" placeholder="Enter Peer ID to Connect">
+            <button id="connect" class="btn btn-success btn-block mt-3">
+                <i class="fas fa-link"></i> Connect
+            </button>
+        </div>
+    </div>
+
+    <!-- Whiteboard Section -->
+    <div id="whiteboard-section" class="hidden">
+        <!-- Floating Settings Button -->
+        <button class="settings-btn" id="settings-toggle">
+            <i class="fas fa-cog"></i>
+        </button>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settings-panel">
+            <div class="mb-3">
+                <label for="pencil-size">Brush Size</label>
+                <input type="range" id="pencil-size" min="1" max="10" value="2">
+            </div>
+            <div class="mb-3">
+                <label for="pencil-color">Brush Color</label>
+                <input type="color" id="pencil-color" value="#000000">
+            </div>
+        </div>
+
+        <!-- Whiteboard Canvas -->
+        <canvas id="whiteboard"></canvas>
+    </div>
+
+<script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+<script>
+const peer = new Peer();
+let conn = null; // Peer connection
+const canvas = document.getElementById('whiteboard');
+const ctx = canvas.getContext('2d');
+
+// UI Elements
+const peerIdInput = document.getElementById('peer-id');
+const connectIdInput = document.getElementById('connect-id');
+const connectBtn = document.getElementById('connect');
+const createPeerIdBtn = document.getElementById('create-peer-id');
+const connectionSection = document.getElementById('connection-section');
+const whiteboardSection = document.getElementById('whiteboard-section');
+const settingsToggle = document.getElementById('settings-toggle');
+const settingsPanel = document.getElementById('settings-panel');
+const pencilSizeInput = document.getElementById('pencil-size');
+const pencilColorInput = document.getElementById('pencil-color');
+
+// Whiteboard State
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+// Resize canvas to fit the screen
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+// Create a Peer ID
+createPeerIdBtn.addEventListener('click', () => {
+    Swal.fire({
+        title: 'Creating Peer ID...',
+        timer: 1000,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    peer.on('open', (id) => {
+        peerIdInput.value = id;
+        Swal.fire('Peer ID Created!', `Your Peer ID: ${id}`, 'success');
+    });
+});
+
+// Connect to another peer
+connectBtn.addEventListener('click', () => {
+    const connectId = connectIdInput.value.trim();
+    if (!connectId) {
+        Swal.fire('Error', 'Please enter a Peer ID to connect.', 'error');
+        return;
+    }
+
+    conn = peer.connect(connectId);
+    conn.on('open', () => {
+        Swal.fire('Connected!', `You are now connected to: ${connectId}`, 'success');
+        setupConnectionEvents();
+
+        // Switch to whiteboard view
+        connectionSection.classList.add('hidden');
+        whiteboardSection.classList.remove('hidden');
+
+        // Resize the canvas to ensure it renders properly
+        resizeCanvas();
+    });
+
+    conn.on('error', (err) => Swal.fire('Connection Error', err, 'error'));
+});
+
+// Handle incoming connections
+peer.on('connection', (connection) => {
+    conn = connection;
+    Swal.fire('Connected!', `Another user connected to your whiteboard!`, 'success');
+    setupConnectionEvents();
+
+    // Switch to whiteboard view
+    connectionSection.classList.add('hidden');
+    whiteboardSection.classList.remove('hidden');
+
+    // Resize the canvas to ensure it renders properly
+    resizeCanvas();
+});
+
+// Toggle settings panel
+settingsToggle.addEventListener('click', () => {
+    if (settingsPanel.style.display === 'block') {
+        settingsPanel.style.display = 'none';
+    } else {
+        settingsPanel.style.display = 'block';
+    }
+});
+
+// Drawing functionality
+canvas.addEventListener('mousedown', (e) => startDrawing(e.offsetX, e.offsetY));
+canvas.addEventListener('mousemove', (e) => draw(e.offsetX, e.offsetY));
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
+
+// Touch support
+canvas.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
+});
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    draw(touch.clientX - rect.left, touch.clientY - rect.top);
+});
+canvas.addEventListener('touchend', stopDrawing);
+
+// Drawing logic
+function startDrawing(x, y) {
+    isDrawing = true;
+    lastX = x;
+    lastY = y;
+}
+function draw(x, y) {
+    if (!isDrawing) return;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = pencilColorInput.value;
+    ctx.lineWidth = pencilSizeInput.value;
+    ctx.stroke();
+    ctx.closePath();
+
+    // Share drawing with peer
+    if (conn && conn.open) {
+        conn.send({ x1: lastX, y1: lastY, x2: x, y2: y, color: ctx.strokeStyle, size: ctx.lineWidth });
+    }
+    lastX = x;
+    lastY = y;
+}
+function stopDrawing() {
+    isDrawing = false;
+}
+
+// Handle incoming data from peers
+function setupConnectionEvents() {
+    conn.on('data', (data) => {
+        if (data && data.x1 !== undefined) {
+            const { x1, y1, x2, y2, color, size } = data;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = size;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.closePath();
+        }
+    });
+
+    conn.on('close', () => Swal.fire('Disconnected!', 'The connection was closed.', 'info'));
+}
+</script>
+</body>
+</html>
