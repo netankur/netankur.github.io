@@ -33,13 +33,27 @@
         </div>
     </div>
     <hr>
-    <!-- Rest of the code stays the same -->
+    <div id="transfer-section" class="mt-4">
+        <div class="mb-3">
+            <h4>File Transfer</h4>
+            <input type="file" id="file-input" class="form-control mb-3">
+            <button class="btn btn-warning" id="send-file-btn" disabled><i class="fas fa-paper-plane"></i> Send File</button>
+        </div>
+        <div class="progress mb-3">
+            <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+        <div id="receiver-info" class="mt-3"></div>
+    </div>
 </div>
 
 <!-- PeerJS -->
 <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
 <script>
     const peer = new Peer();
+    const progressBar = document.getElementById('progress-bar');
+    let conn;
+    let receivedChunks = [];
+    let transferCompleteAlertShown = false;
 
     // Display Peer ID
     peer.on('open', (id) => {
@@ -47,28 +61,125 @@
         Swal.fire('Your Peer ID', id, 'info');
     });
 
-    // Simple Copy Function for Peer ID
+    // Copy Peer ID
     document.getElementById('copy-id').addEventListener('click', () => {
-        const peerIdInput = document.getElementById('your-id');
-        peerIdInput.select();
-        document.execCommand('copy'); // Copy selected text to clipboard
-
-        Swal.fire('Copied!', 'Your Peer ID has been copied to clipboard.', 'success');
+        const peerId = document.getElementById('your-id').value;
+        if (peerId) {
+            navigator.clipboard.writeText(peerId).then(() => {
+                Swal.fire('Copied!', 'Your Peer ID has been copied to clipboard.', 'success');
+            }).catch(() => {
+                Swal.fire('Error', 'Unable to copy Peer ID.', 'error');
+            });
+        } else {
+            Swal.fire('Error', 'Peer ID not available.', 'error');
+        }
     });
 
     // Connect to Peer
     document.getElementById('connect-btn').addEventListener('click', () => {
         const connectId = document.getElementById('connect-id').value;
         if (connectId) {
-            const conn = peer.connect(connectId);
-            conn.on('open', () => {
-                Swal.fire('Connected', `Connected to Peer ID: ${connectId}`, 'success');
-            });
+            conn = peer.connect(connectId);
+            setupConnectionEvents();
         } else {
             Swal.fire('Error', 'Please enter a Peer ID.', 'error');
         }
     });
 
+    // Handle Incoming Connections
+    peer.on('connection', (connection) => {
+        conn = connection;
+        setupConnectionEvents();
+    });
+
+    // Setup Connection Events
+    function setupConnectionEvents() {
+        Swal.fire('Connected', 'You are connected to the peer!', 'success');
+        document.getElementById('send-file-btn').disabled = false;
+
+        conn.on('data', (data) => {
+            if (data.progress) {
+                updateProgressBar(data.progress, data.status);
+            } else if (data.chunk) {
+                receivedChunks.push(data.chunk);
+            } else if (data.complete) {
+                reconstructAndDisplayFile(data.fileName, data.fileSize);
+            }
+        });
+    }
+
+    // Send File
+    document.getElementById('send-file-btn').addEventListener('click', () => {
+        const fileInput = document.getElementById('file-input');
+        if (fileInput.files.length === 0) {
+            Swal.fire('Error', 'Please select a file to send.', 'error');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const chunkSize = 16 * 1024; // 16 KB
+        const fileReader = new FileReader();
+        let offset = 0;
+
+        transferCompleteAlertShown = false;
+
+        fileReader.onload = (event) => {
+            if (conn && conn.open) {
+                conn.send({ chunk: event.target.result });
+                offset += chunkSize;
+
+                // Update progress bar
+                const progress = Math.min((offset / file.size) * 100, 100);
+                updateProgressBar(progress, 'sending');
+                conn.send({ progress, status: 'sending' });
+
+                if (offset < file.size) {
+                    readSlice(offset);
+                } else if (!transferCompleteAlertShown) {
+                    transferCompleteAlertShown = true;
+                    conn.send({ complete: true, fileName: file.name, fileSize: file.size });
+                    Swal.fire('Success', 'File transfer complete.', 'success');
+                }
+            } else {
+                Swal.fire('Error', 'Connection is closed.', 'error');
+            }
+        };
+
+        const readSlice = (o) => {
+            const slice = file.slice(o, o + chunkSize);
+            fileReader.readAsArrayBuffer(slice);
+        };
+
+        readSlice(0);
+    });
+
+    // Update Progress Bar
+    function updateProgressBar(progress, status) {
+        progressBar.style.width = `${progress}%`;
+        progressBar.innerText = `${Math.round(progress)}%`;
+        progressBar.className = `progress-bar ${status === 'sending' ? 'bg-warning' : 'bg-success'}`;
+    }
+
+    // Reconstruct and Display Received File
+    function reconstructAndDisplayFile(fileName, fileSize) {
+        const fileBlob = new Blob(receivedChunks);
+        const fileURL = URL.createObjectURL(fileBlob);
+
+        const receiverInfo = document.getElementById('receiver-info');
+        receiverInfo.innerHTML = `
+            <div class="alert alert-info">
+                <h5>Received File</h5>
+                <p><strong>Name:</strong> ${fileName}</p>
+                <p><strong>Size:</strong> ${(fileSize / 1024).toFixed(2)} KB</p>
+                <a href="${fileURL}" class="btn btn-success" download="${fileName}">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+        `;
+
+        Swal.fire('File Received', `File "${fileName}" received successfully.`, 'success');
+        receivedChunks = []; // Clear chunks for next transfer
+    }
 </script>
 </body>
 </html>
