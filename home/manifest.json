@@ -10,12 +10,12 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/home/assets/img/ig.png",
+      "src": "/home/assets/img/ic.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/home/assets/img/ig.png",
+      "src": "/home/assets/img/ic.png",
       "sizes": "512x512",
       "type": "image/png"
     }
