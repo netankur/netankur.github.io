@@ -10,14 +10,14 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/home/assets/img/ic.png",
+      "src": "/home/assets/img/ic.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpg"
     },
     {
-      "src": "/home/assets/img/ic.png",
+      "src": "/home/assets/img/ic.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpg"
     }
   ],
   "splash_pages": [
