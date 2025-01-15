@@ -68,11 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Add project content
         projectElement.innerHTML = `
           <div class="repository-head">
-            <a href="${project.link}" target="_blank" rel="noopener noreferrer">
-              <h3>${project.name}</h3>
+            <a href="${project.url}" target="_blank" rel="noopener noreferrer">
+              <h3>${project.title}</h3>
             </a>
-            <a href="${project.link}" target="_blank" rel="noopener noreferrer">
-              <img width="16" height="16" src="./asset/svg/external-link.svg" alt="external-link" />
+            <a href="${project.url}" target="_blank" rel="noopener noreferrer">
+              <img width="16" height="16" src="./asset/img/external-link.svg" alt="external-link" />
             </a>
           </div>
           <p class="repository-description">${project.description}</p>
