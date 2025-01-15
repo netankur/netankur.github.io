@@ -1,170 +1,146 @@
 [
-    {
-        "title": "Resume Builder",
-        "subtitle": "tools",
-        "url": "/tool/resume.html",
-        "description": "Your streamlined solution for crafting a polished and comprehensive resume document. It simplifies the process by guiding you through inputting essential details like personal information, academic background, work experience, and other pertinent information into a user-friendly interface.",
-        "date": "2024-07-05"
-    },
-    {
-        "title": "Image to Pdf",
-        "subtitle": "tools",
-        "url": "/tool/image-to-pdf.html",
-        "description": "Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly. Ideal for creating PDF portfolios, reports, and more with ease.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Image Resizer",
-        "subtitle": "tools",
-        "url": "/tool/image-resize.html",
-        "description": "Image Resize Tool: Resize Images Easily, Quickly adjust the dimensions of your images with our Image Resize Tool.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Pdf Generator",
-        "subtitle": "tools",
-        "url": "/tool/pdf.html",
-        "description": "Create professional PDF documents effortlessly with our PDF Generator tool. Customize fonts, styles to suit your needs.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Image Merger",
-        "subtitle": "tools",
-        "url": "/tool/image-merge.html",
-        "description": "Merge multiple images into one with our easy-to-use Image Merge Tool. Choose between horizontal or vertical layouts, adjust sizes automatically, and download your merged image with custom file size options. Perfect for creating collages or combining images for presentations and projects.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Tic Tac Toe",
-        "subtitle": "games",
-        "url": "/tool/tic-tac-toe.html",
-        "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself. Perfect for quick matches and endless fun!",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Words Counter",
-        "subtitle": "tools",
-        "url": "/tool/word-courter.html",
-        "description": "The words counter tool is a simple yet useful web-based application that allows you to analyze and count the number of words, sentences, paragraphs, letters and top keywords in your text.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Text Replace",
-        "subtitle": "tools",
-        "url": "/tool/text-replace.html",
-        "description": "Enhance productivity with our interactive text replace tool. Easily find and replace text in a user-friendly interface.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Dictionary",
-        "subtitle": "tools",
-        "url": "/tool/dictionary.html",
-        "description": "Discover meanings, phonetics, and examples of words. Perfect for quick reference and enhancing your understanding on the go.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "QR Code Generator",
-        "subtitle": "tools",
-        "url": "/tool/qr-code.html",
-        "description": "Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "Rich Text Editor",
-        "subtitle": "tools",
-        "url": "/tool/text-editor.html",
-        "description": "Easily edit and format text with our intuitive Online Rich Text Editor. Enjoy features like bold, italic, alignment, and more. Now includes a convenient print function for immediate document output. Perfect for enhancing content creation.",
-        "date": "2024-07-06"
-    },
-    {
-        "title": "File Encryption",
-        "subtitle": "tools",
-        "url": "/tool/file-encryption.html",
-        "description": "Protect your sensitive files with our Secure File Encryption and Decryption Tool. Upload your documents, set a password, and encrypt them with AES-GCM encryption for maximum security. Decrypt files seamlessly when needed. Enjoy a sleek, dark-themed interface designed for both usability and style.",
-        "date": "2024-07-07"
-    },
-    {
-        "title": "Music Player",
-        "subtitle": "tools",
-        "url": "/tool/music.html",
-        "description": "Our Music Player brings your favorite tunes to your fingertips with a stylish and intuitive interface. Discover and play songs in high-quality audio, complete with artist and album information displayed dynamically. Designed with a sleek dark theme for an immersive experience, our player is perfect for enjoying music on any device.",
-        "date": "2024-07-07"
-    },
-    {
-        "title": "Simple Text Editor",
-        "subtitle": "tools",
-        "url": "/tool/text-edit.html",
-        "description": "Simple Text Editor is a user-friendly web-based text editor that allows you to create and edit text with a variety of fonts. Choose from a diverse selection of typefaces to customize your text to suit your needs.",
-        "date": "2024-07-09"
-    },
-    {
-        "title": "QuickLink: Url Shortener",
-        "subtitle": "tools",
-        "url": "/tool/short.html",
-        "description": "QuickLink is a convenient tool to shorten URLs instantly. Easily generate compact links for sharing and tracking, with built-in redirection timers for smooth navigation. Simplify your links with QuickLink today!",
-        "date": "2024-07-10"
-    },
-    {
-        "title": "Text to Speech",
-        "subtitle": "tools",
-        "url": "/tool/text-to-speech.html",
-        "description": "Text to Speech allows users to convert text into spoken words, with adjustable playback speed. Utilize the intuitive controls to play, pause, and stop speech synthesis, ensuring a seamless experience.",
-        "date": "2024-07-11"
-    },
-    {
-        "title": "URL Saver",
-        "subtitle": "tools",
-        "url": "/tool/url.html",
-        "description": "Save and retrieve links effortlessly with our URL Saver Tool. This tool allows users to securely store URLs and access them later using unique IDs generated for each link. Ideal for organizing bookmarks, sharing links, and ensuring easy access to important URLs across devices.",
-        "date": "2024-07-22"
-    },
-    {
-        "title": "Gradient WallGen",
-        "subtitle": "tools",
-        "url": "/tool/wallpaper.html",
-        "description": "Explore an endless array of vibrant gradients with Gradient WallGen. This tool generates unique wallpapers on-the-fly, allowing you to download your favorite designs instantly. Perfect for adding a splash of color to your desktop or mobile device!",
-        "date": "2024-07-24"
-    },
-    {
-        "title": "YouTube Embed Player",
-        "subtitle": "tools",
-        "url": "/tool/yt.html",
-        "description": "Embed and watch YouTube videos with our sleek, dark-themed player. Enjoy a responsive design that adapts perfectly to any device for an optimal viewing experience.",
-        "date": "2024-07-24"
-    },
-    {
-        "title": "Excel File Viewer",
-        "subtitle": "tools",
-        "url": "/tool/xls.html",
-        "description": "An easy-to-use tool for viewing XLS and XLSX files. Open and browse Excel spreadsheets quickly without needing any software. Perfect for quickly accessing and reviewing spreadsheet data on any device.",
-        "date": "2024-08-01"
-    },
-    {
-        "title": "Messaging App",
-        "subtitle": "tools",
-        "url": "/tool/chat.html",
-        "description": "A peer-to-peer (P2P) chat app enables direct communication between users without needing a central server. This approach ensures secure, efficient, and scalable messaging by connecting users directly to exchange text, media, and files. Ideal for private conversations, group chats, and real-time collaboration.",
-        "date": "2024-11-01"
-    },
-    {
-        "title": "Simple Chat",
-        "subtitle": "tools",
-        "url": "/tool/simple-chat.html",
-        "description": "A P2P chat app allows users to communicate directly, without a central server, for secure and efficient messaging.",
-        "date": "2024-11-01"
-    },
-    {
-        "title": "Whiteboard",
-        "subtitle": "tools",
-        "url": "/tool/whiteboard.html",
-        "description": "A whiteboard app provides a collaborative digital space where users can draw, write, and share ideas in real time. Ideal for brainstorming, teaching, and team meetings.",
-        "date": "2024-11-01"
-    },
-    {
-        "title": "File Transfer",
-        "subtitle": "tools",
-        "url": "/tool/share.html",
-        "description": "A peer-to-peer (P2P) file transfer tool enables direct and secure file sharing between devices without the need for central servers, offering fast and efficient transfers.",
-        "date": "2024-11-01"
-    }
+  {
+    "title": "Resume Builder",
+    "url": "/tool/resume.html",
+    "description": "Your streamlined solution for crafting a polished and comprehensive resume document. It simplifies the process by guiding you through inputting essential details like personal information, academic background, work experience, and other pertinent information into a user-friendly interface.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image to Pdf",
+    "url": "/tool/image-to-pdf.html",
+    "description": "Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Resizer",
+    "url": "/tool/image-resize.html",
+    "description": "Quickly adjust the dimensions of your images with our Image Resize Tool.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Pdf Generator",
+    "url": "/tool/pdf.html",
+    "description": "Create professional PDF documents effortlessly with our PDF Generator tool. Customize fonts and styles to suit your needs.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Merger",
+    "url": "/tool/image-merge.html",
+    "description": "Merge multiple images into one with our easy-to-use Image Merge Tool. Choose between horizontal or vertical layouts, adjust sizes, and download your merged image.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Tic Tac Toe",
+    "url": "/tool/tic-tac-toe.html",
+    "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Words Counter",
+    "url": "/tool/word-courter.html",
+    "description": "Analyze and count the number of words, sentences, paragraphs, letters, and top keywords in your text.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Text Replace",
+    "url": "/tool/text-replace.html",
+    "description": "Enhance productivity with our interactive text replace tool. Easily find and replace text.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Dictionary",
+    "url": "/tool/dictionary.html",
+    "description": "Discover meanings, phonetics, and examples of words. Perfect for quick reference.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "QR Code Generator",
+    "url": "/tool/qr-code.html",
+    "description": "Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Rich Text Editor",
+    "url": "/tool/text-editor.html",
+    "description": "Easily edit and format text with our intuitive Online Rich Text Editor. Includes a convenient print function.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "File Encryption",
+    "url": "/tool/file-encryption.html",
+    "description": "Protect your sensitive files with our Secure File Encryption and Decryption Tool. Set a password and encrypt files with AES-GCM encryption.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Music Player",
+    "url": "/tool/music.html",
+    "description": "Discover and play songs in high-quality audio with a stylish and intuitive interface.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Simple Text Editor",
+    "url": "/tool/text-edit.html",
+    "description": "A user-friendly web-based text editor that allows you to create and edit text with a variety of fonts.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "QuickLink: Url Shortener",
+    "url": "/tool/short.html",
+    "description": "Shorten URLs instantly. Easily generate compact links for sharing and tracking, with built-in redirection timers.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Text to Speech",
+    "url": "/tool/text-to-speech.html",
+    "description": "Convert text into spoken words, with adjustable playback speed and intuitive controls.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "URL Saver",
+    "url": "/tool/url.html",
+    "description": "Save and retrieve links effortlessly with our URL Saver Tool. Securely store and access URLs using unique IDs.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Gradient WallGen",
+    "url": "/tool/wallpaper.html",
+    "description": "Generate vibrant gradient wallpapers and download your favorite designs instantly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "YouTube Embed Player",
+    "url": "/tool/yt.html",
+    "description": "Embed and watch YouTube videos with our sleek, dark-themed player.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Excel File Viewer",
+    "url": "/tool/xls.html",
+    "description": "View XLS and XLSX files quickly without software. Perfect for accessing spreadsheet data on any device.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Messaging App",
+    "url": "/tool/chat.html",
+    "description": "A peer-to-peer chat app enables direct communication between users without a central server.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Simple Chat",
+    "url": "/tool/simple-chat.html",
+    "description": "A P2P chat app for secure and efficient messaging.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Whiteboard",
+    "url": "/tool/whiteboard.html",
+    "description": "Collaborative digital space for drawing, writing, and sharing ideas in real time.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "File Transfer",
+    "url": "/tool/share.html",
+    "description": "A P2P file transfer tool enables secure file sharing between devices without central servers.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  }
 ]
