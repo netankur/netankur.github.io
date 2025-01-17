@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectContainer = document.getElementById("project-container");
 
   // Fetch project data from JSON file
-  fetch("../json/tools.json")
+  fetch("https://netankur.github.io/home/json/tools.json")
     .then((response) => response.json())
     .then((projects) => {
       projects.forEach((project) => {
