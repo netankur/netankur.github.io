@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <h3>${project.title}</h3>
             </a>
             <a href="${project.url}" target="_blank" rel="noopener noreferrer">
-              <img width="16" height="16" src="./asset/img/external-link.svg" alt="external-link" />
+              <img width="16" height="16" src="./assets/img/external-link.svg" alt="external-link" />
             </a>
           </div>
           <p class="repository-description">${project.description}</p>
