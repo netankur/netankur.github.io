@@ -30,11 +30,17 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "Html Editor",
+    "url": "/tool/html-editor.html",
+    "description": "A simple HTML editor lets you write and edit HTML code easily, with a live preview to see your changes in real-time. Perfect for beginners and quick testing!",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Tic Tac Toe",
     "url": "/tool/tic-tac-toe.html",
     "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
     "languages": ["HTML", "CSS", "JavaScript"]
-  },
+  },A simple HTML editor lets you write and edit HTML code easily, with a live preview to see your changes in real-time. Perfect for beginners and quick testing!
   {
     "title": "Words Counter",
     "url": "/tool/word-courter.html",
