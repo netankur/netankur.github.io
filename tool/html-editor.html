@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A simple HTML editor lets you write and edit HTML code easily, with a live preview to see your changes in real-time. Perfect for beginners and quick testing!" />
+    <meta name="description" content="A simple HTML editor with live preview and local storage support." />
     <meta name="author" content="Netankur" />
     <meta name="keywords" content="HTML EDITOR">
     <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
@@ -81,31 +81,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
     <script>
-        // Initialize CodeMirror with character-level undo/redo
+        // Load saved code from Local Storage
+        var savedCode = localStorage.getItem("htmlEditorContent") || "";
+
+        // Initialize CodeMirror with character-level undo/redo and local storage support
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             mode: "text/html",
             lineNumbers: true,
             theme: "darcula",
             lineWrapping: true,
-            historyEventDelay: 0, // Makes each keystroke a separate undo step
+            historyEventDelay: 0,
             extraKeys: {
-                "Ctrl-Z": function(cm) { cm.undo(); }, // Undo with Ctrl+Z
-                "Ctrl-Y": function(cm) { cm.redo(); }  // Redo with Ctrl+Y
+                "Ctrl-Z": function(cm) { cm.undo(); },
+                "Ctrl-Y": function(cm) { cm.redo(); }
             }
         });
 
-        // Function to update output
+        // Set saved code (if any) on page load
+        editor.setValue(savedCode);
+
+        // Function to update output and save to local storage
         function updateOutput() {
-            var outputFrame = document.getElementById('output');
-            outputFrame.innerHTML = editor.getValue();
+            var code = editor.getValue();
+            localStorage.setItem("htmlEditorContent", code); // Save to Local Storage
+            document.getElementById('output').innerHTML = code;
         }
 
-        // Update output on editor change
+        // Update output and save whenever editor changes
         editor.on('change', function() {
             updateOutput();
         });
 
-        // Function to run the code in a new window
+        // Run button - Opens code in a new window
         document.getElementById('runButton').addEventListener('click', function() {
             var code = editor.getValue();
             var newWindow = window.open();
@@ -114,7 +121,7 @@
             newWindow.document.close();
         });
 
-        // Function to download the code as an HTML file
+        // Download button - Saves code as an HTML file
         document.getElementById('downloadButton').addEventListener('click', function() {
             var code = editor.getValue();
             var defaultFileName = 'code.html';
@@ -133,23 +140,24 @@
             link.click();
         });
 
-        // Function to clear the editor and output
+        // Clear button - Clears editor, output, and local storage
         document.getElementById('clearButton').addEventListener('click', function() {
             editor.setValue(""); // Clear the CodeMirror editor
             document.getElementById('output').innerHTML = ""; // Clear the output
+            localStorage.removeItem("htmlEditorContent"); // Clear saved data
         });
 
-        // Undo Function (Per Character)
+        // Undo button
         document.getElementById('undoButton').addEventListener('click', function() {
-            editor.undo(); // Undo last character change
+            editor.undo();
         });
 
-        // Redo Function (Per Character)
+        // Redo button
         document.getElementById('redoButton').addEventListener('click', function() {
-            editor.redo(); // Redo last undone character change
+            editor.redo();
         });
 
-        // Initial output
+        // Load saved content on first run
         updateOutput();
     </script>
 </body>
