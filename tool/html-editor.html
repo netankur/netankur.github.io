@@ -54,10 +54,16 @@
             background-color: #45a049;
         }
         #clearButton {
-            background-color: #f44336; /* Red color for clear button */
+            background-color: #f44336;
         }
         #clearButton:hover {
             background-color: #d32f2f;
+        }
+        #undoButton, #redoButton {
+            background-color: #ffa500;
+        }
+        #undoButton:hover, #redoButton:hover {
+            background-color: #e69500;
         }
     </style>
 </head>
@@ -65,6 +71,8 @@
     <div class="toolbar">
         <button class="button" id="runButton"><i class="fas fa-play"></i></button>
         <button class="button" id="downloadButton"><i class="fas fa-download"></i></button>
+        <button class="button" id="undoButton"><i class="fas fa-undo"></i></button>
+        <button class="button" id="redoButton"><i class="fas fa-redo"></i></button>
         <button class="button" id="clearButton"><i class="fas fa-trash"></i></button>
     </div>
     <textarea id="editor"></textarea>
@@ -73,12 +81,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
     <script>
-        // Initialize CodeMirror with dark theme
+        // Initialize CodeMirror with character-level undo/redo
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             mode: "text/html",
             lineNumbers: true,
             theme: "darcula",
-            lineWrapping: true
+            lineWrapping: true,
+            historyEventDelay: 0, // Makes each keystroke a separate undo step
+            extraKeys: {
+                "Ctrl-Z": function(cm) { cm.undo(); }, // Undo with Ctrl+Z
+                "Ctrl-Y": function(cm) { cm.redo(); }  // Redo with Ctrl+Y
+            }
         });
 
         // Function to update output
@@ -124,6 +137,16 @@
         document.getElementById('clearButton').addEventListener('click', function() {
             editor.setValue(""); // Clear the CodeMirror editor
             document.getElementById('output').innerHTML = ""; // Clear the output
+        });
+
+        // Undo Function (Per Character)
+        document.getElementById('undoButton').addEventListener('click', function() {
+            editor.undo(); // Undo last character change
+        });
+
+        // Redo Function (Per Character)
+        document.getElementById('redoButton').addEventListener('click', function() {
+            editor.redo(); // Redo last undone character change
         });
 
         // Initial output
