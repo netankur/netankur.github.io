@@ -8,8 +8,12 @@
     <meta name="keywords" content="HTML EDITOR">
     <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
     <title>HTML Editor</title>
+
+    <!-- CodeMirror CSS (including Darcula theme) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/darcula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         body {
             display: flex;
@@ -17,12 +21,12 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: #1e1e1e; /* Dark background */
+            color: #ffffff;
         }
         #editor {
             flex: 1;
-            border-right: 1px solid #ccc;
+            border-right: 1px solid #444; /* Dark border */
             background-color: #2d2d2d;
             color: #ffffff;
         }
@@ -30,14 +34,15 @@
             flex: 1;
             padding: 10px;
             overflow: auto;
-            background-color: #ffffff;
-            border-left: 1px solid #ccc;
+            background-color: #2d2d2d;
+            border-left: 1px solid #444;
+            color: white;
         }
         .toolbar {
             display: flex;
             justify-content: flex-end;
             padding: 10px;
-            background-color: #e0e0e0;
+            background-color: #333;
         }
         .button {
             margin-left: 10px;
@@ -78,17 +83,19 @@
     <textarea id="editor"></textarea>
     <div id="output"></div>
 
+    <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+
     <script>
         // Load saved code from Local Storage
         var savedCode = localStorage.getItem("htmlEditorContent") || "";
 
-        // Initialize CodeMirror with character-level undo/redo and local storage support
+        // Initialize CodeMirror with Dark Theme (Darcula)
         var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             mode: "text/html",
             lineNumbers: true,
-            theme: "darcula",
+            theme: "darcula",  // Dark Theme
             lineWrapping: true,
             historyEventDelay: 0,
             extraKeys: {
@@ -103,7 +110,7 @@
         // Function to update output and save to local storage
         function updateOutput() {
             var code = editor.getValue();
-            localStorage.setItem("htmlEditorContent", code); // Save to Local Storage
+            localStorage.setItem("htmlEditorContent", code);
             document.getElementById('output').innerHTML = code;
         }
 
