@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light gray background */
+            color: #333;
+        }
+        #editor {
+            flex: 1;
+            border-right: 1px solid #ccc; /* Light gray border */
+            background-color: #2d2d2d; /* Dark background for editor */
+            color: #ffffff; /* White text for editor */
+        }
+        #output {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+            background-color: #ffffff; /* White background for output */
+            border-left: 1px solid #ccc; /* Light gray border */
+        }
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+            background-color: #e0e0e0; /* Light gray toolbar */
+        }
+        .button {
+            margin-left: 10px;
+            padding: 10px;
+            border: none;
+            background-color: #4CAF50; /* Green background for buttons */
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        .button i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button class="button" id="runButton"><i class="fas fa-play"></i> Run</button>
+        <button class="button" id="downloadButton"><i class="fas fa-download"></i> Download</button>
+    </div>
+    <textarea id="editor"></textarea>
+    <div id="output"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script>
+        // Initialize CodeMirror with dark theme
+        var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+            mode: "text/html",
+            lineNumbers: true,
+            theme: "darcula", // Dark theme for CodeMirror
+            lineWrapping: true
+        });
+
+        // Function to update output
+        function updateOutput() {
+            var outputFrame = document.getElementById('output');
+            outputFrame.innerHTML = editor.getValue();
+        }
+
+        // Update output on editor change
+        editor.on('change', function() {
+            updateOutput();
+        });
+
+        // Function to run the code in a new window
+        document.getElementById('runButton').addEventListener('click', function() {
+            var code = editor.getValue();
+            var newWindow = window.open();
+            newWindow.document.open();
+            newWindow.document.write(code);
+            newWindow.document.close();
+        });
+
+        // Function to download the code as an HTML file
+        document.getElementById('downloadButton').addEventListener('click', function() {
+            var code = editor.getValue();
+            var blob = new Blob([code], { type: 'text/html' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'code.html';
+            link.click();
+        });
+
+        // Initial output
+        updateOutput();
+    </script>
+</body>
+</html>
