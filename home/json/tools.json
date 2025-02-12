@@ -36,6 +36,12 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "Sticky Notes",
+    "url": "/tool/sticky-note.html",
+    "description": "A versatile and interactive sticky notes web app that lets you create, edit, delete, and download notes. Perfect for organizing thoughts, tasks, or reminders in a visually appealing way. Easily save and download your notes with random filenames for easy access!",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Tic Tac Toe",
     "url": "/tool/tic-tac-toe.html",
     "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
