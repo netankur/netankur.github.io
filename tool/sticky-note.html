@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A versatile and interactive sticky notes web app that lets you create, edit, delete, and download notes. Perfect for organizing thoughts, tasks, or reminders in a visually appealing way. Easily save and download your notes with random filenames for easy access!" />
+    <meta name="author" content="Netankur" />
+    <meta name="keywords" content="sticky notes, web app, download notes, note app, random colors" />
+    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+    <title>Sticky Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #addNoteBtn {
+            padding: 10px 15px;
+            font-size: 16px;
+            background: #ffcc00;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        #addNoteBtn:hover {
+            background: #e6b800;
+        }
+
+        #notesContainer {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .note {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 16px;
+            padding: 5px;
+            min-height: 150px;
+            max-height: 300px; /* Set max height */
+            overflow-y: auto; /* Enable scrolling */
+        }
+
+        /* Hide scrollbar for Chrome, Safari, and Edge */
+        .note textarea::-webkit-scrollbar {
+            width: 0px; /* Hide scrollbar */
+        }
+
+        /* Hide scrollbar for Firefox */
+        .note textarea {
+            scrollbar-width: none;
+        }
+
+        /* Remove focus outline when typing */
+        .note textarea:focus {
+            outline: none; /* Removes the default blue outline when the textarea is focused */
+        }
+
+        /* Delete button styles */
+        .deleteBtn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 14px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .deleteBtn:hover {
+            background: darkred;
+        }
+
+        /* Download button styles */
+        .downloadBtn {
+            position: absolute;
+            top: 5px;
+            right: 35px; /* Position next to the delete button */
+            background: green;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 14px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .downloadBtn:hover {
+            background: darkgreen;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sticky Notes App</h1>
+        <button id="addNoteBtn">Add Note</button>
+        <div id="notesContainer"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const notesContainer = document.getElementById("notesContainer");
+            const addNoteBtn = document.getElementById("addNoteBtn");
+
+            function loadNotes() {
+                notesContainer.innerHTML = "";
+                let notes = JSON.parse(localStorage.getItem("stickyNotes")) || [];
+                notes.forEach((noteText) => {
+                    createNote(noteText);
+                });
+            }
+
+            function saveNotes() {
+                const notes = Array.from(document.querySelectorAll(".note textarea")).map(note => note.value);
+                localStorage.setItem("stickyNotes", JSON.stringify(notes));
+            }
+
+            function getRandomColor() {
+                return `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+            }
+
+            function getTextColor(backgroundColor) {
+                const rgb = backgroundColor.match(/\d+/g);
+                const brightness = (parseInt(rgb[0]) * 0.2126 + parseInt(rgb[1]) * 0.7152 + parseInt(rgb[2]) * 0.0722);
+                return brightness < 128 ? "white" : "black";
+            }
+
+            function generateRandomFileName() {
+                return `note-${Math.floor(Math.random() * 1000000)}`;
+            }
+
+            function createNote(text = "") {
+                const noteDiv = document.createElement("div");
+                noteDiv.classList.add("note");
+
+                // Random card color and ensuring text color doesn't blend
+                const randomCardColor = getRandomColor();
+                const randomTextColor = getTextColor(randomCardColor);
+
+                noteDiv.style.backgroundColor = randomCardColor;
+                noteDiv.style.color = randomTextColor;
+
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.style.color = randomTextColor;  // Explicitly set text color of the textarea
+                textarea.addEventListener("input", saveNotes);
+
+                // Create a delete button
+                const deleteBtn = document.createElement("button");
+                deleteBtn.innerText = "X";
+                deleteBtn.classList.add("deleteBtn");
+                deleteBtn.addEventListener("click", () => {
+                    noteDiv.remove();
+                    saveNotes();
+                });
+
+                // Create a download button
+                const downloadBtn = document.createElement("button");
+                downloadBtn.innerText = "↓"; // Using a simple arrow for download icon
+                downloadBtn.classList.add("downloadBtn");
+                downloadBtn.addEventListener("click", () => {
+                    const fileName = generateRandomFileName() + ".txt";
+                    const blob = new Blob([textarea.value], { type: "text/plain" });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = fileName;
+                    link.click();
+                });
+
+                noteDiv.appendChild(textarea);
+                noteDiv.appendChild(deleteBtn);
+                noteDiv.appendChild(downloadBtn);
+                notesContainer.appendChild(noteDiv);
+
+                saveNotes();
+            }
+
+            addNoteBtn.addEventListener("click", () => createNote());
+
+            loadNotes();
+        });
+    </script>
+</body>
+</html>
