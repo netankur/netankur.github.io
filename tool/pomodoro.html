@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="NetAnkur">
+  <meta name="description" content="A simple and interactive Pomodoro Timer to enhance productivity with customizable session and break durations.">
+  <meta name="keywords" content="Pomodoro Timer, Productivity, Time Management, Focus Timer, Work Timer, Study Timer">
+  <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico">
+  <title>Pomodoro Timer</title>
+  <style>
+    /* Reset & Basic Styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    /* Container */
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      color: #333;
+    }
+    /* Timer Styling */
+    .timer {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 1rem auto;
+    }
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: #333;
+      font-weight: bold;
+    }
+    /* SVG Progress Ring */
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.35s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    /* Control Buttons */
+    .controls {
+      margin-top: 1rem;
+    }
+    .controls button {
+      background: #ff6b6b;
+      border: none;
+      border-radius: 30px;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 120px;
+    }
+    .controls button:hover {
+      background: #ff8e8e;
+    }
+    /* Session Controls */
+    .session-controls {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .session-controls label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0.5rem;
+    }
+    .session-controls input {
+      margin-top: 0.25rem;
+      width: 60px;
+      padding: 0.25rem;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+      .time-display {
+        font-size: 2.5rem;
+      }
+      .controls button {
+        width: 100px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pomodoro Timer</h1>
+    <div class="timer">
+      <!-- SVG Progress Ring -->
+      <svg class="progress-ring" width="280" height="280">
+        <circle class="progress-ring__circle" stroke="#ff6b6b" stroke-width="12" fill="transparent" r="130" cx="140" cy="140"/>
+      </svg>
+      <!-- Time Display -->
+      <div class="time-display">25:00</div>
+    </div>
+    <div class="controls">
+      <button id="startPauseBtn">Start</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div class="session-controls">
+      <label>
+        Session Length (min)
+        <input type="number" id="sessionLength" min="1" max="60" value="25">
+      </label>
+      <label>
+        Break Length (min)
+        <input type="number" id="breakLength" min="1" max="30" value="5">
+      </label>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const startPauseBtn = document.getElementById('startPauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const timeDisplay = document.querySelector('.time-display');
+      const sessionInput = document.getElementById('sessionLength');
+      const breakInput = document.getElementById('breakLength');
+      const circle = document.querySelector('.progress-ring__circle');
+
+      // Setup progress ring
+      const radius = circle.r.baseVal.value;
+      const circumference = 2 * Math.PI * radius;
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      circle.style.strokeDashoffset = circumference;
+
+      // Timer variables
+      let timerInterval;
+      let isRunning = false;
+      let isSession = true;
+      let sessionDuration = parseInt(sessionInput.value) * 60;
+      let breakDuration = parseInt(breakInput.value) * 60;
+      let remainingTime = sessionDuration;
+
+      // Update display & progress ring
+      function updateDisplay() {
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+        timeDisplay.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        const totalDuration = isSession ? sessionDuration : breakDuration;
+        const percent = remainingTime / totalDuration;
+        const offset = circumference - percent * circumference;
+        circle.style.strokeDashoffset = offset;
+      }
+
+      // Switch mode: session <-> break
+      function switchMode() {
+        isSession = !isSession;
+        if (isSession) {
+          remainingTime = sessionDuration;
+          timeDisplay.style.color = '#333';
+        } else {
+          remainingTime = breakDuration;
+          timeDisplay.style.color = '#28a745';
+        }
+        updateDisplay();
+      }
+
+      // Countdown tick
+      function tick() {
+        if (remainingTime > 0) {
+          remainingTime--;
+          updateDisplay();
+        } else {
+          // Automatically switch modes when time's up
+          switchMode();
+        }
+      }
+
+      // Start Timer
+      function startTimer() {
+        timerInterval = setInterval(tick, 1000);
+        isRunning = true;
+        startPauseBtn.textContent = 'Pause';
+      }
+
+      // Pause Timer
+      function pauseTimer() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startPauseBtn.textContent = 'Resume';
+      }
+
+      // Button Event Listeners
+      startPauseBtn.addEventListener('click', () => {
+        if (!isRunning) {
+          startTimer();
+        } else {
+          pauseTimer();
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startPauseBtn.textContent = 'Start';
+        sessionDuration = parseInt(sessionInput.value) * 60;
+        breakDuration = parseInt(breakInput.value) * 60;
+        isSession = true;
+        remainingTime = sessionDuration;
+        timeDisplay.style.color = '#333';
+        updateDisplay();
+      });
+
+      // Initial display update
+      updateDisplay();
+    });
+  </script>
+</body>
+</html>
