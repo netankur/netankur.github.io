@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="NetAnkur">
+    <meta name="description" content="A simple and efficient unit converter for length, weight, and temperature conversions. Instantly convert between meters, feet, kilograms, pounds, Celsius, Fahrenheit, and more.">
+    <meta name="keywords" content="unit converter, length converter, weight converter, temperature converter, metric to imperial, online conversion tool">
+    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
+    <title>Unit Converter</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  /* Dark animated gradient background */
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #0d0d0d, #262626);
+  background-size: 400% 400%;
+  -webkit-animation: darkGradient 12s ease infinite;
+          animation: darkGradient 12s ease infinite;
+  padding: 20px;
+}
+
+@-webkit-keyframes darkGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes darkGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Container for the converter */
+.converter-container {
+  background: rgba(20, 20, 20, 0.85);
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: #f0f0f0;
+  margin-bottom: 15px;
+}
+
+/* Dropdown group styling */
+.dropdown-group {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+label {
+  font-size: 0.9rem;
+  color: #ccc;
+  display: block;
+  margin-bottom: 5px;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+  background: #333;
+  color: #f0f0f0;
+  cursor: pointer;
+}
+
+/* Input and Output Sections */
+.conversion-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input-container, .output-container {
+  flex: 1;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #333;
+  color: #f0f0f0;
+  font-size: 1rem;
+  outline: none;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+::placeholder {
+  color: #aaa;
+}
+
+/* Swap Button */
+.swap-button {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #f0f0f0;
+  transition: 0.2s;
+}
+
+.swap-button:hover {
+  transform: rotate(180deg);
+}
+
+/* Convert Button */
+#convertBtn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  /* Dark button with subtle gradient */
+  background: linear-gradient(45deg, #444, #666);
+  color: #f0f0f0;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#convertBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 400px) {
+  .converter-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  input, select, button {
+    font-size: 0.9rem;
+  }
+}
+</style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div class="converter-container">
+        <h1>Unit Converter</h1>
+
+        <div class="dropdown-group">
+            <label for="category">Select Category</label>
+            <select id="category">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="temperature">Temperature</option>
+            </select>
+        </div>
+
+        <div class="conversion-section">
+            <div class="input-container">
+                <input type="number" id="inputValue" placeholder="Enter value">
+                <select id="fromUnit"></select>
+            </div>
+            
+            <div class="swap-button">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+
+            <div class="output-container">
+                <input type="text" id="outputValue" placeholder="Result" readonly>
+                <select id="toUnit"></select>
+            </div>
+        </div>
+
+        <button id="convertBtn">Convert</button>
+    </div>
+
+    <script>
+const units = {
+    length: {
+        Meter: 1,
+        Kilometer: 0.001,
+        Centimeter: 100,
+        Millimeter: 1000,
+        Inch: 39.3701,
+        Foot: 3.28084
+    },
+    weight: {
+        Kilogram: 1,
+        Gram: 1000,
+        Pound: 2.20462,
+        Ounce: 35.274
+    },
+    temperature: {
+        Celsius: val => val,
+        Fahrenheit: val => (val * 9/5) + 32,
+        Kelvin: val => val + 273.15
+    }
+};
+
+const categoryEl = document.getElementById("category");
+const fromUnitEl = document.getElementById("fromUnit");
+const toUnitEl = document.getElementById("toUnit");
+const inputValueEl = document.getElementById("inputValue");
+const outputValueEl = document.getElementById("outputValue");
+const convertBtn = document.getElementById("convertBtn");
+
+function populateUnits(category) {
+    fromUnitEl.innerHTML = "";
+    toUnitEl.innerHTML = "";
+
+    Object.keys(units[category]).forEach(unit => {
+        fromUnitEl.add(new Option(unit, unit));
+        toUnitEl.add(new Option(unit, unit));
+    });
+}
+
+categoryEl.addEventListener("change", () => populateUnits(categoryEl.value));
+
+convertBtn.addEventListener("click", () => {
+    let category = categoryEl.value;
+    let fromUnit = fromUnitEl.value;
+    let toUnit = toUnitEl.value;
+    let inputValue = parseFloat(inputValueEl.value);
+
+    if (isNaN(inputValue)) {
+        outputValueEl.value = "Invalid Input";
+        return;
+    }
+
+    let convertedValue = category === "temperature"
+        ? units.temperature[toUnit]((fromUnit === "Celsius") ? inputValue : (fromUnit === "Fahrenheit") ? (inputValue - 32) * 5/9 : inputValue - 273.15)
+        : (inputValue * units[category][toUnit]) / units[category][fromUnit];
+
+    outputValueEl.value = convertedValue.toFixed(4);
+});
+
+populateUnits(categoryEl.value);
+</script>
+</body>
+</html>
