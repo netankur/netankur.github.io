@@ -85,6 +85,8 @@
       border-radius: 5px;
       align-items: center;
       transition: 0.3s;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
 
     li.completed {
@@ -92,8 +94,13 @@
       opacity: 0.7;
     }
 
-    li span {
-      cursor: pointer;
+    /* Allow task text to wrap correctly */
+    li span:first-child {
+      flex: 1;
+      max-width: 80%;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
 
     .delete-btn {
