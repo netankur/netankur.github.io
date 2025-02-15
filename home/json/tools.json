@@ -42,6 +42,12 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "Unit Converter",
+    "url": "/tool/unit-converter.html",
+    "description": "A simple and efficient unit converter for length, weight, and temperature conversions. Instantly convert between meters, feet, kilograms, pounds, Celsius, Fahrenheit, and more.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Tic Tac Toe",
     "url": "/tool/tic-tac-toe.html",
     "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
