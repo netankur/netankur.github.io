@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Minifier & Beautifier</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #1E1E1E, #333);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 5px;
+            transition: background 0.3s;
+        }
+        .container {
+            width: 95%;
+            max-width: 750px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        h1 { font-size: 20px; font-weight: 600; margin-bottom: 5px; }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            max-height: 45vh;
+            height: auto;
+            background: #222;
+            color: #fff;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: 0.3s;
+        }
+        textarea:focus {
+            border-color: #00c853;
+            box-shadow: 0 0 8px rgba(0, 200, 83, 0.5);
+        }
+        .settings, .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 5px;
+        }
+        select, button, .checkbox-container input {
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        select { background: #222; color: #fff; outline: none; }
+        button {
+            flex: 1;
+            background: #00c853;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 200, 83, 0.3);
+            min-width: 100px;
+        }
+        button:hover { background: #009e5c; }
+        #themeToggle {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        #themeToggle:hover {
+            background: white;
+            color: #222;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .checkbox-container input {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #00c853;
+            background: transparent;
+            position: relative;
+        }
+        .checkbox-container input:checked {
+            background: #00c853;
+        }
+        .checkbox-container input:checked::after {
+            content: "✔";
+            font-size: 14px;
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 3px;
+        }
+        .light-mode {
+            background: linear-gradient(135deg, #F4F4F4, #DDD);
+            color: #222;
+        }
+        .light-mode .container {
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .light-mode textarea, .light-mode select {
+            background: #fff;
+            color: #222;
+            border-color: #ddd;
+        }
+        .light-mode button {
+            background: #007BFF;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
+        }
+        .light-mode button:hover { background: #005ecb; }
+        .light-mode #themeToggle {
+            border: 2px solid black;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Code Minifier & Beautifier</h1>
+        <button id="themeToggle">🌙 Dark Mode</button>
+        
+        <textarea id="codeInput" placeholder="Enter HTML, CSS, or JS..." oninput="autoResize(this)"></textarea>
+
+        <div class="settings">
+            <label>Indent Size: 
+                <select id="indentSize">
+                    <option value="2">2</option>
+                    <option value="4" selected>4</option>
+                    <option value="8">8</option>
+                </select>
+            </label>
+            <div class="checkbox-container">
+                <input type="checkbox" id="removeComments">
+                <label for="removeComments">Remove Comments</label>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="beautifyCode()">Beautify</button>
+            <button onclick="minifyCode()">Minify</button>
+            <button onclick="clearCode()">Clear</button>
+            <button onclick="copyCode()">Copy</button>
+            <button onclick="downloadCode()">Download</button>
+        </div>
+
+        <textarea id="codeOutput" placeholder="Output will appear here..." readonly></textarea>
+    </div>
+
+    <script>
+        document.getElementById("themeToggle").addEventListener("click", function() {
+            document.body.classList.toggle("light-mode");
+            this.textContent = document.body.classList.contains("light-mode") ? "🌞 Light Mode" : "🌙 Dark Mode";
+        });
+
+        function autoResize(textarea) {
+            textarea.style.height = "auto";
+            textarea.style.height = (textarea.scrollHeight) + "px";
+        }
+
+        function beautifyCode() {
+            let code = document.getElementById("codeInput").value;
+            let indentSize = parseInt(document.getElementById("indentSize").value);
+            let formattedCode = html_beautify(code, { indent_size: indentSize });
+            document.getElementById("codeOutput").value = formattedCode;
+            autoResize(document.getElementById("codeOutput"));
+        }
+
+        function minifyCode() {
+            let code = document.getElementById("codeInput").value;
+            let removeComments = document.getElementById("removeComments").checked;
+            if (removeComments) {
+                code = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            }
+            let minifiedCode = code.replace(/\s+/g, ' ').trim();
+            document.getElementById("codeOutput").value = minifiedCode;
+            autoResize(document.getElementById("codeOutput"));
+        }
+
+        function clearCode() {
+            document.getElementById("codeInput").value = "";
+            document.getElementById("codeOutput").value = "";
+        }
+
+function copyCode() {
+    let outputText = document.getElementById("codeOutput").value;
+    if (!outputText) {
+        alert("Nothing to copy!");
+        return;
+    }
+    navigator.clipboard.writeText(outputText).then(() => {
+        alert("Copied to clipboard!");
+    }).catch(err => {
+        console.error("Failed to copy: ", err);
+    });
+}
+
+function downloadCode() {
+    let outputText = document.getElementById("codeOutput").value;
+    if (!outputText) {
+        alert("Nothing to download!");
+        return;
+    }
+    let blob = new Blob([outputText], { type: "text/plain" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "formatted_code.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+    </script>
+</body>
+</html>
