@@ -54,6 +54,36 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "Weather App",
+    "url": "/tool/weather.html",
+    "description": "Stay updated with real-time weather forecasts using our Weather App. Get accurate temperature, humidity, wind speed, and weather conditions for any location. Enjoy a user-friendly interface with detailed weather insights at your fingertips.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Pomodoro Timer",
+    "url": "/tool/pomodoro.html",
+    "description": "Boost your productivity with our Pomodoro Timer. Utilize the proven Pomodoro technique to stay focused by working in timed intervals with short breaks. Customize session lengths and track your progress effortlessly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Code Minifier",
+    "url": "/tool/minifier.html",
+    "description": "Optimize your code with our Code Minifier. Reduce file size by minifying HTML, CSS, and JavaScript, improving website performance and load times. Simply paste your code and get a compact, efficient version instantly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Draw Pad",
+    "url": "/tool/drawpad.html",
+    "description": "Unleash your creativity with our Draw Pad. Sketch, doodle, and create digital art effortlessly with a simple and intuitive drawing tool. Customize brush sizes, colors, and save your creations instantly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Colour Palette Generator",
+    "url": "/tool/colour-palette.html",
+    "description": "Create stunning colour palettes effortlessly with our Colour Palette Generator. Generate harmonious colour schemes, explore trendy combinations, and save your favourites for design inspiration.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Tic Tac Toe",
     "url": "/tool/tic-tac-toe.html",
     "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
