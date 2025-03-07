@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Formatter</title>
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        /* Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        /* General Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928DAB);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 95%;
+            max-width: 800px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            background: linear-gradient(135deg, #232526, #414345);
+            color: #eee;
+        }
+
+        /* Auto-Adjusting Textarea */
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 400px;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            outline: none;
+            resize: none;
+            transition: 0.3s;
+            overflow-y: hidden;
+            box-sizing: border-box;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Button Container */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .buttons button, .dark-mode-btn {
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .dark-mode-btn {
+            background: #ff9800;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Output Preview */
+        #output {
+            min-height: 60px;
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            word-wrap: break-word;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Counter */
+        #counter {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: #ddd;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-text-height"></i> Text Formatter</h1>
+        
+        <!-- Dark Mode Toggle -->
+        <button id="toggleDarkMode" class="dark-mode-btn"><i class="fas fa-moon"></i> Toggle Dark Mode</button>
+
+        <!-- Text Input Area -->
+        <textarea id="textInput" placeholder="Enter your text here..." oninput="adjustTextArea(this)"></textarea>
+
+        <!-- Formatting Buttons -->
+        <div class="buttons">
+            <button onclick="transformText('uppercase')"><i class="fas fa-arrow-up"></i> UPPERCASE</button>
+            <button onclick="transformText('lowercase')"><i class="fas fa-arrow-down"></i> lowercase</button>
+            <button onclick="transformText('titlecase')"><i class="fas fa-heading"></i> Title Case</button>
+            <button onclick="transformText('sentencecase')"><i class="fas fa-pen-alt"></i> Sentence case</button>
+            <button onclick="transformText('reverse')"><i class="fas fa-random"></i> Reverse</button>
+            <button onclick="clearText()"><i class="fas fa-eraser"></i> Clear</button>
+            <button onclick="copyToClipboard()"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+
+        <!-- Live Preview -->
+        <h3>Preview:</h3>
+        <div id="output"></div>
+
+        <!-- Character and Word Counter -->
+        <p id="counter">Characters: 0 | Words: 0</p>
+    </div>
+
+    <script>
+        const textInput = document.getElementById("textInput");
+        const output = document.getElementById("output");
+        const counter = document.getElementById("counter");
+        const toggleDarkModeBtn = document.getElementById("toggleDarkMode");
+
+        // Auto-adjust textarea height
+        function adjustTextArea(element) {
+            element.style.height = "auto";
+            element.style.height = element.scrollHeight + "px";
+            updatePreview();
+        }
+
+        function transformText(type) {
+            let text = textInput.value.trim();
+            if (text === "") {
+                alert("Please enter some text.");
+                return;
+            }
+
+            let result;
+            switch (type) {
+                case "uppercase": result = text.toUpperCase(); break;
+                case "lowercase": result = text.toLowerCase(); break;
+                case "titlecase": result = text.replace(/\b\w/g, char => char.toUpperCase()); break;
+                case "sentencecase": result = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(); break;
+                case "reverse": result = text.split("").reverse().join(""); break;
+                default: result = text;
+            }
+
+            output.textContent = result;
+            updateCounter(result);
+        }
+
+        function clearText() {
+            textInput.value = "";
+            output.textContent = "";
+            updateCounter("");
+            adjustTextArea(textInput);
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                alert("Copied to clipboard!");
+            });
+        }
+
+        function updateCounter(text) {
+            counter.textContent = `Characters: ${text.length} | Words: ${text.trim().split(/\s+/).length}`;
+        }
+
+        function updatePreview() {
+            output.textContent = textInput.value;
+            updateCounter(textInput.value);
+        }
+
+        toggleDarkModeBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
+
+        textInput.addEventListener("input", updatePreview);
+    </script>
+</body>
+</html>
