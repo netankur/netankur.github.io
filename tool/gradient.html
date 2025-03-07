@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Gradient Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { display: flex; height: 100vh; background: #121212; color: white; }
+        .container { display: flex; width: 100%; }
+        .controls { width: 30%; background: #1e1e1e; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        h2, h3 { margin-bottom: 10px; }
+        label { margin-top: 10px; font-size: 14px; }
+        input, select, textarea, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: none; outline: none; }
+        input, select { background: #333; color: white; }
+        textarea { background: #222; color: #00ffcc; resize: none; height: 80px; }
+        button { background: #00ffcc; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00cca3; }
+        .preview { width: 70%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #gradient-preview { width: 80%; height: 80%; border-radius: 10px; transition: 0.3s; background: linear-gradient(90deg, #ff0000 0%, #0000ff 100%); border: 2px solid #fff; }
+        .color-stop { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .preview-box { width: 250px; height: 150px; border-radius: 10px; margin-top: 20px; border: 2px solid white; }
+        @media (max-width: 768px) { .container { flex-direction: column; } .controls, .preview { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="controls">
+            <h2>Gradient Generator</h2>
+            <label for="gradient-type">Gradient Type</label>
+            <select id="gradient-type">
+                <option value="linear">Linear</option>
+                <option value="radial">Radial</option>
+            </select>
+            <label for="angle">Angle (for Linear)</label>
+            <input type="range" id="angle" min="0" max="360" value="90">
+            <span id="angle-value">90°</span>
+
+            <div id="color-stops">
+                <h3>Color Stops</h3>
+                <button id="add-color">+ Add Color</button>
+            </div>
+
+            <h3>CSS Code</h3>
+            <textarea id="css-output" readonly></textarea>
+            <button id="copy-css">Copy to Clipboard</button>
+        </aside>
+
+        <main class="preview">
+            <h2>Preview</h2>
+            <div id="gradient-preview"></div>
+            <div class="preview-box" id="preview-box"></div> <!-- PREVIEW BOX -->
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const gradientType = document.getElementById("gradient-type");
+            const angleInput = document.getElementById("angle");
+            const angleValue = document.getElementById("angle-value");
+            const colorStopsContainer = document.getElementById("color-stops");
+            const gradientPreview = document.getElementById("gradient-preview");
+            const previewBox = document.getElementById("preview-box");
+            const cssOutput = document.getElementById("css-output");
+            const copyCssButton = document.getElementById("copy-css");
+            const addColorButton = document.getElementById("add-color");
+
+            let colorStops = [];
+
+            function updateGradient() {
+                let gradient;
+                if (gradientType.value === "linear") {
+                    gradient = `linear-gradient(${angleInput.value}deg, ${colorStops.map(c => `${c.color} ${c.position}%`).join(", ")})`;
+                } else {
+                    gradient = `radial-gradient(circle, ${colorStops.map(c => `${c.color} ${c.position}%`).join(", ")})`;
+                }
+                gradientPreview.style.background = gradient;
+                previewBox.style.background = gradient;
+                cssOutput.value = `background: ${gradient};`;
+            }
+
+            function addColorStop(color = "#ff0000", position = 50) {
+                const colorStopDiv = document.createElement("div");
+                colorStopDiv.classList.add("color-stop");
+
+                const colorInput = document.createElement("input");
+                colorInput.type = "color";
+                colorInput.value = color;
+
+                const positionInput = document.createElement("input");
+                positionInput.type = "range";
+                positionInput.min = "0";
+                positionInput.max = "100";
+                positionInput.value = position;
+
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "×";
+                removeButton.onclick = () => {
+                    colorStops = colorStops.filter(c => c.id !== colorStopDiv);
+                    colorStopDiv.remove();
+                    updateGradient();
+                };
+
+                const colorData = { id: colorStopDiv, color, position };
+
+                colorInput.addEventListener("input", function () {
+                    colorData.color = this.value;
+                    updateGradient();
+                });
+
+                positionInput.addEventListener("input", function () {
+                    colorData.position = this.value;
+                    updateGradient();
+                });
+
+                colorStops.push(colorData);
+                colorStopDiv.append(colorInput, positionInput, removeButton);
+                colorStopsContainer.appendChild(colorStopDiv);
+                updateGradient();
+            }
+
+            addColorButton.addEventListener("click", () => addColorStop());
+
+            angleInput.addEventListener("input", () => {
+                angleValue.textContent = `${angleInput.value}°`;
+                updateGradient();
+            });
+
+            copyCssButton.addEventListener("click", () => {
+                navigator.clipboard.writeText(cssOutput.value);
+                alert("Copied!");
+            });
+
+            // Default colors
+            addColorStop("#ff0000", 0);
+            addColorStop("#0000ff", 100);
+        });
+    </script>
+</body>
+</html>
