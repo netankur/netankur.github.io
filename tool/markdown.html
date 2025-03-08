@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+
+    <style>
+        :root {
+            --bg-color: #fff;
+            --text-color: #000;
+            --editor-bg: #f7f7f7;
+            --preview-bg: #eee;
+        }
+
+        .dark-mode {
+            --bg-color: #1e1e1e;
+            --text-color: #f5f5f5;
+            --editor-bg: #2d2d2d;
+            --preview-bg: #333;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: var(--editor-bg);
+        }
+
+        .toolbar button {
+            padding: 8px;
+            cursor: pointer;
+            background: var(--preview-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        textarea, #preview {
+            width: 50%;
+            height: 100%;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
+        }
+
+        textarea {
+            background: var(--editor-bg);
+            color: var(--text-color);
+        }
+
+        #preview {
+            background: var(--preview-bg);
+            overflow-y: auto;
+            padding: 20px;
+            border-left: 1px solid #ccc;
+        }
+
+        #resizer {
+            width: 5px;
+            cursor: ew-resize;
+            background: gray;
+            height: 100%;
+        }
+
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            background: var(--preview-bg);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-panel label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 5px;
+            background: var(--editor-bg);
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            textarea, #preview {
+                width: 100%;
+                height: 50%;
+            }
+            #resizer {
+                width: 100%;
+                height: 5px;
+                cursor: ns-resize;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button onclick="insertMarkdown('**bold**')"><b>B</b></button>
+        <button onclick="insertMarkdown('_italic_')"><i>I</i></button>
+        <button onclick="insertMarkdown('# Heading')">H</button>
+        <button onclick="insertMarkdown('[Link](https://)')">🔗</button>
+        <button onclick="insertMarkdown('![Image](url)')">🖼</button>
+        <button onclick="downloadMarkdown()">⬇️ MD</button>
+        <button onclick="downloadHTML()">⬇️ HTML</button>
+        <button onclick="downloadPDF()">📄 PDF</button>
+        <button id="themeToggle">🌙</button>
+        <button onclick="toggleSettings()">⚙️</button>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <label>Font Size: <input type="number" id="fontSize" value="16" min="10" max="30" onchange="updateSettings()"></label>
+        <label>Line Height: <input type="number" id="lineHeight" value="1.5" step="0.1" min="1" max="3" onchange="updateSettings()"></label>
+    </div>
+
+    <div class="editor-container">
+        <textarea id="markdown"></textarea>
+        <div id="resizer"></div>
+        <div id="preview"></div>
+    </div>
+
+    <footer>
+        <span id="stats">Words: 0 | Characters: 0 | Lines: 0</span>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const editor = document.getElementById("markdown");
+            const preview = document.getElementById("preview");
+
+            editor.value = localStorage.getItem("markdown") || "";
+            updatePreview();
+
+            editor.addEventListener("input", () => {
+                localStorage.setItem("markdown", editor.value);
+                updatePreview();
+                updateStats();
+            });
+
+            document.getElementById("themeToggle").addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+            });
+
+            const resizer = document.getElementById("resizer");
+            resizer.addEventListener("mousedown", (e) => {
+                document.addEventListener("mousemove", resize);
+                document.addEventListener("mouseup", stopResize);
+            });
+
+            function resize(e) {
+                let percentage = (e.clientX / window.innerWidth) * 100;
+                document.getElementById("markdown").style.width = percentage + "%";
+                document.getElementById("preview").style.width = (100 - percentage) + "%";
+            }
+
+            function stopResize() {
+                document.removeEventListener("mousemove", resize);
+                document.removeEventListener("mouseup", stopResize);
+            }
+        });
+
+        function updatePreview() {
+            let markdownText = document.getElementById("markdown").value;
+            document.getElementById("preview").innerHTML = marked.parse(markdownText);
+            document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+        }
+
+        function updateStats() {
+            let text = document.getElementById("markdown").value;
+            let words = text.match(/\b\w+\b/g)?.length || 0;
+            let chars = text.length;
+            let lines = text.split(/\n/).length;
+            document.getElementById("stats").textContent = `Words: ${words} | Characters: ${chars} | Lines: ${lines}`;
+        }
+
+        function updateSettings() {
+            let fontSize = document.getElementById("fontSize").value + "px";
+            let lineHeight = document.getElementById("lineHeight").value;
+            document.getElementById("markdown").style.fontSize = fontSize;
+            document.getElementById("markdown").style.lineHeight = lineHeight;
+        }
+
+        function insertMarkdown(text) {
+            let editor = document.getElementById("markdown");
+            let start = editor.selectionStart;
+            editor.value = editor.value.substring(0, start) + text + editor.value.substring(start);
+            editor.dispatchEvent(new Event("input"));
+        }
+
+        function downloadMarkdown() { saveFile("document.md", "text/markdown"); }
+        function downloadHTML() { saveFile("document.html", "text/html"); }
+        function downloadPDF() { html2pdf().from(document.getElementById("preview")).save("document.pdf"); }
+        function saveFile(filename, type) { let blob = new Blob([document.getElementById("markdown").value], { type }); let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); }
+        function toggleSettings() { let panel = document.getElementById("settingsPanel"); panel.style.display = panel.style.display === "block" ? "none" : "block"; }
+    </script>
+
+</body>
+</html>
