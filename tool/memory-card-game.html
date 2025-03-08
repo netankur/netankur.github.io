@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <style>
+        :root {
+            --primary-bg: #f0f0f0;
+            --card-back: #4a90e2;
+            --card-front: #ffcc00;
+            --text-color: #333;
+            --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] {
+            --primary-bg: #1e1e2d;
+            --card-back: #222;
+            --card-front: #f4b400;
+            --text-color: #fff;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            text-align: center;
+            background: var(--primary-bg);
+            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+            transition: background 0.4s ease;
+            padding: 20px;
+        }
+
+        header {
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-shadow: var(--box-shadow);
+        }
+
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+        }
+
+        .game-info {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+            perspective: 1000px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            border-radius: 10px;
+            position: relative;
+            aspect-ratio: 1/1;
+        }
+
+        .card .front, .card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(2vw + 1em); /* Dynamically adjust font size */
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .card .front {
+            background: var(--card-front);
+            transform: rotateY(180deg);
+        }
+
+        .card .back {
+            background: var(--card-back);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            display: none;
+            color: white;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card .front, .card .back {
+                font-size: calc(3vw + 1em);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card .front, .card .back {
+                font-size: calc(4vw + 0.5em);
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+<header>
+    <h1>🧠 Memory Card Game</h1>
+    <div class="game-info">
+        <span>⏳ Time: <span id="timer">0</span> sec</span>
+    </div>
+    <label for="difficulty">Difficulty:</label>
+    <select id="difficulty">
+        <option value="4">Easy (4x4)</option>
+        <option value="6">Medium (6x6)</option>
+        <option value="8">Hard (8x8)</option>
+    </select>
+
+    <label for="mode">Mode:</label>
+    <select id="mode">
+        <option value="numbers">Numbers</option>
+        <option value="emojis">Emojis</option>
+        <option value="letters">Letters</option>
+    </select>
+
+    <button id="start">Start Game</button>
+    <button id="toggle-theme">Toggle Dark Mode</button>
+</header>
+
+<section class="game-board" id="game-board"></section>
+
+<div class="modal" id="victory-modal">
+    <h2>🎉 Congratulations!</h2>
+    <p>You completed the game in <span id="final-time">0</span> seconds.</p>
+    <button id="play-again">Play Again</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const board = document.getElementById("game-board");
+    const startButton = document.getElementById("start");
+    const themeToggle = document.getElementById("toggle-theme");
+    const timerDisplay = document.getElementById("timer");
+    const victoryModal = document.getElementById("victory-modal");
+    const finalTime = document.getElementById("final-time");
+    const playAgain = document.getElementById("play-again");
+    
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let time = 0;
+    let timer;
+    let isChecking = false; // Prevents clicking during card check
+
+    startButton.onclick = () => {
+        let grid = parseInt(document.getElementById("difficulty").value);
+        let mode = document.getElementById("mode").value;
+        setupBoard(grid, mode);
+    };
+
+    themeToggle.onclick = () => {
+        document.body.dataset.theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+    };
+
+    function setupBoard(size, mode) {
+        board.innerHTML = "";
+        board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        flippedCards = [];
+        matchedPairs = 0;
+
+        let values = generateValues(size, mode);
+        shuffle(values);
+
+        time = 0;
+        clearInterval(timer);
+        timerDisplay.textContent = "0";
+        timer = setInterval(() => timerDisplay.textContent = ++time, 1000);
+
+        values.forEach(value => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.value = value;
+            card.innerHTML = `<div class="front">${value}</div><div class="back">?</div>`;
+            card.onclick = () => flipCard(card);
+            board.appendChild(card);
+        });
+    }
+
+    function generateValues(size, mode) {
+        let emojiSet = [
+    "🎯", "🔥", "🎉", "🚀", "🌟", "💡", "💖", "🍕", "🎵", "🏆", "🧩", "🎈", "⚡",
+    "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍",
+    "😘", "😗", "😙", "😚", "😇", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮",
+    "😯", "😲", "😳", "😵", "😡", "😠", "😷", "😇", "🤔", "🤗", "🤩", "🤪", 
+    "🤫", "🤭", "🧐", "🤓", "😈", "👿", "👻", "💀", "☠️", "👽", "💩", "🤖", 
+    "🎃", "😺", "😸", "😻", "😼", "😽", "🙀", "😿", "😾", "🐶", "🐱", "🐭", 
+    "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", 
+    "🐔", "🐧", "🐦", "🐤", "🐣", "🐥", "🦅", "🦆", "🦉", "🦇", "🐺", "🐗", 
+    "🐴", "🦄", "🐝", "🐞", "🦋", "🐌", "🐛", "🐜", "🐢", "🐍", "🦎", "🐙", 
+    "🐠", "🐟", "🐡", "🦈", "🐬", "🐳", "🐋", "🦭", "🐊", "🦕", "🦖", "🐉", 
+    "🦄", "🐲", "🌍", "🌎", "🌏", "🌐", "🌈", "☀️", "🌤️", "🌦️", "🌧️", 
+    "🌩️", "🌨️", "❄️", "🌪️", "🌫️", "🌊", "💧", "🌊", "🌋", "🗻", "🏔️", 
+    "⛰️", "🏕️", "🏖️", "🏝️", "🏞️", "🌅", "🌄", "🌠", "🌌", "⭐", "🌟", 
+    "✨", "⚡", "🔥", "💥", "💫", "🌈", "🌤️", "🌦️", "🌧️", "🌨️", "🌩️", 
+    "🌪️", "🌫️", "🌊", "💧", "🌊", "🌋", "🗻", "🏔️", "⛰️", "🏕️", "🏖️", 
+    "🏝️", "🏞️", "🌅", "🌄", "🌠", "🌌", "⭐", "🌟", "✨", "⚡", "🔥", "💥", 
+    "💫", "🌈", "🌤️", "🌦️", "🌧️", "🌨️", "🌩️", "🌪️", "🌫️", "🌊", "💧"
+];
+        let letterSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+        let set = mode === "emojis" ? emojiSet : mode === "letters" ? letterSet : [...Array(size * size / 2).keys()];
+        return [...set, ...set].slice(0, size * size);
+    }
+
+    function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+
+    function flipCard(card) {
+        if (isChecking || flippedCards.includes(card) || card.classList.contains("flipped")) return;
+
+        card.classList.add("flipped");
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+            isChecking = true;
+            setTimeout(checkMatch, 800);
+        }
+    }
+
+    function checkMatch() {
+        let [card1, card2] = flippedCards;
+        if (card1.dataset.value === card2.dataset.value) {
+            card1.onclick = null;
+            card2.onclick = null;
+            matchedPairs++;
+        } else {
+            card1.classList.remove("flipped");
+            card2.classList.remove("flipped");
+        }
+
+        flippedCards = [];
+        isChecking = false;
+
+        if (matchedPairs === board.children.length / 2) {
+            clearInterval(timer);
+            finalTime.textContent = time;
+            victoryModal.classList.add("show");
+        }
+    }
+
+    playAgain.onclick = () => {
+        victoryModal.classList.remove("show");
+        startButton.click();
+    };
+});
+</script>
+
+</body>
+</html>
