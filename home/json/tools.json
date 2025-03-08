@@ -60,6 +60,60 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "Bar Chart Generator",
+    "url": "/tool/bar-chart.html",
+    "description": "Visualize your data easily with our Bar Chart Generator. Create customizable bar charts with adjustable labels, colors, and values. Perfect for presentations, reports, and data analysis.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Box Shadow Generator",
+    "url": "/tool/box-shadow.html",
+    "description": "Easily create CSS box shadows with our Box Shadow Generator. Customize shadow intensity, blur, spread, and color to enhance your web designs. Get instant CSS code for seamless integration.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Dice Roller",
+    "url": "/tool/dice-roller.html",
+    "description": "Roll virtual dice anytime with our Dice Roller tool. Choose different dice types, roll multiple dice at once, and get random outcomes for board games, RPGs, and fun activities.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "EMI Calculator",
+    "url": "/tool/emi-calculator.html",
+    "description": "Plan your loans efficiently with our EMI Calculator. Calculate your Equated Monthly Installments (EMIs) based on loan amount, interest rate, and tenure. Get a clear repayment schedule instantly.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Markdown Editor",
+    "url": "/tool/markdown.html",
+    "description": "Write and preview Markdown effortlessly with our Markdown Editor. Convert Markdown to formatted text, preview in real-time, and export content for blogs, notes, and documentation.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Maze Generator",
+    "url": "/tool/maze.html",
+    "description": "Generate random mazes with our Maze Generator. Solve challenging mazes or use them for puzzles and game design. Customize difficulty levels and explore endless possibilities.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Memory Card Game",
+    "url": "/tool/memory-card-game.html",
+    "description": "Test your memory with our fun Memory Card Game. Flip cards, match pairs, and challenge yourself to complete the game in the shortest time possible.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Password Generator",
+    "url": "/tool/password-generator.html",
+    "description": "Create secure passwords instantly with our Password Generator. Customize length, include special characters, and generate strong passwords to keep your accounts safe.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Pie Chart Generator",
+    "url": "/tool/pie-chart.html",
+    "description": "Visualize data in a clear and engaging way with our Pie Chart Generator. Customize labels, colors, and values to create stunning pie charts for reports and presentations.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Pomodoro Timer",
     "url": "/tool/pomodoro.html",
     "description": "Boost your productivity with our Pomodoro Timer. Utilize the proven Pomodoro technique to stay focused by working in timed intervals with short breaks. Customize session lengths and track your progress effortlessly.",
