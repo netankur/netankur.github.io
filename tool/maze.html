@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Generator & Solver</title>
+    <!-- Link to Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        header {
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button, select {
+            padding: 12px 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        button {
+            background: #ffcc00;
+            color: #333;
+        }
+
+        button:hover {
+            background: #ff9900;
+            transform: scale(1.1);
+        }
+
+        select {
+            background: #fff;
+            color: #333;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            transition: 0.5s;
+        }
+
+        #mobileControls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            background: #28a745;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #218838;
+            transform: scale(1.2);
+        }
+
+        /* Animation */
+        .player {
+            transition: transform 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-random"></i> Maze</h1>
+    </header>
+
+    <main>
+        <div id="controls">
+            <select id="mazeSize">
+                <option value="10">10x10</option>
+                <option value="20" selected>20x20</option>
+                <option value="30">30x30</option>
+                <option value="40">40x40</option>
+                <option value="50">50x50</option>
+            </select>
+
+            <button id="generateMaze"><i class="fas fa-play"></i></button>
+            <button id="solveMaze"><i class="fas fa-lightbulb"></i></button>
+            <button id="resetMaze"><i class="fas fa-redo"></i></button>
+        </div>
+
+        <canvas id="mazeCanvas"></canvas>
+
+        <!-- Mobile Controls -->
+        <div id="mobileControls">
+            <div class="control-row">
+                <button class="control-btn" id="moveUp"><i class="fas fa-arrow-up"></i></button>
+            </div>
+            <div class="control-row">
+                <button class="control-btn" id="moveLeft"><i class="fas fa-arrow-left"></i></button>
+                <button class="control-btn" id="moveRight"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="control-row">
+                <button class="control-btn" id="moveDown"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById("mazeCanvas");
+        const ctx = canvas.getContext("2d");
+        let mazeSize = 20;
+        let maze = [];
+        let cellSize = 20;
+        let playerPos = [0, 0];
+        let finishPos = [mazeSize - 1, mazeSize - 1];
+
+        document.getElementById("mazeSize").addEventListener("change", (e) => {
+            mazeSize = parseInt(e.target.value);
+            generateMaze();
+        });
+
+        document.getElementById("generateMaze").addEventListener("click", generateMaze);
+        document.getElementById("solveMaze").addEventListener("click", solveMaze);
+        document.getElementById("resetMaze").addEventListener("click", generateMaze);
+
+        function generateMaze() {
+            cellSize = Math.floor(window.innerWidth / mazeSize * 0.8); // Adjust size dynamically
+            canvas.width = cellSize * mazeSize;
+            canvas.height = cellSize * mazeSize;
+            maze = Array.from({ length: mazeSize }, () => Array(mazeSize).fill(1));
+            playerPos = [0, 0];
+
+            let stack = [[0, 0]];
+            let visited = new Set(["0,0"]);
+
+            while (stack.length > 0) {
+                let [x, y] = stack.pop();
+                maze[y][x] = 0;
+
+                let neighbors = [
+                    [x + 2, y], [x - 2, y], [x, y + 2], [x, y - 2]
+                ].filter(([nx, ny]) =>
+                    nx >= 0 && ny >= 0 && nx < mazeSize && ny < mazeSize &&
+                    !visited.has(`${nx},${ny}`)
+                );
+
+                if (neighbors.length > 0) {
+                    stack.push([x, y]);
+                    let [nx, ny] = neighbors[Math.floor(Math.random() * neighbors.length)];
+                    maze[(y + ny) / 2][(x + nx) / 2] = 0;
+                    visited.add(`${nx},${ny}`);
+                    stack.push([nx, ny]);
+                }
+            }
+
+            // Fix: Ensure the exit point is on a path
+            let exitX = mazeSize - 1;
+            let exitY = mazeSize - 1;
+
+            if (maze[exitY][exitX] === 1) {
+                for (let y = mazeSize - 1; y >= 0; y--) {
+                    for (let x = mazeSize - 1; x >= 0; x--) {
+                        if (maze[y][x] === 0) {
+                            exitX = x;
+                            exitY = y;
+                            break;
+                        }
+                    }
+                    if (maze[exitY][exitX] === 0) break;
+                }
+            }
+
+            finishPos = [exitX, exitY];
+            drawMaze();
+        }
+
+        function drawMaze() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < mazeSize; y++) {
+                for (let x = 0; x < mazeSize; x++) {
+                    ctx.fillStyle = maze[y][x] ? "black" : "white";
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+
+            ctx.fillStyle = "green"; // Start
+            ctx.fillRect(0, 0, cellSize, cellSize);
+            ctx.fillStyle = "red"; // Exit (Fixed)
+            ctx.fillRect(finishPos[0] * cellSize, finishPos[1] * cellSize, cellSize, cellSize);
+
+            drawPlayer();
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = "blue";
+            ctx.fillRect(playerPos[0] * cellSize, playerPos[1] * cellSize, cellSize, cellSize);
+        }
+
+        function movePlayer(dx, dy) {
+            let [x, y] = playerPos;
+            let nx = x + dx;
+            let ny = y + dy;
+
+            if (nx >= 0 && ny >= 0 && nx < mazeSize && ny < mazeSize && maze[ny][nx] === 0) {
+                playerPos = [nx, ny];
+                drawMaze();
+
+                if (nx === finishPos[0] && ny === finishPos[1]) {
+                    alert("🎉 You reached the goal!");
+                }
+            }
+        }
+
+        // Mobile Controls
+        document.getElementById("moveUp").addEventListener("click", () => movePlayer(0, -1));
+        document.getElementById("moveDown").addEventListener("click", () => movePlayer(0, 1));
+        document.getElementById("moveLeft").addEventListener("click", () => movePlayer(-1, 0));
+        document.getElementById("moveRight").addEventListener("click", () => movePlayer(1, 0));
+
+        generateMaze();
+
+let moveInterval; // Stores interval ID for smooth movement
+
+// Function to start moving
+function startMoving(dx, dy) {
+    if (!moveInterval) {
+        moveInterval = setInterval(() => movePlayer(dx, dy), 100);
+        movePlayer(dx, dy);
+    }
+}
+
+// Function to stop moving
+function stopMoving() {
+    clearInterval(moveInterval);
+    moveInterval = null;
+}
+
+// Handle keyboard arrow key hold
+document.addEventListener("keydown", (event) => {
+    if (event.repeat) return; // Prevent excessive firing on first press
+
+    switch (event.key) {
+        case "ArrowUp":
+            startMoving(0, -1);
+            break;
+        case "ArrowDown":
+            startMoving(0, 1);
+            break;
+        case "ArrowLeft":
+            startMoving(-1, 0);
+            break;
+        case "ArrowRight":
+            startMoving(1, 0);
+            break;
+    }
+});
+
+document.addEventListener("keyup", stopMoving);
+
+// Handle touch & mouse hold for mobile buttons
+document.getElementById("moveUp").addEventListener("mousedown", () => startMoving(0, -1));
+document.getElementById("moveDown").addEventListener("mousedown", () => startMoving(0, 1));
+document.getElementById("moveLeft").addEventListener("mousedown", () => startMoving(-1, 0));
+document.getElementById("moveRight").addEventListener("mousedown", () => startMoving(1, 0));
+
+document.getElementById("moveUp").addEventListener("mouseup", stopMoving);
+document.getElementById("moveDown").addEventListener("mouseup", stopMoving);
+document.getElementById("moveLeft").addEventListener("mouseup", stopMoving);
+document.getElementById("moveRight").addEventListener("mouseup", stopMoving);
+
+// Also stop movement when the mouse leaves the button (for better mobile experience)
+document.getElementById("moveUp").addEventListener("mouseleave", stopMoving);
+document.getElementById("moveDown").addEventListener("mouseleave", stopMoving);
+document.getElementById("moveLeft").addEventListener("mouseleave", stopMoving);
+document.getElementById("moveRight").addEventListener("mouseleave", stopMoving);
+
+// Ensure touch works on mobile
+document.getElementById("moveUp").addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    startMoving(0, -1);
+});
+document.getElementById("moveDown").addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    startMoving(0, 1);
+});
+document.getElementById("moveLeft").addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    startMoving(-1, 0);
+});
+document.getElementById("moveRight").addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    startMoving(1, 0);
+});
+
+document.getElementById("moveUp").addEventListener("touchend", stopMoving);
+document.getElementById("moveDown").addEventListener("touchend", stopMoving);
+document.getElementById("moveLeft").addEventListener("touchend", stopMoving);
+document.getElementById("moveRight").addEventListener("touchend", stopMoving);
+
+// Maze Solver using BFS (Breadth-First Search)
+function solveMaze() {
+    let queue = [[...playerPos]];
+    let visited = new Set();
+    let parent = {};
+    visited.add(`${playerPos[0]},${playerPos[1]}`);
+
+    while (queue.length) {
+        let [x, y] = queue.shift();
+
+        if (x === finishPos[0] && y === finishPos[1]) {
+            let path = [];
+            while (`${x},${y}` in parent) {
+                path.push([x, y]);
+                [x, y] = parent[`${x},${y}`];
+            }
+            path.reverse();
+            
+            let index = 0;
+            function animateSolve() {
+                if (index < path.length) {
+                    playerPos = path[index];
+                    drawMaze();
+                    index++;
+                    setTimeout(animateSolve, 200);
+                } else {
+                    alert("🎉 Maze solved!");
+                }
+            }
+            animateSolve();
+            return;
+        }
+
+        [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]].forEach(([nx, ny]) => {
+            if (nx >= 0 && ny >= 0 && nx < mazeSize && ny < mazeSize && maze[ny][nx] === 0 && !visited.has(`${nx},${ny}`)) {
+                visited.add(`${nx},${ny}`);
+                parent[`${nx},${ny}`] = [x, y];
+                queue.push([nx, ny]);
+            }
+        });
+    }
+}
+    </script>
+</body>
+</html>
