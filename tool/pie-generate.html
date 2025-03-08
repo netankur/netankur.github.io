@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Pie Chart Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 🌟 Root Variables */
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #222;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            --button-color: #007bff;
+            --button-hover: #0056b3;
+            --border-radius: 12px;
+        }
+
+        .dark-theme {
+            --bg-color: #181818;
+            --text-color: #f0f0f0;
+            --card-bg: rgba(40, 40, 40, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s ease;
+            padding: 20px;
+        }
+
+        /* 🌟 Layout */
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 280px;
+            max-width: 350px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            max-width: 500px;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            background: var(--button-color);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+            transform: scale(1.05);
+        }
+
+        /* 🌟 Horizontal Data Entry */
+        .data-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .data-entry input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .data-entry input[type="text"] {
+            flex: 2;
+            min-width: 120px;
+        }
+
+        .data-entry input[type="number"] {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .data-entry input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: none;
+            padding: 0;
+        }
+
+        .remove {
+            background: cyan;
+            padding: 8px;
+        }
+
+        .remove:hover {
+            background: #c0392b;
+        }
+
+        #legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        #legend li {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        /* 🌟 Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .data-entry {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .data-entry input {
+                width: 100%;
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 🎛 Sidebar Controls -->
+        <aside class="sidebar">
+            <h2>Pie Chart Generator</h2>
+            <button id="themeToggle">🌙 Toggle Theme</button>
+            <div id="dataInputs"></div>
+            <button id="addData">+ Add Data</button>
+            <button id="reset">🔄 Reset</button>
+            <button id="download">📥 Download Chart</button>
+        </aside>
+
+        <!-- 📊 Chart Area -->
+        <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+            <ul id="legend"></ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById("pieChart").getContext("2d");
+            let chartData = [{ label: "Sample", value: 10, color: getRandomColor() }];
+
+            let pieChart = new Chart(ctx, {
+                type: "pie",
+                data: generateChartData(),
+                options: { 
+                    responsive: true, 
+                    animation: { animateRotate: true, animateScale: true }, 
+                    plugins: { legend: { display: true } } 
+                }
+            });
+
+            const dataInputs = document.getElementById("dataInputs");
+            const addDataBtn = document.getElementById("addData");
+            const resetBtn = document.getElementById("reset");
+            const downloadBtn = document.getElementById("download");
+            const themeToggle = document.getElementById("themeToggle");
+
+            function generateChartData() {
+                return {
+                    labels: chartData.map(d => d.label),
+                    datasets: [{ data: chartData.map(d => d.value), backgroundColor: chartData.map(d => d.color) }]
+                };
+            }
+
+            function updateChart() {
+                chartData = Array.from(document.querySelectorAll(".data-entry")).map(div => ({
+                    label: div.querySelector("input[type='text']").value || "Untitled",
+                    value: parseFloat(div.querySelector("input[type='number']").value) || 0,
+                    color: div.querySelector("input[type='color']").value
+                }));
+
+                pieChart.data = generateChartData();
+                pieChart.update();
+            }
+
+            function addDataInput(label = "", value = "", color = getRandomColor()) {
+                const div = document.createElement("div");
+                div.classList.add("data-entry");
+                div.innerHTML = `
+                    <input type="text" placeholder="Label" value="${label}">
+                    <input type="number" placeholder="Value" value="${value}">
+                    <input type="color" value="${color}">
+                    <button class="remove">❌</button>
+                `;
+                dataInputs.appendChild(div);
+                div.querySelector(".remove").addEventListener("click", () => { div.remove(); updateChart(); });
+                div.querySelectorAll("input").forEach(input => input.addEventListener("input", updateChart));
+            }
+
+            function getRandomColor() {
+                return `#${Math.floor(Math.random()*16777215).toString(16)}`;
+            }
+
+            downloadBtn.addEventListener("click", () => {
+                const link = document.createElement("a");
+                link.href = document.getElementById("pieChart").toDataURL("image/png");
+                link.download = "pie-chart.png";
+                link.click();
+            });
+
+            addDataBtn.addEventListener("click", () => addDataInput());
+            resetBtn.addEventListener("click", () => { chartData = []; dataInputs.innerHTML = ""; updateChart(); });
+            themeToggle.addEventListener("click", () => { document.body.classList.toggle("dark-theme"); });
+
+            addDataInput("Example", "20");
+            updateChart();
+        });
+    </script>
+</body>
+</html>
