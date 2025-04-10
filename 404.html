@@ -1,109 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Error 404</title>
-  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
-  <style>
-    @import 'https://fonts.googleapis.com/css?family=Inconsolata';
-    html {
-      min-height: 100%;
-    }
-    body {
-      box-sizing: border-box;
-      height: 100%;
-      background-color: #000;
-      background-image: radial-gradient(#11581e, #041607), url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
-      background-repeat: no-repeat;
-      background-size: cover;
-      font-family: 'Inconsolata', Helvetica, sans-serif;
-      font-size: 1.5rem;
-      color: rgba(128, 255, 128, 0.8);
-      text-shadow: 0 0 1ex rgba(51, 255, 51, 1), 0 0 2px rgba(255, 255, 255, 0.8);
-    }
-    .noise {
-      pointer-events: none;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-image: url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
-      background-repeat: no-repeat;
-      background-size: cover;
-      z-index: -1;
-      opacity: 0.02;
-    }
-    .overlay {
-      pointer-events: none;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
-      background-size: auto 4px;
-      z-index: 1;
-    }
-    .overlay::before {
-      content: "";
-      pointer-events: none;
-      position: absolute;
-      display: block;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
-      background-image: linear-gradient(0deg, transparent 0%, rgba(32, 128, 32, 0.2) 2%, rgba(32, 128, 32, 0.8) 3%, rgba(32, 128, 32, 0.2) 3%, transparent 100%);
-      background-repeat: no-repeat;
-      animation: scan 7.5s linear 0s infinite;
-    }
-    @keyframes scan {
-      0% {
-        background-position: 0 -100vh;
-      }
-      35%, 100% {
-        background-position: 0 100vh;
-      }
-    }
-    .terminal {
-      box-sizing: inherit;
-      position: absolute;
-      height: 100%;
-      width: 1000px;
-      max-width: 100%;
-      padding: 4rem;
-      text-transform: uppercase;
-    }
-    .output {
-      color: rgba(128, 255, 128, 0.8);
-      text-shadow: 0 0 1px rgba(51, 255, 51, 0.4), 0 0 2px rgba(255, 255, 255, 0.8);
-    }
-    .output::before {
-      content: "> ";
-    }
-    a {
-      color: #fff;
-      text-decoration: none;
-    }
-    a::before {
-      content: "[";
-    }
-    a::after {
-      content: "]";
-    }
-    .errorcode {
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Error</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff0066;
+            --bg: #0a0a0a;
+            --shadow: rgba(0, 255, 136, 0.3);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .terminal-container {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            background: var(--bg);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 50px var(--shadow);
+            overflow: hidden;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary);
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .window-btn {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid #444;
+        }
+
+        .terminal-screen {
+            height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            position: relative;
+        }
+
+        .output-line {
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 1.5s steps(30);
+        }
+
+        .blinking-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 20px;
+            background: var(--primary);
+            animation: blink 1s infinite;
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .prompt {
+            color: var(--secondary);
+            margin-right: 10px;
+        }
+
+        input#cmdInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--primary);
+            color: inherit;
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 5px;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .terminal-container {
+                padding: 20px;
+                border-radius: 10px;
+            }
+            
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .terminal-screen {
+                height: 300px;
+            }
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
 </head>
 <body>
-  <div class="noise"></div>
-  <div class="overlay"></div>
-  <div class="terminal">
-    <h1>Error <span class="errorcode">404</span></h1>
-    <p class="output">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
-    <p class="output">Please try to <a href="#1">go back</a> or <a href="#2">return to the homepage</a>.</p>
-    <p class="output">Good luck.</p>
-  </div>
+    <div class="terminal-container">
+        <div class="scan-line"></div>
+        <div class="terminal-header">
+            <div class="header-title">404 Error</div>
+            <div class="window-controls">
+                <div class="window-btn" style="background: #ff6666;"></div>
+                <div class="window-btn" style="background: #ffdd55;"></div>
+                <div class="window-btn" style="background: #66ff66;"></div>
+            </div>
+        </div>
+        <div class="terminal-screen" id="terminalOutput">
+            <div class="output-line">Initializing system...</div>
+            <div class="output-line">Loading error handler v2.4.1...</div>
+            <div class="output-line">[ERROR] Page not found: File does not exist in current directory</div>
+            <div class="output-line">Status: 404 - The requested resource could not be located</div>
+            <div class="output-line">Suggestions:</div>
+            <div class="output-line">- Type 'help' for available commands</div>
+            <div class="output-line">- Type 'home' to return to main directory</div>
+            <div class="output-line">- Type 'report' to notify administrator</div>
+        </div>
+        <div class="command-line">
+            <span class="prompt">C:\></span>
+            <input type="text" id="cmdInput" autofocus>
+            <span class="blinking-cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        const terminalOutput = document.getElementById('terminalOutput');
+        const input = document.getElementById('cmdInput');
+
+        const commands = {
+            'help': () => addOutput([
+                'Available commands:',
+                'home - Return to main page',
+                'report - Send error report',
+                'clear - Clear terminal',
+                'about - System information',
+                'contact - Support details'
+            ]),
+            'home': () => window.location.href = '/',
+            'report': () => addOutput('Error report sent to admin@domain.com'),
+            'clear': () => terminalOutput.innerHTML = '',
+            'about': () => addOutput('System v3.2.1 | Uptime: 189d 4h | Memory: 768MB'),
+            'contact': () => addOutput('Support: support@domain.com | Tel: 555-123-4567')
+        };
+
+        function addOutput(messages) {
+            if (!Array.isArray(messages)) messages = [messages];
+            messages.forEach(msg => {
+                const line = document.createElement('div');
+                line.className = 'output-line';
+                line.textContent = msg;
+                terminalOutput.appendChild(line);
+            });
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim().toLowerCase();
+                addOutput(`C:\\> ${cmd}`);
+                
+                if (commands[cmd]) {
+                    commands[cmd]();
+                } else if (cmd) {
+                    addOutput(`'${cmd}' is not recognized as an internal or external command`);
+                }
+                
+                input.value = '';
+            }
+        });
+
+        // Initial typing animation
+        document.querySelectorAll('.output-line').forEach((line, index) => {
+            line.style.animationDelay = `${index * 0.3}s`;
+        });
+    </script>
 </body>
 </html>
