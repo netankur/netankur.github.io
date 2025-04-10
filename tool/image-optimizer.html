@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Optimizer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #2962FF;
+            --accent: #00E676;
+            --dark: #121212;
+            --light: #2d2d2d;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 30px;
+            width: 1200px;
+            max-width: 95%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary);
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .header h1::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .drop-zone {
+            background: var(--glass);
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone:hover {
+            transform: scale(1.02);
+            border-color: var(--accent);
+        }
+
+        .drop-zone.active {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        }
+
+        .drop-zone p {
+            font-size: 1.2em;
+            color: #fff;
+            position: relative;
+            z-index: 2;
+        }
+
+        .preview-container {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .image-comparison {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .comparison-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .comparison-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.1));
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .comparison-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: ew-resize;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            pointer-events: auto;
+            z-index: 3;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+        }
+
+        .zoom-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .zoom-level {
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .control-panel {
+            background: var(--glass);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-panel h3 {
+            position: relative;
+            z-index: 1;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-container {
+            position: relative;
+            z-index: 1;
+            margin: 25px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: #444;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 0 4px rgba(41,98,255,0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .process-btn,
+        .download-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .process-btn:hover {
+            background: #1a52ff;
+        }
+
+        .download-btn {
+            background: var(--accent);
+        }
+
+        .download-btn:hover {
+            background: #00c853;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: var(--glass);
+            border-radius: 15px;
+            padding: 25px;
+            width: 200px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box h2 {
+            color: var(--accent);
+            font-size: 2em;
+            margin: 0 0 10px;
+        }
+
+        .stat-box p {
+            margin: 0;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>Pro Image Optimizer</h1>
+        </div>
+        
+        <div class="drop-zone" id="dropZone">
+            <p>Drag & Drop your image here<br>or<br><span class="browse">Browse files</span></p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        
+        <div class="preview-container">
+            <div class="image-comparison" id="imageComparison">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                     alt="Original" 
+                     id="originalImg"
+                     class="comparison-img">
+                     
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                     alt="Processed" 
+                     id="processedImg"
+                     class="comparison-img">
+                     
+                <div class="comparison-slider" id="comparisonSlider"></div>
+                <div class="comparison-handle" id="comparisonHandle"></div>
+            </div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="adjustZoom(0.25)">+</button>
+                <button class="zoom-btn" onclick="adjustZoom(-0.25)">-</button>
+                <div class="zoom-level" id="zoomLevel">100%</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-panel">
+                <h3>Quality Control</h3>
+                <div class="slider-container">
+                    <input type="range" min="10" max="100" value="85" class="slider" id="qualitySlider">
+                    <div class="slider-value" id="qualityValue">85%</div>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <h3>Dimension Control</h3>
+                <div class="slider-container">
+                    <input type="range" min="200" max="3000" value="1500" class="slider" id="sizeSlider">
+                    <div class="slider-value" id="sizeValue">1500px</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="process-btn" id="processBtn" disabled>
+                <span>Process Image</span>
+            </button>
+            
+            <button class="download-btn" id="downloadBtn" disabled>
+                <span>Download Processed</span>
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h2 id="originalSize">0 KB</h2>
+                <p>Original Size</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="newSize">0 KB</h2>
+                <p>Optimized Size</p>
+            </div>
+            <div class="stat-box">
+                <h2 id="reduction">0%</h2>
+                <p>Reduction</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+        let originalBlob = null;
+        let currentProcessedUrl = null;
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const originalImg = document.getElementById('originalImg');
+        const processedImg = document.getElementById('processedImg');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const processBtn = document.getElementById('processBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const originalSize = document.getElementById('originalSize');
+        const newSize = document.getElementById('newSize');
+        const reduction = document.getElementById('reduction');
+
+        // Zoom functionality
+        function adjustZoom(delta) {
+            currentZoom = Math.max(0.25, Math.min(3, currentZoom + delta));
+            const scale = currentZoom.toFixed(2);
+
+            document.querySelectorAll('.comparison-img').forEach(img => {
+                img.style.transform = `scale(${scale})`;
+                img.style.transformOrigin = 'center';
+            });
+
+            document.getElementById('zoomLevel').textContent = `${(scale * 100).toFixed(0)}%`;
+        }
+
+        // Drag-and-drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        dropZone.addEventListener('dragenter', () => dropZone.classList.add('active'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        dropZone.addEventListener('drop', handleDrop);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            handleFiles(e.target.files);
+        }
+
+        function handleFiles(files) {
+            if (!files.length) return;
+            const file = files[0];
+            originalBlob = file;
+            const url = URL.createObjectURL(file);
+
+            originalImg.src = url;
+            processedImg.src = url;
+
+            updateOriginalSize(file.size);
+            dropZone.style.display = 'none';
+            processBtn.disabled = false;
+            downloadBtn.disabled = true;
+        }
+
+        function updateOriginalSize(size) {
+            originalSize.textContent = formatBytes(size);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 KB';
+            const k = 1024;
+            const dm = 2;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // Sliders
+        qualitySlider.addEventListener('input', (e) => {
+            document.getElementById('qualityValue').textContent = `${e.target.value}%`;
+        });
+
+        sizeSlider.addEventListener('input', (e) => {
+            document.getElementById('sizeValue').textContent = `${e.target.value}px`;
+        });
+
+        // Comparison slider
+        const comparisonHandle = document.getElementById('comparisonHandle');
+        let isDragging = false;
+
+        comparisonHandle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', stopDrag);
+        });
+
+        function handleDrag(e) {
+            if (!isDragging) return;
+            const rect = document.getElementById('imageComparison').getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+
+            comparisonHandle.style.left = `${x}px`;
+            document.getElementById('comparisonSlider').style.width = `${x}px`;
+
+            document.querySelectorAll('.comparison-img').forEach(img => {
+                img.style.clipPath = `inset(0 ${100 - (x / rect.width) * 100}% 0 0)`;
+            });
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', handleDrag);
+        }
+
+        // Process button
+        processBtn.addEventListener('click', async () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = async () => {
+                const maxWidth = parseInt(sizeSlider.value);
+                const maxHeight = parseInt(sizeSlider.value);
+
+                let width = img.width;
+                let height = img.height;
+                const ratio = Math.min(maxWidth / width, maxHeight / height);
+
+                canvas.width = Math.floor(width * ratio);
+                canvas.height = Math.floor(height * ratio);
+
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                const quality = qualitySlider.value / 100;
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+                currentProcessedUrl = URL.createObjectURL(blob);
+                processedImg.src = currentProcessedUrl;
+
+                const originalSizeBytes = originalBlob.size;
+                const newSizeBytes = blob.size;
+                const reductionPercent = ((originalSizeBytes - newSizeBytes) / originalSizeBytes * 100).toFixed(1);
+
+                newSize.textContent = formatBytes(newSizeBytes);
+                reduction.textContent = `${reductionPercent}%`;
+
+                // Update for next iteration
+                originalBlob = blob;
+                originalImg.src = currentProcessedUrl;
+
+                // Enable download button
+                downloadBtn.disabled = false;
+            };
+
+            img.src = originalImg.src;
+        });
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            if (!currentProcessedUrl) return;
+
+            const link = document.createElement('a');
+            link.href = currentProcessedUrl;
+            link.download = `processed_${Date.now()}.${originalBlob.type.split('/')[1]}`;
+            link.click();
+        });
+    </script>
+</body>
+</html>
