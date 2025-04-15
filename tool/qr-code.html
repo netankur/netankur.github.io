@@ -1,147 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level to suit your needs. Download your generated QR code as a PNG image for use in various applications." />
-  <meta name="author" content="Netankur" />
-  <meta name="keywords" content="Qr Code Generator">
-  <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
-  <title>QR Code Generator</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  
-  <style>
-    body {
-      background-color: #212529; /* Dark background color */
-      color: #ffffff; /* Light text color */
-    }
-    .form-control {
-      background-color: #343a40; /* Dark form background */
-      color: #ffffff; /* Light form text color */
-      border-color: #ffffff; /* Light form border color */
-    }
-    .btn-primary {
-      background-color: #007bff; /* Bootstrap primary color */
-      border-color: #007bff; /* Bootstrap primary border color */
-    }
-    .btn-primary:hover {
-      background-color: #0056b3; /* Darker hover color */
-      border-color: #0056b3; /* Darker hover border color */
-    }
-    .btn-success {
-      background-color: #28a745; /* Bootstrap success color */
-      border-color: #28a745; /* Bootstrap success border color */
-    }
-    .btn-success:hover {
-      background-color: #218838; /* Darker hover color */
-      border-color: #218838; /* Darker hover border color */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator Pro</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #212121;
+            line-height: 1.5;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .qr-container {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 3fr 2fr;
+                align-items: start;
+            }
+            
+            .qr-container {
+                position: sticky;
+                top: 24px;
+                max-width: 400px;
+            }
+        }
+
+        .qr-preview {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        #qr-code {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .options-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background: #e0e0e0;
+        }
+
+        .tab {
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: white;
+            color: #3f51b5;
+        }
+
+        .tab-content {
+            padding: 24px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #5c6bc0;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin-top: 4px;
+            font-size: 16px;
+        }
+
+        .customize-panel {
+            border-top: 1px solid #eee;
+        }
+
+        .customize-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f5f5f5;
+        }
+
+        .customize-content {
+            padding: 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .customize-content.active {
+            max-height: 600px;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr 1fr;
+            margin: 24px;
+        }
+
+        button {
+            background: #3f51b5;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #303f9f;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab {
+                padding: 14px;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .qr-preview {
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .input-group {
+                margin-bottom: 16px;
+            }
+            
+            input, select, textarea {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6 mx-auto">
-        <h2 class="text-center mb-4"><i class="fas fa-qrcode"></i> QR Code Generator</h2>
-        <div class="form-group">
-          <label for="qr-input">Text/URL:</label>
-          <textarea class="form-control" id="qr-input" rows="3" placeholder="Enter text or URL"></textarea>
+    <div class="container">
+        <div class="qr-container">
+            <div class="qr-preview">
+                <div id="qr-code" class="qr-canvas"></div>
+            </div>
         </div>
-        <div class="form-group">
-          <label>Options:</label>
-          <div class="row">
-            <div class="col-md-6">
-              <label for="qr-size">Size:</label>
-              <input type="number" id="qr-size" class="form-control" value="250">
+
+        <div class="options-panel">
+            <div class="tabs">
+                <div class="tab active" data-tab="text">Text</div>
+                <div class="tab" data-tab="url">URL</div>
+                <div class="tab" data-tab="email">Email</div>
+                <div class="tab" data-tab="vcard">vCard</div>
             </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col-md-6">
-              <label for="qr-background">Background Color:</label>
-              <input type="color" id="qr-background" class="form-control" value="#ffffff">
+
+            <div class="tab-content">
+                <!-- Text Content -->
+                <div id="text" class="tab-pane active">
+                    <div class="input-group">
+                        <label>Text Content</label>
+                        <textarea id="text-content" rows="4" placeholder="Enter text..."></textarea>
+                    </div>
+                </div>
+
+                <!-- URL Content -->
+                <div id="url" class="tab-pane">
+                    <div class="input-group">
+                        <label>URL</label>
+                        <input type="url" id="url-content" placeholder="https://example.com">
+                    </div>
+                </div>
+
+                <!-- Email Content -->
+                <div id="email" class="tab-pane">
+                    <div class="input-group">
+                        <label>To</label>
+                        <input type="email" id="email-to" placeholder="recipient@example.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Subject</label>
+                        <input type="text" id="email-subject">
+                    </div>
+                    <div class="input-group">
+                        <label>Body</label>
+                        <textarea id="email-body" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- vCard Content -->
+                <div id="vcard" class="tab-pane">
+                    <div class="input-group">
+                        <label>Name</label>
+                        <input type="text" id="vcard-name">
+                    </div>
+                    <div class="input-group">
+                        <label>Phone</label>
+                        <input type="tel" id="vcard-phone">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="vcard-email">
+                    </div>
+                    <div class="input-group">
+                        <label>Address</label>
+                        <input type="text" id="vcard-address">
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-              <label for="qr-foreground">Foreground Color:</label>
-              <input type="color" id="qr-foreground" class="form-control" value="#000000">
+
+            <!-- Customization Panel -->
+            <div class="customize-panel">
+                <div class="customize-header" onclick="toggleCustomize()">
+                    <span>Customize Options</span>
+                    <span class="material-icons">expand_more</span>
+                </div>
+                <div class="customize-content" id="customize-content">
+                    <div class="input-group color-picker">
+                        <div>
+                            <label>Foreground Color</label>
+                            <input type="color" id="qr-color" value="#000000">
+                        </div>
+                        <div>
+                            <label>Background Color</label>
+                            <input type="color" id="bg-color" value="#FFFFFF">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Size</label>
+                        <input type="range" id="qr-size" min="200" max="800" value="200">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Margin</label>
+                        <input type="range" id="qr-margin" min="0" max="20" value="10">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Error Correction</label>
+                        <select id="qr-error-correction">
+                            <option value="L">Low (7%)</option>
+                            <option value="M" selected>Medium (15%)</option>
+                            <option value="Q">Quartile (25%)</option>
+                            <option value="H">High (30%)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Dot Style</label>
+                        <select id="qr-dot-type">
+                            <option value="square">Square</option>
+                            <option value="dots">Dots</option>
+                            <option value="rounded">Rounded</option>
+                            <option value="classy">Classy</option>
+                            <option value="classy-rounded">Classy Rounded</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col-md-6">
-              <label for="qr-level">Correction Level:</label>
-              <select id="qr-level" class="form-control">
-                <option value="L">Low</option>
-                <option value="M">Medium</option>
-                <option value="Q">Quartile</option>
-                <option value="H">High</option>
-              </select>
+
+            <div class="button-group">
+                <button onclick="generateQR()">Generate</button>
+                <button onclick="downloadQR()">Download</button>
             </div>
-            <div class="col-md-6">
-              <label for="qr-padding">Padding:</label>
-              <input type="number" id="qr-padding" class="form-control" value="20">
-            </div>
-          </div>
         </div>
-        <div class="form-group text-center">
-          <button class="btn btn-primary" onclick="generateQR()"><i class="fas fa-qrcode"></i> Generate QR</button>
-          <button class="btn btn-success ml-2" onclick="downloadQR()"><i class="fas fa-download"></i> Download QR</button>
-        </div>
-        <div class="text-center">
-          <img id="qrious" src="" alt="Generated QR Code">
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- JavaScript -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script>
-    var generateQR = function() {
-      var text = document.getElementById('qr-input').value;
-      var size = document.getElementById('qr-size').value;
-      var background = document.getElementById('qr-background').value;
-      var foreground = document.getElementById('qr-foreground').value;
-      var level = document.getElementById('qr-level').value;
-      var padding = document.getElementById('qr-padding').value;
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.min.js"></script>
+    <script>
+        let qrInstance = null;
+        const tabContents = document.querySelectorAll('.tab-pane');
+        const tabs = document.querySelectorAll('.tab');
 
-      var qr = new QRious({
-        element: document.getElementById('qrious'),
-        value: text,
-        size: size,
-        background: background,
-        foreground: foreground,
-        level: level,
-        padding: padding
-      });
-    };
+        function initQR() {
+            qrInstance = new QRCodeStyling({
+                width: 200,
+                height: 200,
+                type: 'canvas',
+                data: 'Initial content',
+                margin: 10,
+                qrOptions: {
+                    errorCorrectionLevel: 'M'
+                },
+                dotsOptions: {
+                    color: '#000000',
+                    type: 'square'
+                },
+                backgroundOptions: {
+                    color: '#FFFFFF'
+                }
+            });
+            qrInstance.append(document.getElementById('qr-code'));
+        }
 
-    var downloadQR = function() {
-      var img = document.getElementById('qrious');
-      var canvas = document.createElement('canvas');
-      var ctx = canvas.getContext('2d');
+        function generateQR() {
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            let data = '';
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+            // Get content based on active tab
+            switch(activeTab) {
+                case 'text':
+                    data = document.getElementById('text-content').value;
+                    break;
+                case 'url':
+                    data = document.getElementById('url-content').value;
+                    break;
+                case 'email':
+                    const to = document.getElementById('email-to').value;
+                    const subject = document.getElementById('email-subject').value;
+                    const body = document.getElementById('email-body').value;
+                    data = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    break;
+                case 'vcard':
+                    const name = document.getElementById('vcard-name').value;
+                    const phone = document.getElementById('vcard-phone').value;
+                    const email = document.getElementById('vcard-email').value;
+                    const address = document.getElementById('vcard-address').value;
+                    data = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nADR:${address}\nEND:VCARD`;
+                    break;
+            }
 
-      // Convert canvas to data URL
-      var dataURL = canvas.toDataURL("image/png");
+            if (!data) return alert('Please fill required fields');
 
-      // Create a temporary link element
-      var link = document.createElement('a');
-      link.href = dataURL;
-      link.download = 'QRCode.png';
-      document.body.appendChild(link);
+            // Get customization options
+            const options = {
+                data: data,
+                width: parseInt(document.getElementById('qr-size').value),
+                height: parseInt(document.getElementById('qr-size').value),
+                margin: parseInt(document.getElementById('qr-margin').value),
+                qrOptions: {
+                    errorCorrectionLevel: document.getElementById('qr-error-correction').value
+                },
+                dotsOptions: {
+                    color: document.getElementById('qr-color').value,
+                    type: document.getElementById('qr-dot-type').value
+                },
+                backgroundOptions: {
+                    color: document.getElementById('bg-color').value
+                }
+            };
 
-      // Trigger the download
-      link.click();
+            qrInstance.update(options);
+        }
 
-      // Clean up
-      document.body.removeChild(link);
-    };
-  </script>
+        function downloadQR() {
+            if (qrInstance) {
+                qrInstance.download({ 
+                    name: 'qr_code',
+                    extension: 'png'
+                });
+            }
+        }
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.style.display = 'none');
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).style.display = 'block';
+            });
+        });
+
+        // Customization toggle
+        function toggleCustomize() {
+            const content = document.getElementById('customize-content');
+            content.classList.toggle('active');
+            document.querySelector('.customize-header .material-icons').textContent = 
+                content.classList.contains('active') ? 'expand_less' : 'expand_more';
+        }
+
+        // Initialize
+        initQR();
+        document.getElementById('text-content').value = 'Sample text';
+        generateQR();
+    </script>
 </body>
 </html>
