@@ -102,7 +102,7 @@
         }
 
         #clear-btn {
-            bottom: calc(2rem + 4.5vw); /* Positioned just above Settings */
+            bottom: calc(2rem + 4.5vw);
             background-color: #dc3545;
             color: #fff;
             display: none;
@@ -216,7 +216,7 @@
                 editor.setValue(tempCode, -1); // -1 to place cursor at start
             }
 
-            // Save to localStorage on input
+            // Auto-save to localStorage on every change (single keystroke)
             editor.session.on('change', () => {
                 localStorage.setItem('tempCode', editor.getValue());
             });
