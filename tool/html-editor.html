@@ -3,169 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A simple HTML editor lets you write and edit HTML code easily, with a live preview to see your changes in real-time. Perfect for beginners and quick testing!" />
-    <meta name="author" content="Netankur" />
-    <meta name="keywords" content="HTML EDITOR">
-    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
-    <title>HTML Editor</title>
-
-    <!-- CodeMirror CSS (including Darcula theme) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/darcula.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <title>HTML Code Compiler</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
         body {
+            background-color: #1e1e1e;
+            padding: 1vw;
+            overflow-x: hidden;
+        }
+
+        .container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e; /* Dark background */
-            color: #ffffff;
         }
-        #editor {
-            flex: 1;
-            border-right: 1px solid #444; /* Dark border */
-            background-color: #2d2d2d;
-            color: #ffffff;
+
+        #code-editor {
+            width: 100%;
+            height: calc(100vh - 2vw);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
         }
-        #output {
-            flex: 1;
-            padding: 10px;
-            overflow: auto;
-            background-color: #2d2d2d;
-            border-left: 1px solid #444;
-            color: white;
+
+        .ace_scrollbar-h {
+            overflow-x: auto !important;
         }
-        .toolbar {
-            display: flex;
-            justify-content: flex-end;
-            padding: 10px;
-            background-color: #333;
-        }
-        .button {
-            margin-left: 10px;
-            padding: 10px;
+
+        #settings-btn, #save-btn, #run-btn, #clear-btn {
+            position: fixed;
+            right: 2vw;
+            padding: calc(0.8rem + 0.2vw) calc(1.6rem + 0.4vw);
+            font-size: calc(0.8rem + 0.2vw);
             border: none;
-            background-color: #4CAF50;
-            color: white;
+            border-radius: 50px;
             cursor: pointer;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, background-color 0.3s, opacity 0.3s;
+            z-index: 1000;
         }
-        .button:hover {
-            background-color: #45a049;
+
+        #settings-btn {
+            bottom: calc(2rem + 0.5vw);
+            background-color: #6c757d;
+            color: #fff;
         }
-        #clearButton {
-            background-color: #f44336;
+
+        #settings-btn:hover {
+            background-color: #5a6268;
+            transform: scale(1.1);
         }
-        #clearButton:hover {
-            background-color: #d32f2f;
+
+        #run-btn {
+            bottom: calc(12rem + 4vw);
+            background-color: #28a745;
+            color: #fff;
+            display: none;
+            opacity: 0;
         }
-        #undoButton, #redoButton {
-            background-color: #ffa500;
+
+        #run-btn.visible {
+            display: block;
+            opacity: 1;
         }
-        #undoButton:hover, #redoButton:hover {
-            background-color: #e69500;
+
+        #run-btn:hover {
+            background-color: #218838;
+            transform: scale(1.1);
+        }
+
+        #save-btn {
+            bottom: calc(7rem + 2vw);
+            background-color: #007acc;
+            color: #fff;
+            display: none;
+            opacity: 0;
+        }
+
+        #save-btn.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #save-btn:hover {
+            background-color: #005f99;
+            transform: scale(1.1);
+        }
+
+        #save-btn.saved {
+            background-color: #28a745;
+        }
+
+        #clear-btn {
+            bottom: calc(2rem + 4.5vw); /* Positioned just above Settings */
+            background-color: #dc3545;
+            color: #fff;
+            display: none;
+            opacity: 0;
+        }
+
+        #clear-btn.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #clear-btn:hover {
+            background-color: #b02a37;
+            transform: scale(1.1);
+        }
+
+        #clear-btn.cleared {
+            background-color: #28a745;
+        }
+
+        /* Responsive Design for Tablets */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5vw;
+            }
+
+            #code-editor {
+                height: calc(100vh - 3vw);
+            }
+
+            #settings-btn, #save-btn, #run-btn, #clear-btn {
+                padding: calc(0.7rem + 0.2vw) calc(1.4rem + 0.4vw);
+                font-size: calc(0.7rem + 0.2vw);
+                right: 1.5vw;
+            }
+
+            #run-btn {
+                bottom: calc(10rem + 3vw);
+            }
+
+            #save-btn {
+                bottom: calc(6rem + 1.5vw);
+            }
+
+            #clear-btn {
+                bottom: calc(1.5rem + 4vw);
+            }
+
+            #settings-btn {
+                bottom: calc(1.5rem + 0.5vw);
+            }
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 2vw;
+            }
+
+            #code-editor {
+                height: calc(100vh - 4vw);
+            }
+
+            #settings-btn, #save-btn, #run-btn, #clear-btn {
+                padding: calc(0.6rem + 0.2vw) calc(1.2rem + 0.4vw);
+                font-size: calc(0.6rem + 0.2vw);
+                right: 2vw;
+            }
+
+            #run-btn {
+                bottom: calc(8rem + 2.5vw);
+            }
+
+            #save-btn {
+                bottom: calc(5rem + 1vw);
+            }
+
+            #clear-btn {
+                bottom: calc(1rem + 3.5vw);
+            }
+
+            #settings-btn {
+                bottom: calc(1rem + 0.5vw);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="toolbar">
-        <button class="button" id="runButton"><i class="fas fa-play"></i></button>
-        <button class="button" id="downloadButton"><i class="fas fa-download"></i></button>
-        <button class="button" id="undoButton"><i class="fas fa-undo"></i></button>
-        <button class="button" id="redoButton"><i class="fas fa-redo"></i></button>
-        <button class="button" id="clearButton"><i class="fas fa-trash"></i></button>
+    <div class="container">
+        <div id="code-editor"></div>
+        <button id="settings-btn">Settings</button>
+        <button id="run-btn">Run</button>
+        <button id="save-btn">Save</button>
+        <button id="clear-btn">Clear</button>
     </div>
-    <textarea id="editor"></textarea>
-    <div id="output"></div>
-
-    <!-- CodeMirror JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
-
     <script>
-        // Load saved code from Local Storage
-        var savedCode = localStorage.getItem("htmlEditorContent") || "";
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Ace Editor
+            const editor = ace.edit('code-editor');
+            editor.setTheme('ace/theme/monokai');
+            editor.session.setMode('ace/mode/html');
+            editor.setOptions({
+                fontSize: 'calc(0.9rem + 0.2vw)',
+                showPrintMargin: false,
+                wrap: false // Disable text wrapping
+            });
 
-        // Initialize CodeMirror with Dark Theme (Darcula)
-        var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-            mode: "text/html",
-            lineNumbers: true,
-            theme: "darcula",  // Dark Theme
-            lineWrapping: true,
-            historyEventDelay: 0,
-            extraKeys: {
-                "Ctrl-Z": function(cm) { cm.undo(); },
-                "Ctrl-Y": function(cm) { cm.redo(); }
-            }
-        });
-
-        // Set saved code (if any) on page load
-        editor.setValue(savedCode);
-
-        // Function to update output and save to local storage
-        function updateOutput() {
-            var code = editor.getValue();
-            localStorage.setItem("htmlEditorContent", code);
-            document.getElementById('output').innerHTML = code;
-        }
-
-        // Update output and save whenever editor changes
-        editor.on('change', function() {
-            updateOutput();
-        });
-
-        // Run button - Opens code in a new window
-        document.getElementById('runButton').addEventListener('click', function() {
-            var code = editor.getValue();
-            var newWindow = window.open();
-            newWindow.document.open();
-            newWindow.document.write(code);
-            newWindow.document.close();
-        });
-
-        // Download button - Saves code as an HTML file
-        document.getElementById('downloadButton').addEventListener('click', function() {
-            var code = editor.getValue();
-            var defaultFileName = 'code.html';
-            var fileName = prompt("Enter the filename (without extension):", defaultFileName.replace('.html', ''));
-
-            if (fileName) {
-                fileName += '.html';
-            } else {
-                fileName = defaultFileName;
+            // Load temporary code from localStorage if available
+            const tempCode = localStorage.getItem('tempCode');
+            if (tempCode) {
+                editor.setValue(tempCode, -1); // -1 to place cursor at start
             }
 
-            var blob = new Blob([code], { type: 'text/html' });
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            link.click();
-        });
+            // Save to localStorage on input
+            editor.session.on('change', () => {
+                localStorage.setItem('tempCode', editor.getValue());
+            });
 
-        // Clear button - Clears editor, output, and local storage
-        document.getElementById('clearButton').addEventListener('click', function() {
-            editor.setValue(""); // Clear the CodeMirror editor
-            document.getElementById('output').innerHTML = ""; // Clear the output
-            localStorage.removeItem("htmlEditorContent"); // Clear saved data
-        });
+            const settingsButton = document.getElementById('settings-btn');
+            const runButton = document.getElementById('run-btn');
+            const saveButton = document.getElementById('save-btn');
+            const clearButton = document.getElementById('clear-btn');
 
-        // Undo button
-        document.getElementById('undoButton').addEventListener('click', function() {
-            editor.undo();
-        });
+            // Toggle visibility of action buttons
+            let buttonsVisible = false;
+            settingsButton.addEventListener('click', () => {
+                buttonsVisible = !buttonsVisible;
+                const buttons = [runButton, saveButton, clearButton];
+                buttons.forEach(button => {
+                    button.classList.toggle('visible', buttonsVisible);
+                });
+                settingsButton.textContent = buttonsVisible ? 'Close' : 'Settings';
+            });
 
-        // Redo button
-        document.getElementById('redoButton').addEventListener('click', function() {
-            editor.redo();
-        });
+            // Handle Save button click
+            saveButton.addEventListener('click', () => {
+                let fileName = prompt('Enter file name (e.g., myfile.html):');
+                if (fileName) {
+                    fileName = fileName.trim();
+                    if (!fileName) {
+                        alert('File name cannot be empty.');
+                        return;
+                    }
+                    // Append .html if not present
+                    if (!fileName.toLowerCase().endsWith('.html')) {
+                        fileName += '.html';
+                    }
+                    const code = editor.getValue() || '<h1>Hello, World!</h1>';
+                    // Create a Blob with the HTML content
+                    const blob = new Blob([code], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    // Create a temporary anchor tag to trigger download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    // Visual feedback
+                    saveButton.classList.add('saved');
+                    saveButton.textContent = 'Saved!';
+                    setTimeout(() => {
+                        saveButton.classList.remove('saved');
+                        saveButton.textContent = 'Save';
+                    }, 1000);
+                } else {
+                    alert('Save cancelled or invalid file name.');
+                }
+            });
 
-        // Load saved content on first run
-        updateOutput();
+            // Handle Clear button click
+            clearButton.addEventListener('click', () => {
+                editor.setValue('');
+                localStorage.removeItem('tempCode');
+                clearButton.classList.add('cleared');
+                clearButton.textContent = 'Cleared!';
+                setTimeout(() => {
+                    clearButton.classList.remove('cleared');
+                    clearButton.textContent = 'Clear';
+                }, 1000);
+            });
+
+            // Handle Run button click
+            runButton.addEventListener('click', () => {
+                const code = editor.getValue() || '<h1>Hello, World!</h1>';
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                    newWindow.document.open();
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Preview</title>
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                    margin: 20px;
+                                    background-color: #fff;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${code}
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } else {
+                    alert('Please allow pop-ups to view the preview.');
+                }
+            });
+        });
     </script>
 </body>
 </html>
