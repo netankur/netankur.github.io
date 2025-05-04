@@ -1,441 +1,472 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator Pro</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
-            color: #212121;
-            line-height: 1.5;
-            padding: 16px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-        }
-
-        .qr-container {
-            position: relative;
-            max-width: 400px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                grid-template-columns: 3fr 2fr;
-                align-items: start;
-            }
-            
-            .qr-container {
-                position: sticky;
-                top: 24px;
-                max-width: 400px;
-            }
-        }
-
-        .qr-preview {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 300px;
-        }
-
-        #qr-code {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-
-        .options-panel {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .tabs {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2px;
-            background: #e0e0e0;
-        }
-
-        .tab {
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .tab.active {
-            background: white;
-            color: #3f51b5;
-        }
-
-        .tab-content {
-            padding: 24px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .input-group {
-            margin-bottom: 24px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #5c6bc0;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            margin-top: 4px;
-            font-size: 16px;
-        }
-
-        .customize-panel {
-            border-top: 1px solid #eee;
-        }
-
-        .customize-header {
-            padding: 16px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f5f5f5;
-        }
-
-        .customize-content {
-            padding: 24px;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .customize-content.active {
-            max-height: 600px;
-        }
-
-        .button-group {
-            display: grid;
-            gap: 16px;
-            grid-template-columns: 1fr 1fr;
-            margin: 24px;
-        }
-
-        button {
-            background: #3f51b5;
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-weight: 500;
-        }
-
-        button:hover {
-            background: #303f9f;
-        }
-
-        @media (max-width: 768px) {
-            .tabs {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab {
-                padding: 14px;
-            }
-            
-            .button-group {
-                grid-template-columns: 1fr;
-            }
-            
-            .qr-preview {
-                min-height: 250px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 8px;
-            }
-            
-            .input-group {
-                margin-bottom: 16px;
-            }
-            
-            input, select, textarea {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="qr-container">
-            <div class="qr-preview">
-                <div id="qr-code" class="qr-canvas"></div>
-            </div>
-        </div>
-
-        <div class="options-panel">
-            <div class="tabs">
-                <div class="tab active" data-tab="text">Text</div>
-                <div class="tab" data-tab="url">URL</div>
-                <div class="tab" data-tab="email">Email</div>
-                <div class="tab" data-tab="vcard">vCard</div>
-            </div>
-
-            <div class="tab-content">
-                <!-- Text Content -->
-                <div id="text" class="tab-pane active">
-                    <div class="input-group">
-                        <label>Text Content</label>
-                        <textarea id="text-content" rows="4" placeholder="Enter text..."></textarea>
-                    </div>
-                </div>
-
-                <!-- URL Content -->
-                <div id="url" class="tab-pane">
-                    <div class="input-group">
-                        <label>URL</label>
-                        <input type="url" id="url-content" placeholder="https://example.com">
-                    </div>
-                </div>
-
-                <!-- Email Content -->
-                <div id="email" class="tab-pane">
-                    <div class="input-group">
-                        <label>To</label>
-                        <input type="email" id="email-to" placeholder="recipient@example.com">
-                    </div>
-                    <div class="input-group">
-                        <label>Subject</label>
-                        <input type="text" id="email-subject">
-                    </div>
-                    <div class="input-group">
-                        <label>Body</label>
-                        <textarea id="email-body" rows="3"></textarea>
-                    </div>
-                </div>
-
-                <!-- vCard Content -->
-                <div id="vcard" class="tab-pane">
-                    <div class="input-group">
-                        <label>Name</label>
-                        <input type="text" id="vcard-name">
-                    </div>
-                    <div class="input-group">
-                        <label>Phone</label>
-                        <input type="tel" id="vcard-phone">
-                    </div>
-                    <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" id="vcard-email">
-                    </div>
-                    <div class="input-group">
-                        <label>Address</label>
-                        <input type="text" id="vcard-address">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customization Panel -->
-            <div class="customize-panel">
-                <div class="customize-header" onclick="toggleCustomize()">
-                    <span>Customize Options</span>
-                    <span class="material-icons">expand_more</span>
-                </div>
-                <div class="customize-content" id="customize-content">
-                    <div class="input-group color-picker">
-                        <div>
-                            <label>Foreground Color</label>
-                            <input type="color" id="qr-color" value="#000000">
-                        </div>
-                        <div>
-                            <label>Background Color</label>
-                            <input type="color" id="bg-color" value="#FFFFFF">
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Size</label>
-                        <input type="range" id="qr-size" min="200" max="800" value="200">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Margin</label>
-                        <input type="range" id="qr-margin" min="0" max="20" value="10">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Error Correction</label>
-                        <select id="qr-error-correction">
-                            <option value="L">Low (7%)</option>
-                            <option value="M" selected>Medium (15%)</option>
-                            <option value="Q">Quartile (25%)</option>
-                            <option value="H">High (30%)</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Dot Style</label>
-                        <select id="qr-dot-type">
-                            <option value="square">Square</option>
-                            <option value="dots">Dots</option>
-                            <option value="rounded">Rounded</option>
-                            <option value="classy">Classy</option>
-                            <option value="classy-rounded">Classy Rounded</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button onclick="generateQR()">Generate</button>
-                <button onclick="downloadQR()">Download</button>
-            </div>
-        </div>
+<html class="scroll-smooth" lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   QR Code Generator
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js">
+  </script>
+ </head>
+ <body class="bg-gradient-to-br from-indigo-50 via-white to-indigo-50 min-h-screen flex flex-col p-6">
+  <main class="flex flex-col md:flex-row flex-grow w-full max-w-7xl mx-auto gap-10">
+   <form class="flex-grow space-y-6" id="qr-form" novalidate="">
+    <div>
+     <label class="block text-indigo-800 font-semibold mb-2 text-lg" for="type-select">
+      Select QR Code Type
+     </label>
+     <select aria-label="Select QR Code Type" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="type-select" name="type-select">
+      <option value="text">
+       Text
+      </option>
+      <option value="url">
+       URL
+      </option>
+      <option value="vcard">
+       vCard
+      </option>
+      <option value="email">
+       Email
+      </option>
+      <option value="wifi">
+       WiFi
+      </option>
+     </select>
     </div>
+    <!-- Input groups -->
+    <div class="input-group" data-type="text url">
+     <label class="block text-indigo-800 font-semibold mb-2" for="text-input">
+      Enter Text or URL
+     </label>
+     <input aria-describedby="text-input-desc" autocomplete="off" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="text-input" name="text-input" placeholder="Enter text or URL" type="text"/>
+     <p class="text-indigo-500 text-sm mt-1" id="text-input-desc">
+      Any text or website URL
+     </p>
+    </div>
+    <div class="input-group hidden space-y-4" data-type="vcard">
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-firstname">
+       First Name
+      </label>
+      <input autocomplete="given-name" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-firstname" name="vcard-firstname" placeholder="John" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-lastname">
+       Last Name
+      </label>
+      <input autocomplete="family-name" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-lastname" name="vcard-lastname" placeholder="Doe" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-org">
+       Organization
+      </label>
+      <input autocomplete="organization" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-org" name="vcard-org" placeholder="Company Inc." type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-title">
+       Title
+      </label>
+      <input autocomplete="organization-title" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-title" name="vcard-title" placeholder="Software Engineer" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-phone">
+       Phone
+      </label>
+      <input autocomplete="tel" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-phone" name="vcard-phone" placeholder="+1 234 567 890" type="tel"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-email">
+       Email
+      </label>
+      <input autocomplete="email" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-email" name="vcard-email" placeholder="john.doe@example.com" type="email"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-url">
+       Website
+      </label>
+      <input autocomplete="url" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="vcard-url" name="vcard-url" placeholder="https://example.com" type="url"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="vcard-address">
+       Address
+      </label>
+      <textarea aria-multiline="true" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition resize-y" id="vcard-address" name="vcard-address" placeholder="123 Main St, City, Country" rows="2"></textarea>
+     </div>
+    </div>
+    <div class="input-group hidden space-y-4" data-type="email">
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="email-to">
+       To (Email Address)
+      </label>
+      <input autocomplete="email" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="email-to" name="email-to" placeholder="recipient@example.com" type="email"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="email-subject">
+       Subject
+      </label>
+      <input autocomplete="off" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="email-subject" name="email-subject" placeholder="Subject" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="email-body">
+       Body
+      </label>
+      <textarea aria-multiline="true" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition resize-y" id="email-body" name="email-body" placeholder="Write your message here..." rows="3"></textarea>
+     </div>
+    </div>
+    <div class="input-group hidden space-y-4" data-type="wifi">
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="wifi-ssid">
+       SSID (Network Name)
+      </label>
+      <input autocomplete="off" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="wifi-ssid" name="wifi-ssid" placeholder="MyWiFiNetwork" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="wifi-password">
+       Password
+      </label>
+      <input autocomplete="off" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium placeholder-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="wifi-password" name="wifi-password" placeholder="password123" type="text"/>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="wifi-encryption">
+       Encryption
+      </label>
+      <select aria-label="WiFi Encryption Type" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="wifi-encryption" name="wifi-encryption">
+       <option value="WPA">
+        WPA/WPA2
+       </option>
+       <option value="WEP">
+        WEP
+       </option>
+       <option value="nopass">
+        None
+       </option>
+      </select>
+     </div>
+     <div>
+      <label class="block text-indigo-800 font-semibold mb-2" for="wifi-hidden">
+       Hidden Network
+      </label>
+      <select aria-label="WiFi Hidden Network" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="wifi-hidden" name="wifi-hidden">
+       <option selected="" value="false">
+        No
+       </option>
+       <option value="true">
+        Yes
+       </option>
+      </select>
+     </div>
+    </div>
+    <!-- Additional options toggle -->
+    <div class="border-t border-indigo-300 pt-6">
+     <button aria-controls="additional-options" aria-expanded="false" class="w-full flex items-center justify-between text-indigo-900 font-semibold text-lg focus:outline-none focus:ring-4 focus:ring-indigo-400 rounded-lg px-4 py-3 hover:bg-indigo-100 transition" id="toggle-options-btn" type="button">
+      Additional Options
+      <i class="fas fa-chevron-down transition-transform duration-300" id="toggle-icon">
+      </i>
+     </button>
+     <div aria-hidden="true" class="mt-4 hidden space-y-5" id="additional-options">
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="color-dark">
+        Dark Color
+       </label>
+       <input aria-label="Dark color for QR code dots" class="w-full h-12 p-1 border border-indigo-300 rounded-lg cursor-pointer" id="color-dark" name="color-dark" type="color" value="#000000"/>
+      </div>
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="color-light">
+        Light Color
+       </label>
+       <input aria-label="Light color for QR code background" class="w-full h-12 p-1 border border-indigo-300 rounded-lg cursor-pointer" id="color-light" name="color-light" type="color" value="#ffffff"/>
+      </div>
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="error-correction">
+        Error Correction Level
+       </label>
+       <select aria-label="Error correction level" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="error-correction" name="error-correction">
+        <option value="L">
+         Low (7%)
+        </option>
+        <option selected="" value="M">
+         Medium (15%)
+        </option>
+        <option value="Q">
+         Quartile (25%)
+        </option>
+        <option value="H">
+         High (30%)
+        </option>
+       </select>
+      </div>
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="margin">
+        Margin (modules)
+       </label>
+       <input aria-label="Margin around QR code in modules" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="margin" max="50" min="0" name="margin" type="number" value="2"/>
+      </div>
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="scale">
+        Scale (size multiplier)
+       </label>
+       <input aria-label="Scale multiplier for QR code size" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="scale" max="20" min="1" name="scale" type="number" value="8"/>
+      </div>
+      <div>
+       <label class="block text-indigo-800 font-semibold mb-2" for="dot-style">
+        Dot Style
+       </label>
+       <select aria-label="Dot style for QR code" class="w-full border border-indigo-300 rounded-lg px-4 py-3 text-indigo-900 text-lg font-medium focus:outline-none focus:ring-4 focus:ring-indigo-400 transition" id="dot-style" name="dot-style">
+        <option selected="" value="square">
+         Square
+        </option>
+        <option value="round">
+         Round
+        </option>
+       </select>
+      </div>
+     </div>
+    </div>
+    <button aria-label="Generate QR code" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold py-4 rounded-lg text-xl shadow-lg transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-500" id="generate-btn" type="button">
+     <i class="fas fa-qrcode mr-3">
+     </i>
+     Generate QR Code
+    </button>
+   </form>
+   <section aria-label="Generated QR code and download" class="flex flex-col items-center justify-center space-y-6 w-full max-w-md">
+    <div class="w-full aspect-square bg-white rounded-lg shadow-xl flex items-center justify-center border-4 border-indigo-300">
+     <img alt="Placeholder image showing a blank QR code area with text 'QR Code Will Appear Here'" class="w-11/12 h-11/12 object-contain rounded-lg" height="auto" id="qr-code" src="https://placehold.co/224x224/png?text=QR+Code+Will+Appear+Here" width="auto"/>
+    </div>
+    <a aria-label="Download generated QR code" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-colors duration-300 flex items-center space-x-3 focus:outline-none focus:ring-4 focus:ring-indigo-500" download="qrcode.png" href="#" id="download-btn" role="button" tabindex="0">
+     <i class="fas fa-download text-lg">
+     </i>
+     <span>
+      Download QR Code
+     </span>
+    </a>
+   </section>
+  </main>
+  <script>
+   const typeSelect = document.getElementById("type-select");
+    const form = document.getElementById("qr-form");
+    const generateBtn = document.getElementById("generate-btn");
+    const qrCodeImg = document.getElementById("qr-code");
+    const downloadBtn = document.getElementById("download-btn");
+    const inputGroups = form.querySelectorAll(".input-group");
+    const toggleOptionsBtn = document.getElementById("toggle-options-btn");
+    const additionalOptions = document.getElementById("additional-options");
+    const toggleIcon = document.getElementById("toggle-icon");
 
-    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.min.js"></script>
-    <script>
-        let qrInstance = null;
-        const tabContents = document.querySelectorAll('.tab-pane');
-        const tabs = document.querySelectorAll('.tab');
-
-        function initQR() {
-            qrInstance = new QRCodeStyling({
-                width: 200,
-                height: 200,
-                type: 'canvas',
-                data: 'Initial content',
-                margin: 10,
-                qrOptions: {
-                    errorCorrectionLevel: 'M'
-                },
-                dotsOptions: {
-                    color: '#000000',
-                    type: 'square'
-                },
-                backgroundOptions: {
-                    color: '#FFFFFF'
-                }
-            });
-            qrInstance.append(document.getElementById('qr-code'));
+    function showInputsForType(type) {
+      inputGroups.forEach((group) => {
+        const types = group.getAttribute("data-type").split(" ");
+        if (types.includes(type)) {
+          group.classList.remove("hidden");
+        } else {
+          group.classList.add("hidden");
         }
+      });
+    }
 
-        function generateQR() {
-            const activeTab = document.querySelector('.tab.active').dataset.tab;
-            let data = '';
+    typeSelect.addEventListener("change", () => {
+      showInputsForType(typeSelect.value);
+      qrCodeImg.src = "https://placehold.co/224x224/png?text=QR+Code+Will+Appear+Here";
+      qrCodeImg.alt = "Placeholder image showing a blank QR code area with text 'QR Code Will Appear Here'";
+      downloadBtn.classList.add("hidden");
+    });
 
-            // Get content based on active tab
-            switch(activeTab) {
-                case 'text':
-                    data = document.getElementById('text-content').value;
-                    break;
-                case 'url':
-                    data = document.getElementById('url-content').value;
-                    break;
-                case 'email':
-                    const to = document.getElementById('email-to').value;
-                    const subject = document.getElementById('email-subject').value;
-                    const body = document.getElementById('email-body').value;
-                    data = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                    break;
-                case 'vcard':
-                    const name = document.getElementById('vcard-name').value;
-                    const phone = document.getElementById('vcard-phone').value;
-                    const email = document.getElementById('vcard-email').value;
-                    const address = document.getElementById('vcard-address').value;
-                    data = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nADR:${address}\nEND:VCARD`;
-                    break;
+    toggleOptionsBtn?.addEventListener("click", () => {
+      const expanded = toggleOptionsBtn.getAttribute("aria-expanded") === "true";
+      toggleOptionsBtn.setAttribute("aria-expanded", !expanded);
+      additionalOptions.classList.toggle("hidden");
+      additionalOptions.setAttribute("aria-hidden", expanded);
+      toggleIcon.style.transform = expanded ? "rotate(0deg)" : "rotate(180deg)";
+    });
+
+    function generateVCard(data) {
+      let vcard = "BEGIN:VCARD\nVERSION:3.0\n";
+      if (data.firstname || data.lastname) {
+        vcard += `N:${data.lastname || ""};${data.firstname || ""};;;\n`;
+        vcard += `FN:${data.firstname || ""} ${data.lastname || ""}\n`;
+      }
+      if (data.org) vcard += `ORG:${data.org}\n`;
+      if (data.title) vcard += `TITLE:${data.title}\n`;
+      if (data.phone) vcard += `TEL;TYPE=WORK,VOICE:${data.phone}\n`;
+      if (data.email) vcard += `EMAIL;TYPE=PREF,INTERNET:${data.email}\n`;
+      if (data.url) vcard += `URL:${data.url}\n`;
+      if (data.address) vcard += `ADR;TYPE=WORK:;;${data.address.replace(/\n/g, ";")}\n`;
+      vcard += "END:VCARD";
+      return vcard;
+    }
+
+    function generateEmail(data) {
+      const to = encodeURIComponent(data.to || "");
+      const subject = encodeURIComponent(data.subject || "");
+      const body = encodeURIComponent(data.body || "");
+      return `mailto:${to}?subject=${subject}&body=${body}`;
+    }
+
+    function generateWiFi(data) {
+      const type = data.encryption || "WPA";
+      const ssid = data.ssid || "";
+      const password = data.password || "";
+      const hidden = data.hidden === "true" ? "true" : "false";
+      return `WIFI:T:${type};S:${ssid};P:${password};H:${hidden};;`;
+    }
+
+    function drawRoundedQRCode(text, options, callback) {
+      try {
+        const qr = QRCode.create(text, { errorCorrectionLevel: options.errorCorrectionLevel });
+        const modules = qr.modules;
+        const size = modules.size;
+        const scale = options.scale;
+        const margin = options.margin;
+
+        const canvasSize = (size + margin * 2) * scale;
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = options.colorLight;
+        ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+        ctx.fillStyle = options.colorDark;
+
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (modules.get(r, c)) {
+              const x = (c + margin) * scale;
+              const y = (r + margin) * scale;
+              if (options.dotStyle === "round") {
+                const radius = scale / 2;
+                ctx.beginPath();
+                ctx.arc(x + radius, y + radius, radius * 0.85, 0, 2 * Math.PI);
+                ctx.fill();
+              } else {
+                ctx.fillRect(x, y, scale, scale);
+              }
             }
-
-            if (!data) return alert('Please fill required fields');
-
-            // Get customization options
-            const options = {
-                data: data,
-                width: parseInt(document.getElementById('qr-size').value),
-                height: parseInt(document.getElementById('qr-size').value),
-                margin: parseInt(document.getElementById('qr-margin').value),
-                qrOptions: {
-                    errorCorrectionLevel: document.getElementById('qr-error-correction').value
-                },
-                dotsOptions: {
-                    color: document.getElementById('qr-color').value,
-                    type: document.getElementById('qr-dot-type').value
-                },
-                backgroundOptions: {
-                    color: document.getElementById('bg-color').value
-                }
-            };
-
-            qrInstance.update(options);
+          }
         }
+        callback(null, canvas.toDataURL());
+      } catch (e) {
+        callback(e, null);
+      }
+    }
 
-        function downloadQR() {
-            if (qrInstance) {
-                qrInstance.download({ 
-                    name: 'qr_code',
-                    extension: 'png'
-                });
+    generateBtn.addEventListener("click", () => {
+      const type = typeSelect.value;
+      let qrText = "";
+      if (type === "text" || type === "url") {
+        const textInput = form.querySelector('input[name="text-input"]');
+        if (!textInput.value.trim()) {
+          alert("Please enter text or URL.");
+          return;
+        }
+        qrText = textInput.value.trim();
+      } else if (type === "vcard") {
+        const data = {
+          firstname: form.querySelector('input[name="vcard-firstname"]').value.trim(),
+          lastname: form.querySelector('input[name="vcard-lastname"]').value.trim(),
+          org: form.querySelector('input[name="vcard-org"]').value.trim(),
+          title: form.querySelector('input[name="vcard-title"]').value.trim(),
+          phone: form.querySelector('input[name="vcard-phone"]').value.trim(),
+          email: form.querySelector('input[name="vcard-email"]').value.trim(),
+          url: form.querySelector('input[name="vcard-url"]').value.trim(),
+          address: form.querySelector('textarea[name="vcard-address"]').value.trim(),
+        };
+        if (!data.firstname && !data.lastname) {
+          alert("Please enter at least a first name or last name for vCard.");
+          return;
+        }
+        qrText = generateVCard(data);
+      } else if (type === "email") {
+        const data = {
+          to: form.querySelector('input[name="email-to"]').value.trim(),
+          subject: form.querySelector('input[name="email-subject"]').value.trim(),
+          body: form.querySelector('textarea[name="email-body"]').value.trim(),
+        };
+        if (!data.to) {
+          alert("Please enter recipient email address.");
+          return;
+        }
+        qrText = generateEmail(data);
+      } else if (type === "wifi") {
+        const data = {
+          ssid: form.querySelector('input[name="wifi-ssid"]').value.trim(),
+          password: form.querySelector('input[name="wifi-password"]').value.trim(),
+          encryption: form.querySelector('select[name="wifi-encryption"]').value,
+          hidden: form.querySelector('select[name="wifi-hidden"]').value,
+        };
+        if (!data.ssid) {
+          alert("Please enter WiFi SSID.");
+          return;
+        }
+        if (data.encryption !== "nopass" && !data.password) {
+          alert("Please enter WiFi password.");
+          return;
+        }
+        qrText = generateWiFi(data);
+      }
+
+      const colorDark = form.querySelector('input[name="color-dark"]').value || "#000000";
+      const colorLight = form.querySelector('input[name="color-light"]').value || "#ffffff";
+      const errorCorrectionLevel = form.querySelector('select[name="error-correction"]').value || "M";
+      let margin = parseInt(form.querySelector('input[name="margin"]').value, 10);
+      if (isNaN(margin) || margin < 0) margin = 2;
+      let scale = parseInt(form.querySelector('input[name="scale"]').value, 10);
+      if (isNaN(scale) || scale < 1) scale = 8;
+      const dotStyle = form.querySelector('select[name="dot-style"]').value || "square";
+
+      if (dotStyle === "square") {
+        QRCode.toDataURL(
+          qrText,
+          {
+            margin: margin,
+            color: {
+              dark: colorDark,
+              light: colorLight,
+            },
+            errorCorrectionLevel: errorCorrectionLevel,
+            scale: scale,
+          },
+          (err, url) => {
+            if (err) {
+              alert("Failed to generate QR code.");
+              return;
             }
-        }
+            qrCodeImg.src = url;
+            qrCodeImg.alt = `QR code representing the ${type} data`;
+            downloadBtn.href = url;
+            downloadBtn.classList.remove("hidden");
+          }
+        );
+      } else {
+        drawRoundedQRCode(
+          qrText,
+          {
+            colorDark,
+            colorLight,
+            errorCorrectionLevel,
+            margin,
+            scale,
+            dotStyle,
+          },
+          (err, url) => {
+            if (err) {
+              alert("Failed to generate QR code.");
+              return;
+            }
+            qrCodeImg.src = url;
+            qrCodeImg.alt = `QR code representing the ${type} data with rounded dots`;
+            downloadBtn.href = url;
+            downloadBtn.classList.remove("hidden");
+          }
+        );
+      }
+    });
 
-        // Tab switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(content => content.style.display = 'none');
-                
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).style.display = 'block';
-            });
-        });
-
-        // Customization toggle
-        function toggleCustomize() {
-            const content = document.getElementById('customize-content');
-            content.classList.toggle('active');
-            document.querySelector('.customize-header .material-icons').textContent = 
-                content.classList.contains('active') ? 'expand_less' : 'expand_more';
-        }
-
-        // Initialize
-        initQR();
-        document.getElementById('text-content').value = 'Sample text';
-        generateQR();
-    </script>
-</body>
+    // Initialize inputs visibility on page load
+    showInputsForType(typeSelect.value);
+  </script>
+ </body>
 </html>
