@@ -1,4 +1,1141 @@
-<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Whiteboard with Collaboration Status Indicator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <style>
+    canvas:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+  <header class="flex items-center justify-between bg-white shadow px-4 py-3">
+    <h1 class="text-xl font-semibold text-gray-800">Whiteboard</h1>
+    <div class="flex items-center space-x-3">
+      <button
+        id="downloadBtn"
+        aria-label="Download drawing"
+        class="text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+        title="Download Drawing"
+      >
+        <i class="fas fa-download fa-lg"></i>
+      </button>
+      <button
+        id="settingsBtn"
+        aria-label="Open settings"
+        class="text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+        title="Settings"
+      >
+        <i class="fas fa-cog fa-lg"></i>
+      </button>
+      <button
+        id="collabToggleBtn"
+        aria-label="Toggle collaboration mode"
+        class="relative text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+        title="Toggle Collaboration Mode"
+      >
+        <i class="fas fa-users fa-lg"></i>
+        <span
+          id="connectionStatusLight"
+          class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-600 border-2 border-white"
+          title="Disconnected"
+        ></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow relative">
+    <canvas
+      id="whiteboard"
+      tabindex="0"
+      class="w-full h-full block"
+      aria-label="Drawing whiteboard"
+    ></canvas>
+  </main>
+
+  <!-- Settings Modal -->
+  <div
+    id="settingsModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settingsTitle"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4 max-h-[90vh] overflow-y-auto"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="settingsTitle" class="text-xl font-semibold text-gray-800">
+          Settings
+        </h2>
+        <button
+          id="closeSettings"
+          aria-label="Close settings"
+          class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+        >
+          <i class="fas fa-times fa-lg"></i>
+        </button>
+      </div>
+
+      <form id="settingsForm" class="space-y-6">
+        <fieldset>
+          <legend class="text-gray-700 font-semibold mb-2">Tool</legend>
+          <div class="flex flex-wrap gap-4">
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="tool"
+                value="pen"
+                class="form-radio text-indigo-600"
+                id="toolPen"
+              />
+              <span class="ml-2 text-gray-700">Pen</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="tool"
+                value="eraser"
+                class="form-radio text-indigo-600"
+                id="toolEraser"
+              />
+              <span class="ml-2 text-gray-700">Eraser</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="tool"
+                value="line"
+                class="form-radio text-indigo-600"
+                id="toolLine"
+              />
+              <span class="ml-2 text-gray-700">Line</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="tool"
+                value="rectangle"
+                class="form-radio text-indigo-600"
+                id="toolRectangle"
+              />
+              <span class="ml-2 text-gray-700">Rectangle</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="tool"
+                value="circle"
+                class="form-radio text-indigo-600"
+                id="toolCircle"
+              />
+              <span class="ml-2 text-gray-700">Circle</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div>
+          <label
+            for="colorPicker"
+            class="block text-gray-700 font-semibold mb-1"
+            >Color</label
+          >
+          <input
+            type="color"
+            id="colorPicker"
+            name="color"
+            value="#000000"
+            class="w-16 h-10 p-0 border border-gray-300 rounded cursor-pointer"
+          />
+        </div>
+
+        <div>
+          <label
+            for="strokeWidth"
+            class="block text-gray-700 font-semibold mb-1"
+            >Stroke Width: <span id="strokeWidthValue">4</span> px</label
+          >
+          <input
+            type="range"
+            id="strokeWidth"
+            name="strokeWidth"
+            min="1"
+            max="50"
+            value="4"
+            class="w-full"
+          />
+        </div>
+
+        <fieldset>
+          <legend class="text-gray-700 font-semibold mb-2">Options</legend>
+          <div class="flex flex-col gap-3">
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                id="toggleSmooth"
+                name="smooth"
+                class="form-checkbox text-indigo-600"
+              />
+              <span class="ml-2 text-gray-700">Smooth Drawing</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                id="toggleFill"
+                name="fill"
+                class="form-checkbox text-indigo-600"
+              />
+              <span class="ml-2 text-gray-700">Fill Shapes</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                id="toggleGrid"
+                name="grid"
+                class="form-checkbox text-indigo-600"
+              />
+              <span class="ml-2 text-gray-700">Show Grid</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button
+            type="button"
+            id="clearBtn"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            Clear Board
+          </button>
+          <button
+            type="button"
+            id="undoBtn"
+            class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            id="closeSettingsBtn"
+            class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            Close
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Collaboration Modal -->
+  <div
+    id="collabModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="collabTitle"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4 max-h-[90vh] overflow-y-auto"
+    >
+      <h2 id="collabTitle" class="text-xl font-semibold text-gray-800 mb-4">
+        Collaboration Mode
+      </h2>
+      <div class="mb-4">
+        <label for="peerIdDisplay" class="block text-gray-700 font-semibold mb-1"
+          >Your Peer ID</label
+        >
+        <input
+          type="text"
+          id="peerIdDisplay"
+          readonly
+          class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 select-all"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="connectPeerIdInput" class="block text-gray-700 font-semibold mb-1"
+          >Connect to Peer ID</label
+        >
+        <input
+          type="text"
+          id="connectPeerIdInput"
+          placeholder="Enter peer ID to connect"
+          class="w-full border border-gray-300 rounded px-3 py-2"
+        />
+      </div>
+      <div class="flex justify-between gap-3">
+        <button
+          id="connectPeerBtn"
+          class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          Connect
+        </button>
+        <button
+          id="disconnectPeerBtn"
+          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          disabled
+        >
+          Disconnect
+        </button>
+        <button
+          id="closeCollabBtn"
+          class="px-4 py-2 bg-gray-400 text-gray-800 rounded hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("whiteboard");
+      const ctx = canvas.getContext("2d");
+      let drawing = false;
+      let currentTool = "pen";
+      let currentColor = "#000000";
+      let strokeWidth = 4;
+      let smoothDrawing = true;
+      let fillShapes = false;
+      let showGrid = false;
+
+      // Undo stack
+      const undoStack = [];
+      const maxUndo = 50;
+
+      // For freehand drawing points
+      let points = [];
+
+      // For shape drawing
+      let startX = 0;
+      let startY = 0;
+      let isDrawingShape = false;
+
+      // Local Storage Keys
+      const LS_CANVAS = "whiteboard-canvas";
+      const LS_SETTINGS = "whiteboard-settings";
+      const LS_UNDO = "whiteboard-undo";
+      const LS_PEER_ID = "whiteboard-peer-id";
+
+      // Collaboration variables
+      let collaborationEnabled = false;
+      let peer = null;
+      let conn = null;
+
+      // Elements
+      const settingsBtn = document.getElementById("settingsBtn");
+      const settingsModal = document.getElementById("settingsModal");
+      const closeSettings = document.getElementById("closeSettings");
+      const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+      const settingsForm = document.getElementById("settingsForm");
+      const strokeWidthInput = document.getElementById("strokeWidth");
+      const strokeWidthValue = document.getElementById("strokeWidthValue");
+      const colorPicker = document.getElementById("colorPicker");
+      const toggleSmooth = document.getElementById("toggleSmooth");
+      const toggleFill = document.getElementById("toggleFill");
+      const toggleGrid = document.getElementById("toggleGrid");
+      const clearBtn = document.getElementById("clearBtn");
+      const undoBtn = document.getElementById("undoBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const collabToggleBtn = document.getElementById("collabToggleBtn");
+
+      const collabModal = document.getElementById("collabModal");
+      const peerIdDisplay = document.getElementById("peerIdDisplay");
+      const connectPeerIdInput = document.getElementById("connectPeerIdInput");
+      const connectPeerBtn = document.getElementById("connectPeerBtn");
+      const disconnectPeerBtn = document.getElementById("disconnectPeerBtn");
+      const closeCollabBtn = document.getElementById("closeCollabBtn");
+      const connectionStatusLight = document.getElementById("connectionStatusLight");
+
+      // Resize canvas to fill window
+      function resizeCanvas() {
+        const imgDataUrl = canvas.toDataURL();
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - document.querySelector("header").offsetHeight;
+
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          if (showGrid) drawGrid();
+        };
+        img.src = imgDataUrl;
+      }
+
+      // Draw grid lines
+      function drawGrid() {
+        const gridSize = 25;
+        ctx.save();
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 1;
+
+        for (let x = 0; x <= canvas.width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x + 0.5, 0);
+          ctx.lineTo(x + 0.5, canvas.height);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y + 0.5);
+          ctx.lineTo(canvas.width, y + 0.5);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Save current canvas state to undo stack and localStorage
+      function saveState() {
+        if (undoStack.length >= maxUndo) {
+          undoStack.shift();
+        }
+        const dataUrl = canvas.toDataURL();
+        undoStack.push(dataUrl);
+        localStorage.setItem(LS_UNDO, JSON.stringify(undoStack));
+        saveCanvasToLocalStorage();
+      }
+
+      // Undo function
+      function undo() {
+        if (undoStack.length === 0) return;
+        undoStack.pop();
+        const lastState = undoStack[undoStack.length - 1];
+        if (!lastState) {
+          clearCanvas(true);
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          if (showGrid) drawGrid();
+          saveCanvasToLocalStorage();
+          if (collaborationEnabled) broadcastCanvas();
+        };
+        img.src = lastState;
+        localStorage.setItem(LS_UNDO, JSON.stringify(undoStack));
+      }
+
+      // Clear canvas
+      function clearCanvas(skipSave = false) {
+        if (!skipSave) saveState();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (showGrid) drawGrid();
+        if (!skipSave) saveCanvasToLocalStorage();
+        if (collaborationEnabled) broadcastCanvas();
+      }
+
+      // Efficient smooth drawing using incremental quadratic curves
+      let lastPoint = null;
+      let lastMidPoint = null;
+
+      function drawSmoothIncrementalLine(newPoint) {
+        if (!lastPoint) {
+          lastPoint = newPoint;
+          ctx.beginPath();
+          ctx.moveTo(newPoint.x, newPoint.y);
+          return;
+        }
+        const midPoint = {
+          x: (lastPoint.x + newPoint.x) / 2,
+          y: (lastPoint.y + newPoint.y) / 2,
+        };
+        ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
+        ctx.stroke();
+        lastPoint = newPoint;
+        lastMidPoint = midPoint;
+      }
+
+      // Draw line shape
+      function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      // Draw rectangle shape
+      function drawRectangle(x1, y1, x2, y2, fill) {
+        const rectX = Math.min(x1, x2);
+        const rectY = Math.min(y1, y2);
+        const rectWidth = Math.abs(x2 - x1);
+        const rectHeight = Math.abs(y2 - y1);
+        ctx.beginPath();
+        if (fill) {
+          ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+        } else {
+          ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+        }
+      }
+
+      // Draw circle shape
+      function drawCircle(x1, y1, x2, y2, fill) {
+        const centerX = (x1 + x2) / 2;
+        const centerY = (y1 + y2) / 2;
+        const radiusX = Math.abs(x2 - x1) / 2;
+        const radiusY = Math.abs(y2 - y1) / 2;
+        const radius = Math.min(radiusX, radiusY);
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY, radius, radius, 0, 0, Math.PI * 2);
+        if (fill) {
+          ctx.fill();
+        } else {
+          ctx.stroke();
+        }
+      }
+
+      // Eraser draws white lines
+      function setEraser() {
+        ctx.strokeStyle = "#ffffff";
+      }
+
+      // Update cursor style based on tool
+      function updateCursor() {
+        canvas.style.cursor = "crosshair";
+      }
+
+      // Update connection status light and disconnect button state
+      function updateConnectionStatus(connected) {
+        if (connected) {
+          connectionStatusLight.classList.remove("bg-red-600");
+          connectionStatusLight.classList.add("bg-green-500");
+          connectionStatusLight.title = "Connected";
+          disconnectPeerBtn.disabled = false;
+        } else {
+          connectionStatusLight.classList.remove("bg-green-500");
+          connectionStatusLight.classList.add("bg-red-600");
+          connectionStatusLight.title = "Disconnected";
+          disconnectPeerBtn.disabled = true;
+        }
+      }
+
+      // Broadcast canvas image to connected peer
+      function broadcastCanvas() {
+        if (conn && conn.open) {
+          try {
+            const dataUrl = canvas.toDataURL();
+            conn.send({ type: "canvas", dataUrl });
+          } catch {}
+        }
+      }
+
+      // Broadcast drawing data to connected peer
+      function broadcastDraw(data) {
+        if (conn && conn.open) {
+          try {
+            conn.send({ type: "draw", data });
+          } catch {}
+        }
+      }
+
+      // Handle incoming drawing data from peer
+      function handleRemoteDraw(data) {
+        if (!data) return;
+        if (data.type === "canvas") {
+          const img = new Image();
+          img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            if (showGrid) drawGrid();
+            saveCanvasToLocalStorage();
+            if (!undoStack.length || undoStack[undoStack.length - 1] !== data.dataUrl) {
+              undoStack.push(data.dataUrl);
+              localStorage.setItem(LS_UNDO, JSON.stringify(undoStack));
+            }
+          };
+          img.src = data.dataUrl;
+        } else if (data.type === "draw") {
+          const d = data.data;
+          ctx.lineCap = "round";
+          ctx.lineJoin = d.smoothDrawing ? "round" : "miter";
+          ctx.lineWidth = d.strokeWidth;
+          if (d.tool === "eraser") {
+            ctx.strokeStyle = "#ffffff";
+          } else {
+            ctx.strokeStyle = d.color;
+          }
+          ctx.fillStyle = d.color;
+
+          if (d.type === "beginPath") {
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+          } else if (d.type === "smoothLine") {
+            if (!handleRemoteDraw.lastPoint) {
+              handleRemoteDraw.lastPoint = { x: d.x, y: d.y };
+              ctx.beginPath();
+              ctx.moveTo(d.x, d.y);
+              return;
+            }
+            const lastPoint = handleRemoteDraw.lastPoint;
+            const midPoint = {
+              x: (lastPoint.x + d.x) / 2,
+              y: (lastPoint.y + d.y) / 2,
+            };
+            ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midPoint.x, midPoint.y);
+            ctx.stroke();
+            handleRemoteDraw.lastPoint = { x: d.x, y: d.y };
+          } else if (d.type === "lineTo") {
+            ctx.lineTo(d.x, d.y);
+            ctx.stroke();
+          } else if (d.type === "shape") {
+            if (handleRemoteDraw.lastPoint) {
+              handleRemoteDraw.lastPoint = null;
+            }
+            if (d.tool === "line") {
+              drawLine(d.startX, d.startY, d.endX, d.endY);
+            } else if (d.tool === "rectangle") {
+              drawRectangle(d.startX, d.startY, d.endX, d.endY, d.fillShapes);
+            } else if (d.tool === "circle") {
+              drawCircle(d.startX, d.startY, d.endX, d.endY, d.fillShapes);
+            }
+          }
+        }
+      }
+      handleRemoteDraw.lastPoint = null;
+
+      // Pointer event handlers
+      function pointerDown(e) {
+        e.preventDefault();
+        drawing = true;
+        saveState();
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (currentTool === "pen" || currentTool === "eraser") {
+          lastPoint = { x, y };
+          lastMidPoint = null;
+          ctx.lineCap = "round";
+          ctx.lineJoin = smoothDrawing ? "round" : "miter";
+          ctx.lineWidth = strokeWidth;
+          if (currentTool === "eraser") {
+            setEraser();
+          } else {
+            ctx.strokeStyle = currentColor;
+          }
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          if (collaborationEnabled) {
+            broadcastDraw({
+              type: "beginPath",
+              x,
+              y,
+              tool: currentTool,
+              color: currentColor,
+              strokeWidth,
+              smoothDrawing,
+            });
+          }
+        } else {
+          startX = x;
+          startY = y;
+          isDrawingShape = true;
+        }
+      }
+
+      function pointerMove(e) {
+        if (!drawing) return;
+        e.preventDefault();
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (currentTool === "pen" || currentTool === "eraser") {
+          ctx.lineCap = "round";
+          ctx.lineJoin = smoothDrawing ? "round" : "miter";
+          ctx.lineWidth = strokeWidth;
+          if (currentTool === "eraser") {
+            setEraser();
+          } else {
+            ctx.strokeStyle = currentColor;
+          }
+
+          if (smoothDrawing) {
+            drawSmoothIncrementalLine({ x, y });
+            if (collaborationEnabled) {
+              broadcastDraw({
+                type: "smoothLine",
+                x,
+                y,
+                tool: currentTool,
+                color: currentColor,
+                strokeWidth,
+                smoothDrawing,
+              });
+            }
+          } else {
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            if (collaborationEnabled) {
+              broadcastDraw({
+                type: "lineTo",
+                x,
+                y,
+                tool: currentTool,
+                color: currentColor,
+                strokeWidth,
+                smoothDrawing,
+              });
+            }
+          }
+        } else if (isDrawingShape) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          restoreCanvas(false);
+
+          ctx.lineWidth = strokeWidth;
+          ctx.strokeStyle = currentColor;
+          ctx.fillStyle = currentColor;
+
+          if (currentTool === "line") {
+            drawLine(startX, startY, x, y);
+          } else if (currentTool === "rectangle") {
+            drawRectangle(startX, startY, x, y, fillShapes);
+          } else if (currentTool === "circle") {
+            drawCircle(startX, startY, x, y, fillShapes);
+          }
+        }
+      }
+
+      function pointerUp(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        drawing = false;
+
+        if (currentTool === "pen" || currentTool === "eraser") {
+          if (!smoothDrawing) {
+            ctx.stroke();
+          } else {
+            if (lastPoint) {
+              ctx.lineTo(lastPoint.x, lastPoint.y);
+              ctx.stroke();
+            }
+          }
+          lastPoint = null;
+          lastMidPoint = null;
+          saveCanvasToLocalStorage();
+          if (collaborationEnabled) broadcastCanvas();
+        } else if (isDrawingShape) {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          ctx.lineWidth = strokeWidth;
+          ctx.strokeStyle = currentColor;
+          ctx.fillStyle = currentColor;
+
+          if (currentTool === "line") {
+            drawLine(startX, startY, x, y);
+          } else if (currentTool === "rectangle") {
+            drawRectangle(startX, startY, x, y, fillShapes);
+          } else if (currentTool === "circle") {
+            drawCircle(startX, startY, x, y, fillShapes);
+          }
+          isDrawingShape = false;
+          saveCanvasToLocalStorage();
+          if (collaborationEnabled) {
+            broadcastCanvas();
+            broadcastDraw({
+              type: "shape",
+              tool: currentTool,
+              startX,
+              startY,
+              endX: x,
+              endY: y,
+              color: currentColor,
+              strokeWidth,
+              fillShapes,
+            });
+          }
+        }
+      }
+
+      // Restore canvas from last undo state or clear
+      function restoreCanvas(saveUndo = true) {
+        if (undoStack.length === 0) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          if (showGrid) drawGrid();
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          if (showGrid) drawGrid();
+          if (saveUndo) saveCanvasToLocalStorage();
+        };
+        img.src = undoStack[undoStack.length - 1];
+      }
+
+      // Save canvas image to localStorage
+      function saveCanvasToLocalStorage() {
+        try {
+          const dataUrl = canvas.toDataURL();
+          localStorage.setItem(LS_CANVAS, dataUrl);
+        } catch {}
+      }
+
+      // Load canvas image from localStorage
+      function loadCanvasFromLocalStorage() {
+        const dataUrl = localStorage.getItem(LS_CANVAS);
+        if (!dataUrl) return false;
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          if (showGrid) drawGrid();
+          undoStack.push(dataUrl);
+          localStorage.setItem(LS_UNDO, JSON.stringify(undoStack));
+        };
+        img.src = dataUrl;
+        return true;
+      }
+
+      // Save settings to localStorage
+      function saveSettingsToLocalStorage() {
+        const settings = {
+          currentTool,
+          currentColor,
+          strokeWidth,
+          smoothDrawing,
+          fillShapes,
+          showGrid,
+        };
+        localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+      }
+
+      // Load settings from localStorage
+      function loadSettingsFromLocalStorage() {
+        const settingsStr = localStorage.getItem(LS_SETTINGS);
+        if (!settingsStr) return false;
+        try {
+          const settings = JSON.parse(settingsStr);
+          currentTool = settings.currentTool || "pen";
+          currentColor = settings.currentColor || "#000000";
+          strokeWidth = settings.strokeWidth || 4;
+          smoothDrawing = settings.smoothDrawing !== undefined ? settings.smoothDrawing : true;
+          fillShapes = settings.fillShapes || false;
+          showGrid = settings.showGrid || false;
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      // Load undo stack from localStorage
+      function loadUndoFromLocalStorage() {
+        const undoStr = localStorage.getItem(LS_UNDO);
+        if (!undoStr) return false;
+        try {
+          const undoArr = JSON.parse(undoStr);
+          if (Array.isArray(undoArr)) {
+            undoStack.length = 0;
+            undoArr.forEach((item) => undoStack.push(item));
+            return true;
+          }
+          return false;
+        } catch {
+          return false;
+        }
+      }
+
+      // Download canvas as PNG image
+      function downloadCanvas() {
+        const link = document.createElement("a");
+        link.download = `whiteboard_${new Date().toISOString().slice(0,19).replace(/:/g,"-")}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      // PeerJS setup and connection handling
+      async function setupPeer(existingId) {
+        return new Promise((resolve, reject) => {
+          const options = {
+            debug: 2,
+            config: {
+              iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" },
+                { urls: "stun:stun2.l.google.com:19302" },
+              ],
+            },
+          };
+          if (existingId) options.id = existingId;
+
+          const newPeer = new Peer(options);
+
+          newPeer.on("open", (id) => {
+            localStorage.setItem(LS_PEER_ID, id);
+            resolve(newPeer);
+          });
+
+          newPeer.on("error", (err) => {
+            reject(err);
+          });
+        });
+      }
+
+      function setupConnectionHandlers(connection) {
+        connection.on("open", () => {
+          console.log("Connected to peer:", connection.peer);
+          updateConnectionStatus(true);
+          broadcastCanvas();
+          collabModal.classList.add("hidden");
+        });
+
+        connection.on("data", (data) => {
+          if (data.type === "draw") {
+            handleRemoteDraw(data);
+          } else if (data.type === "canvas") {
+            handleRemoteDraw(data);
+          }
+        });
+
+        connection.on("close", () => {
+          console.log("Connection closed");
+          conn = null;
+          updateConnectionStatus(false);
+          alert("Collaboration connection closed.");
+        });
+
+        connection.on("error", (err) => {
+          console.error("Connection error:", err);
+          alert("Connection error: " + err);
+          updateConnectionStatus(false);
+        });
+      }
+
+      // Connect to peer ID
+      connectPeerBtn.addEventListener("click", () => {
+        const peerIdToConnect = connectPeerIdInput.value.trim();
+        if (!peerIdToConnect) {
+          alert("Please enter a peer ID to connect.");
+          return;
+        }
+        if (conn) {
+          conn.close();
+          conn = null;
+        }
+        conn = peer.connect(peerIdToConnect, { reliable: true });
+        setupConnectionHandlers(conn);
+      });
+
+      // Disconnect peer connection and generate new peer ID
+      disconnectPeerBtn.addEventListener("click", async () => {
+        if (conn) {
+          conn.close();
+          conn = null;
+        }
+        if (peer) {
+          peer.destroy();
+          peer = null;
+        }
+        localStorage.removeItem(LS_PEER_ID);
+        updateConnectionStatus(false);
+        try {
+          peer = await setupPeer(null);
+          peerIdDisplay.value = peer.id;
+          alert("Disconnected. New Peer ID generated.");
+          setupPeerListeners();
+        } catch (err) {
+          alert("Error generating new Peer ID: " + err);
+        }
+      });
+
+      // Toggle collaboration mode
+      collabToggleBtn.addEventListener("click", () => {
+        if (collaborationEnabled) {
+          collabModal.classList.toggle("hidden");
+        } else {
+          enableCollaboration();
+        }
+      });
+
+      // Enable collaboration UI and PeerJS
+      async function enableCollaboration() {
+        collaborationEnabled = true;
+        collabModal.classList.remove("hidden");
+        let storedId = localStorage.getItem(LS_PEER_ID);
+        try {
+          peer = await setupPeer(storedId);
+          peerIdDisplay.value = peer.id;
+          setupPeerListeners();
+          updateConnectionStatus(false);
+        } catch (err) {
+          alert("Error initializing PeerJS: " + err);
+          collaborationEnabled = false;
+          collabModal.classList.add("hidden");
+        }
+      }
+
+      // Setup peer event listeners
+      function setupPeerListeners() {
+        if (!peer) return;
+        peer.on("connection", (connection) => {
+          if (conn) {
+            connection.close();
+            return;
+          }
+          conn = connection;
+          setupConnectionHandlers(conn);
+        });
+      }
+
+      // Disable collaboration UI and connection
+      function disableCollaboration() {
+        collaborationEnabled = false;
+        collabModal.classList.add("hidden");
+        if (conn) {
+          conn.close();
+          conn = null;
+        }
+        if (peer) {
+          peer.destroy();
+          peer = null;
+        }
+        updateConnectionStatus(false);
+      }
+
+      // Close modals
+      closeSettings.addEventListener("click", () => settingsModal.classList.add("hidden"));
+      closeSettingsBtn.addEventListener("click", () => settingsModal.classList.add("hidden"));
+      closeCollabBtn.addEventListener("click", () => {
+        collabModal.classList.add("hidden");
+      });
+
+      // Open settings modal
+      settingsBtn.addEventListener("click", () => {
+        document.getElementById(`tool${capitalize(currentTool)}`).checked = true;
+        colorPicker.value = currentColor;
+        strokeWidthInput.value = strokeWidth;
+        strokeWidthValue.textContent = strokeWidth;
+        toggleSmooth.checked = smoothDrawing;
+        toggleFill.checked = fillShapes;
+        toggleGrid.checked = showGrid;
+        settingsModal.classList.remove("hidden");
+        settingsModal.focus();
+      });
+
+      // Close modal on Escape key
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (!settingsModal.classList.contains("hidden")) settingsModal.classList.add("hidden");
+          if (!collabModal.classList.contains("hidden")) collabModal.classList.add("hidden");
+        }
+      });
+
+      // Update stroke width label
+      strokeWidthInput.addEventListener("input", (e) => {
+        strokeWidthValue.textContent = e.target.value;
+      });
+
+      // Settings form change handler
+      settingsForm.addEventListener("change", () => {
+        const formData = new FormData(settingsForm);
+        currentTool = formData.get("tool");
+        currentColor = formData.get("color");
+        strokeWidth = parseInt(formData.get("strokeWidth"), 10);
+        smoothDrawing = formData.get("smooth") === "on" || toggleSmooth.checked;
+        fillShapes = formData.get("fill") === "on" || toggleFill.checked;
+        showGrid = formData.get("grid") === "on" || toggleGrid.checked;
+
+        updateCursor();
+
+        if (showGrid) {
+          drawGrid();
+        } else {
+          restoreCanvas(false);
+        }
+
+        saveSettingsToLocalStorage();
+      });
+
+      clearBtn.addEventListener("click", () => clearCanvas());
+      undoBtn.addEventListener("click", () => {
+        undo();
+        if (collaborationEnabled) broadcastCanvas();
+      });
+      downloadBtn.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.download = `whiteboard_${new Date().toISOString().slice(0,19).replace(/:/g,"-")}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+
+      // Initialize canvas size and grid
+      function init() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - document.querySelector("header").offsetHeight;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeStyle = currentColor;
+        ctx.fillStyle = currentColor;
+        if (showGrid) drawGrid();
+        updateCursor();
+        updateConnectionStatus(false);
+      }
+
+      // Capitalize first letter helper
+      function capitalize(str) {
+        if (!str) return "";
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      // On window resize, resize canvas and restore content
+      window.addEventListener("resize", () => {
+        resizeCanvas();
+      });
+
+      // Pointer events for drawing
+      canvas.addEventListener("pointerdown", pointerDown);
+      canvas.addEventListener("pointermove", pointerMove);
+      canvas.addEventListener("pointerup", pointerUp);
+      canvas.addEventListener("pointerleave", pointerUp);
+
+      // Prevent scrolling on touch devices when drawing
+      canvas.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+      canvas.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+
+      // Load all from localStorage and initialize
+      function loadAll() {
+        const settingsLoaded = loadSettingsFromLocalStorage();
+        if (!settingsLoaded) {
+          currentTool = "pen";
+          currentColor = "#000000";
+          strokeWidth = 4;
+          smoothDrawing = true;
+          fillShapes = false;
+          showGrid = false;
+        }
+        const undoLoaded = loadUndoFromLocalStorage();
+        init();
+        if (undoLoaded && undoStack.length > 0) {
+          restoreCanvas(false);
+        } else {
+          const canvasLoaded = loadCanvasFromLocalStorage();
+          if (!canvasLoaded) {
+            clearCanvas(true);
+          }
+        }
+      }
+
+      loadAll();
+    })();
+  </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -352,4 +1489,4 @@ window.addEventListener('load', () => {
 });
 </script>
 </body>
-</html>
+</html> -->
