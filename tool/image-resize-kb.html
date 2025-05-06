@@ -1,0 +1,319 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Image Resizer Tool (KB/MB)
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+ </head>
+ <body class="flex flex-col items-center p-6 min-h-screen">
+  <main class="w-full max-w-5xl flex flex-col md:flex-row gap-10">
+   <form aria-label="Image resize form" autocomplete="off" class="flex-1 flex flex-col space-y-8" id="resizeForm" novalidate="">
+    <label aria-label="Select image file to upload" class="cursor-pointer relative flex flex-col items-center justify-center border-4 border-dashed border-purple-400 rounded-3xl p-16 hover:border-yellow-400 transition-colors duration-300 shadow-lg bg-gradient-to-tr from-purple-100 to-yellow-100" for="imageInput">
+     <i class="fas fa-cloud-upload-alt text-8xl text-purple-600 mb-6 drop-shadow-lg">
+     </i>
+     <span class="text-purple-700 font-semibold text-2xl tracking-wide">
+      Click or tap to select an image
+     </span>
+     <span class="text-purple-400 mt-1 text-base font-medium">
+      JPEG or PNG, max 10MB
+     </span>
+     <input accept="image/jpeg, image/png" aria-required="true" id="imageInput" required="" type="file"/>
+    </label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+     <div>
+      <label class="block text-purple-800 font-semibold mb-2 text-lg" for="targetSize">
+       Target Size
+      </label>
+      <input aria-describedby="targetSizeHelp" aria-required="true" class="w-full border border-purple-300 rounded-xl px-4 py-3 text-purple-900 font-semibold placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:border-yellow-400 transition" id="targetSize" min="1" name="targetSize" placeholder="Enter size" required="" step="any" type="number"/>
+      <p class="text-purple-400 text-sm mt-1 select-none" id="targetSizeHelp">
+       Specify the desired file size.
+      </p>
+     </div>
+     <div>
+      <label class="block text-purple-800 font-semibold mb-2 text-lg" for="sizeUnit">
+       Unit
+      </label>
+      <select aria-required="true" class="w-full border border-purple-300 rounded-xl px-4 py-3 text-purple-900 font-semibold focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:border-yellow-400 transition" id="sizeUnit" name="sizeUnit" required="">
+       <option value="kb">
+        KB
+       </option>
+       <option value="mb">
+        MB
+       </option>
+      </select>
+     </div>
+    </div>
+    <div>
+     <label class="block text-purple-800 font-semibold mb-2 text-lg" for="format">
+      Output Format
+     </label>
+     <select aria-required="true" class="w-full border border-purple-300 rounded-xl px-4 py-3 text-purple-900 font-semibold focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:border-yellow-400 transition" id="format" name="format" required="">
+      <option value="jpeg">
+       JPEG (Recommended for compression)
+      </option>
+      <option value="png">
+       PNG (Lossless, larger files)
+      </option>
+     </select>
+    </div>
+    <button aria-label="Resize Image" class="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-purple-900 font-extrabold py-4 rounded-3xl shadow-lg flex items-center justify-center space-x-3 transition-transform active:scale-95" type="submit">
+     <i class="fas fa-compress-alt text-2xl">
+     </i>
+     <span class="text-xl tracking-wide">
+      Resize Image
+     </span>
+    </button>
+   </form>
+   <section aria-atomic="true" aria-live="polite" class="flex-1 flex flex-col items-center space-y-6 text-center text-purple-900 select-none" id="resultSection" tabindex="-1">
+    <div aria-label="Preview of selected or resized image" class="w-full max-w-full rounded-3xl overflow-hidden shadow-lg ring-4 ring-yellow-300 ring-opacity-60 bg-white" id="previewContainer">
+     <img alt="Image preview" class="w-full h-auto object-contain" draggable="false" height="400" id="resizedImage" loading="lazy" src="https://storage.googleapis.com/a1aa/image/e61bcf74-5fc5-40d6-8c07-abad1282eb4b.jpg" width="600"/>
+    </div>
+    <a aria-label="Download resized image" class="inline-block bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-shadow focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:ring-opacity-75 pointer-events-none opacity-50" download="" href="#" id="downloadLink">
+     <i class="fas fa-download mr-2">
+     </i>
+     Download Image
+    </a>
+    <div class="w-full max-w-full font-semibold space-y-1">
+     <p class="text-lg" id="originalInfo">
+     </p>
+     <p class="text-lg" id="resizedInfo">
+     </p>
+    </div>
+   </section>
+  </main>
+  <script>
+   const imageInput = document.getElementById("imageInput");
+    const resizeForm = document.getElementById("resizeForm");
+    const resizedImage = document.getElementById("resizedImage");
+    const downloadLink = document.getElementById("downloadLink");
+    const resultSection = document.getElementById("resultSection");
+    const originalInfo = document.getElementById("originalInfo");
+    const resizedInfo = document.getElementById("resizedInfo");
+    const previewContainer = document.getElementById("previewContainer");
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      else if (bytes < 1024 * 1024)
+        return (bytes / 1024).toFixed(2) + " KB";
+      else return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    function loadImage(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Failed to load image"));
+        };
+        img.src = url;
+      });
+    }
+
+    function canvasToBlob(canvas, format, quality) {
+      return new Promise((resolve) => {
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob);
+          },
+          format,
+          quality
+        );
+      });
+    }
+
+    async function resizeImageToTargetSize(img, targetBytes, format) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      ctx.drawImage(img, 0, 0);
+
+      if (format === "png") {
+        let scale = 1;
+        let blob = await canvasToBlob(canvas, "image/png", 1);
+        if (blob.size <= targetBytes) {
+          return blob;
+        }
+
+        const minWidth = 100;
+        const minHeight = 100;
+
+        while (
+          blob.size > targetBytes &&
+          canvas.width * scale > minWidth &&
+          canvas.height * scale > minHeight
+        ) {
+          scale -= 0.05;
+          canvas.width = Math.floor(img.width * scale);
+          canvas.height = Math.floor(img.height * scale);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          blob = await canvasToBlob(canvas, "image/png", 1);
+        }
+        return blob;
+      } else {
+        let low = 0.1;
+        let high = 1.0;
+        let mid;
+        let blob;
+        let iterations = 0;
+        while (low <= high && iterations < 20) {
+          mid = (low + high) / 2;
+          blob = await canvasToBlob(canvas, "image/jpeg", mid);
+          if (blob.size > targetBytes) {
+            high = mid - 0.01;
+          } else {
+            low = mid + 0.01;
+          }
+          iterations++;
+        }
+        if (blob.size > targetBytes) {
+          let scale = 0.95;
+          while (
+            blob.size > targetBytes &&
+            canvas.width * scale > 100 &&
+            canvas.height * scale > 100
+          ) {
+            canvas.width = Math.floor(img.width * scale);
+            canvas.height = Math.floor(img.height * scale);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            blob = await canvasToBlob(canvas, "image/jpeg", mid);
+            scale -= 0.05;
+          }
+        }
+        return blob;
+      }
+    }
+
+    // Show preview immediately on image select
+    imageInput.addEventListener("change", async () => {
+      if (!imageInput.files.length) {
+        resizedImage.src = "https://placehold.co/600x400/png?text=Image+Preview+Will+Appear+Here";
+        originalInfo.textContent = "";
+        resizedInfo.textContent = "";
+        downloadLink.classList.add("pointer-events-none", "opacity-50");
+        downloadLink.href = "#";
+        downloadLink.download = "";
+        return;
+      }
+      const file = imageInput.files[0];
+      try {
+        const img = await loadImage(file);
+        resizedImage.src = URL.createObjectURL(file);
+        resizedImage.alt = `Preview of selected image: ${file.name}`;
+        originalInfo.textContent = `Original Size: ${formatBytes(file.size)} | Dimensions: ${img.width} x ${img.height}`;
+        resizedInfo.textContent = "";
+        downloadLink.classList.add("pointer-events-none", "opacity-50");
+        downloadLink.href = "#";
+        downloadLink.download = "";
+      } catch {
+        resizedImage.src = "https://placehold.co/600x400/png?text=Image+Preview+Will+Appear+Here";
+        originalInfo.textContent = "";
+        resizedInfo.textContent = "";
+        downloadLink.classList.add("pointer-events-none", "opacity-50");
+        downloadLink.href = "#";
+        downloadLink.download = "";
+      }
+    });
+
+    resizeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!imageInput.files.length) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      const file = imageInput.files[0];
+      const targetSizeInput = parseFloat(
+        document.getElementById("targetSize").value
+      );
+      const sizeUnit = document.getElementById("sizeUnit").value;
+      const format = document.getElementById("format").value;
+
+      if (isNaN(targetSizeInput) || targetSizeInput <= 0) {
+        alert("Please enter a valid target size.");
+        return;
+      }
+
+      let targetBytes = targetSizeInput * 1024;
+      if (sizeUnit === "mb") {
+        targetBytes = targetSizeInput * 1024 * 1024;
+      }
+
+      if (file.size <= targetBytes) {
+        alert(
+          `The original image size (${formatBytes(
+            file.size
+          )}) is already smaller than or equal to the target size.`
+        );
+        return;
+      }
+
+      try {
+        const img = await loadImage(file);
+
+        const resizedBlob = await resizeImageToTargetSize(
+          img,
+          targetBytes,
+          format
+        );
+
+        const resizedUrl = URL.createObjectURL(resizedBlob);
+
+        resizedImage.src = resizedUrl;
+        resizedImage.alt = `Resized image preview (${format.toUpperCase()})`;
+
+        // Generate random number for filename
+        const randomNum = Math.floor(Math.random() * 900000 + 100000);
+        const ext = format === "jpeg" ? "jpg" : "png";
+        downloadLink.href = resizedUrl;
+        downloadLink.download = `resized_${randomNum}.${ext}`;
+        downloadLink.classList.remove("pointer-events-none", "opacity-50");
+
+        originalInfo.textContent = `Original Size: ${formatBytes(
+          file.size
+        )} | Dimensions: ${img.width} x ${img.height}`;
+        const resizedImg = new Image();
+        resizedImg.onload = () => {
+          resizedInfo.textContent = `Resized Size: ${formatBytes(
+            resizedBlob.size
+          )} | Dimensions: ${resizedImg.width} x ${resizedImg.height}`;
+        };
+        resizedImg.src = resizedUrl;
+
+        resultSection.focus();
+        window.scrollTo({
+          top: resultSection.offsetTop - 20,
+          behavior: "smooth",
+        });
+      } catch (error) {
+        alert("Error processing image: " + error.message);
+      }
+    });
+  </script>
+ </body>
+</html>
