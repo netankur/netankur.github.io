@@ -1,0 +1,771 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced Image Color Picker with Palette</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9fafb;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    #imageCanvas {
+      cursor: crosshair;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      border-radius: 0.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      background: white;
+      display: block;
+      margin: 0 auto;
+    }
+    #paletteColors {
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    #paletteColors::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    #paletteColors::-webkit-scrollbar-thumb {
+      background-color: rgba(107, 114, 128, 0.5);
+      border-radius: 4px;
+    }
+    /* Scrollbar for picked colors */
+    #pickedColors {
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    #pickedColors::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    #pickedColors::-webkit-scrollbar-thumb {
+      background-color: rgba(107, 114, 128, 0.5);
+      border-radius: 4px;
+    }
+    /* Button hover and focus */
+    button:focus-visible {
+      outline-offset: 2px;
+      outline: 2px solid #2563eb;
+      outline-radius: 0.375rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6 space-y-10">
+
+  <label
+    for="uploadImage"
+    class="cursor-pointer inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg shadow-lg transition duration-300 select-none"
+    aria-label="Upload an image to pick colors from"
+  >
+    <i class="fas fa-upload mr-3 text-lg"></i>
+    <span class="font-semibold text-lg">Upload Image</span>
+  </label>
+  <input type="file" id="uploadImage" accept="image/*" aria-describedby="uploadHelp" />
+
+  <p id="uploadHelp" class="text-center text-gray-600 max-w-md leading-relaxed select-none">
+    Upload any image to pick colors by clicking or tapping on it. Zoom and pan the image for precise selection. On mobile, use pinch to zoom and drag to pan.
+  </p>
+
+  <div
+    id="imageContainer"
+    class="relative w-full max-w-5xl h-[420px] rounded-xl shadow-xl bg-white overflow-hidden touch-pan-y"
+    aria-label="Image container with zoom and pan"
+  >
+    <canvas
+      id="imageCanvas"
+      class="w-full h-full rounded-xl"
+      role="img"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-describedby="colorInfo"
+      tabindex="0"
+    ></canvas>
+  </div>
+
+  <section
+    id="colorInfo"
+    class="w-full max-w-5xl bg-white rounded-xl shadow-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <div class="flex items-center space-x-6">
+      <div
+        id="colorPreview"
+        class="w-24 h-24 rounded-lg border border-gray-300 shadow-inner"
+        aria-label="Selected color preview"
+      ></div>
+      <div class="select-none">
+        <p class="text-2xl font-semibold text-gray-800" id="colorHex">#FFFFFF</p>
+        <p class="text-sm text-gray-500 mt-1" id="colorRgb">rgb(255, 255, 255)</p>
+        <p class="text-sm text-gray-500 mt-1" id="colorHsl">hsl(0, 0%, 100%)</p>
+      </div>
+    </div>
+    <button
+      id="copyColorBtn"
+      class="flex items-center space-x-3 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-lg transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-green-400 select-none"
+      aria-label="Copy selected color hex code to clipboard"
+      type="button"
+    >
+      <i class="fas fa-copy text-lg"></i>
+      <span class="font-semibold text-lg">Copy Hex</span>
+    </button>
+  </section>
+
+  <section class="w-full max-w-5xl bg-white rounded-xl shadow-xl p-6">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800 select-none">Picked Colors History</h3>
+    <div
+      id="pickedColors"
+      class="flex flex-wrap gap-4 max-h-48 overflow-y-auto"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label="List of previously picked colors"
+      tabindex="0"
+    ></div>
+  </section>
+
+  <section class="w-full max-w-5xl bg-white rounded-xl shadow-xl p-6">
+    <h3 class="text-xl font-semibold mb-4 text-gray-800 select-none">Color Palette Extracted from Image</h3>
+    <div
+      id="paletteColors"
+      class="flex flex-wrap gap-3 max-h-40 overflow-y-auto"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label="Color palette extracted from the uploaded image"
+      tabindex="0"
+    ></div>
+  </section>
+
+  <script>
+    const uploadInput = document.getElementById('uploadImage');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPreview = document.getElementById('colorPreview');
+    const colorHex = document.getElementById('colorHex');
+    const colorRgb = document.getElementById('colorRgb');
+    const colorHsl = document.getElementById('colorHsl');
+    const copyColorBtn = document.getElementById('copyColorBtn');
+    const pickedColorsContainer = document.getElementById('pickedColors');
+    const paletteColorsContainer = document.getElementById('paletteColors');
+    const imageContainer = document.getElementById('imageContainer');
+
+    let img = new Image();
+    let imgLoaded = false;
+
+    // Variables for zoom and pan
+    let scale = 1;
+    let minScale = 1;
+    let maxScale = 5;
+    let originX = 0;
+    let originY = 0;
+    let isPanning = false;
+    let startPan = { x: 0, y: 0 };
+
+    // Store picked colors history (max 15)
+    let pickedColors = [];
+
+    // Store palette colors (max 64)
+    let paletteColors = [];
+
+    // Resize canvas to container size
+    function resizeCanvas() {
+      const rect = imageContainer.getBoundingClientRect();
+      canvas.width = rect.width * devicePixelRatio;
+      canvas.height = rect.height * devicePixelRatio;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      if (imgLoaded) {
+        drawImage();
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    // Draw image with current scale and pan
+    function drawImage() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(originX, originY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0, img.width, img.height);
+      ctx.restore();
+    }
+
+    // Load image from file input
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        img = new Image();
+        img.onload = function () {
+          imgLoaded = true;
+          // Reset zoom and pan
+          scale = 1;
+          originX = 0;
+          originY = 0;
+
+          // Resize canvas and draw image
+          resizeCanvas();
+
+          // Fit image to canvas by scaling down if needed
+          fitImageToCanvas();
+
+          // Extract palette colors from image
+          extractPaletteColors();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Fit image to canvas size with scale and center it
+    function fitImageToCanvas() {
+      const containerWidth = canvas.width / devicePixelRatio;
+      const containerHeight = canvas.height / devicePixelRatio;
+
+      const scaleX = containerWidth / img.width;
+      const scaleY = containerHeight / img.height;
+      scale = Math.min(scaleX, scaleY, 1);
+      minScale = scale;
+
+      // Center image
+      originX = (containerWidth - img.width * scale) / 2;
+      originY = (containerHeight - img.height * scale) / 2;
+
+      drawImage();
+    }
+
+    // Convert RGB to Hex
+    function rgbToHex(r, g, b) {
+      return (
+        '#' +
+        [r, g, b]
+          .map((x) => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          })
+          .join('')
+      ).toUpperCase();
+    }
+
+    // Convert RGB to HSL
+    function rgbToHsl(r, g, b) {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+      const max = Math.max(r, g, b),
+        min = Math.min(r, g, b);
+      let h,
+        s,
+        l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r:
+            h = (g - b) / d + (g < b ? 6 : 0);
+            break;
+          case g:
+            h = (b - r) / d + 2;
+            break;
+          case b:
+            h = (r - g) / d + 4;
+            break;
+        }
+        h /= 6;
+      }
+      h = Math.round(h * 360);
+      s = Math.round(s * 100);
+      l = Math.round(l * 100);
+      return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+
+    // Pick color from canvas at mouse/touch position
+    function pickColor(x, y) {
+      if (!imgLoaded) return;
+
+      // Adjust for devicePixelRatio
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const canvasX = (x - rect.left) * scaleX;
+      const canvasY = (y - rect.top) * scaleY;
+
+      // Reverse pan and zoom to get image pixel coordinates
+      const imgX = (canvasX / devicePixelRatio - originX) / scale;
+      const imgY = (canvasY / devicePixelRatio - originY) / scale;
+
+      if (
+        imgX < 0 ||
+        imgY < 0 ||
+        imgX >= img.width ||
+        imgY >= img.height
+      ) {
+        return;
+      }
+
+      // Clamp pixel coordinates to integer values inside image bounds
+      const px = Math.min(Math.max(Math.floor(imgX * devicePixelRatio), 0), canvas.width - 1);
+      const py = Math.min(Math.max(Math.floor(imgY * devicePixelRatio), 0), canvas.height - 1);
+
+      const pixel = ctx.getImageData(px, py, 1, 1).data;
+
+      const r = pixel[0];
+      const g = pixel[1];
+      const b = pixel[2];
+      const a = pixel[3];
+
+      if (a === 0) {
+        // Transparent pixel, ignore
+        return;
+      }
+
+      const hex = rgbToHex(r, g, b);
+      const hsl = rgbToHsl(r, g, b);
+      const rgb = `rgb(${r}, ${g}, ${b})`;
+
+      colorPreview.style.backgroundColor = hex;
+      colorHex.textContent = hex;
+      colorRgb.textContent = rgb;
+      colorHsl.textContent = hsl;
+
+      addColorToHistory(hex);
+    }
+
+    // Add color to history
+    function addColorToHistory(hex) {
+      if (pickedColors.includes(hex)) {
+        // Move existing color to front
+        pickedColors = pickedColors.filter((c) => c !== hex);
+      }
+      pickedColors.unshift(hex);
+      if (pickedColors.length > 15) {
+        pickedColors.pop();
+      }
+      renderPickedColors();
+    }
+
+    // Render picked colors history
+    function renderPickedColors() {
+      pickedColorsContainer.innerHTML = '';
+      pickedColors.forEach((hex) => {
+        const colorDiv = document.createElement('button');
+        colorDiv.setAttribute('type', 'button');
+        colorDiv.setAttribute('aria-label', `Select color ${hex} from history`);
+        colorDiv.className =
+          'w-10 h-10 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150';
+        colorDiv.style.backgroundColor = hex;
+        colorDiv.addEventListener('click', () => {
+          colorPreview.style.backgroundColor = hex;
+          colorHex.textContent = hex;
+
+          // Convert hex to rgb and hsl
+          const r = parseInt(hex.substr(1, 2), 16);
+          const g = parseInt(hex.substr(3, 2), 16);
+          const b = parseInt(hex.substr(5, 2), 16);
+          colorRgb.textContent = `rgb(${r}, ${g}, ${b})`;
+          colorHsl.textContent = rgbToHsl(r, g, b);
+        });
+        pickedColorsContainer.appendChild(colorDiv);
+      });
+    }
+
+    // Copy hex color to clipboard
+    copyColorBtn.addEventListener('click', () => {
+      const hex = colorHex.textContent;
+      navigator.clipboard.writeText(hex).then(() => {
+        copyColorBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+          copyColorBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Hex';
+        }, 1500);
+      });
+    });
+
+    // Handle click on canvas to pick color
+    canvas.addEventListener('click', (e) => {
+      pickColor(e.clientX, e.clientY);
+    });
+
+    // Handle touch on canvas to pick color (tap)
+    canvas.addEventListener('touchend', (e) => {
+      if (!imgLoaded) return;
+      if (e.touches.length > 0) return; // ignore if still touching
+      if (e.changedTouches.length === 1) {
+        const touch = e.changedTouches[0];
+        pickColor(touch.clientX, touch.clientY);
+      }
+    });
+
+    // Handle keyboard accessibility for canvas (Enter or Space to pick center pixel)
+    canvas.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        pickColor(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      }
+    });
+
+    // Zoom with mouse wheel
+    canvas.addEventListener('wheel', (e) => {
+      if (!imgLoaded) return;
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Calculate zoom direction
+      const delta = -e.deltaY || e.wheelDelta;
+      const zoomFactor = 0.1;
+      let newScale = scale;
+
+      if (delta > 0) {
+        newScale = Math.min(scale * (1 + zoomFactor), maxScale);
+      } else {
+        newScale = Math.max(scale * (1 - zoomFactor), minScale);
+      }
+
+      // Calculate the origin to zoom on mouse position
+      const dx = (mouseX - originX) / scale;
+      const dy = (mouseY - originY) / scale;
+
+      originX = mouseX - dx * newScale;
+      originY = mouseY - dy * newScale;
+      scale = newScale;
+
+      constrainPan();
+      drawImage();
+    }, { passive: false });
+
+    // Touch pinch zoom and pan support
+    let lastTouchDistance = null;
+    let lastTouchCenter = null;
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (!imgLoaded) return;
+      if (e.touches.length === 1) {
+        isPanning = true;
+        startPan.x = e.touches[0].clientX - originX;
+        startPan.y = e.touches[0].clientY - originY;
+      } else if (e.touches.length === 2) {
+        isPanning = false;
+        lastTouchDistance = getTouchDistance(e.touches);
+        lastTouchCenter = getTouchCenter(e.touches);
+      }
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!imgLoaded) return;
+      e.preventDefault();
+      if (e.touches.length === 1 && isPanning) {
+        originX = e.touches[0].clientX - startPan.x;
+        originY = e.touches[0].clientY - startPan.y;
+        constrainPan();
+        drawImage();
+      } else if (e.touches.length === 2) {
+        const newDistance = getTouchDistance(e.touches);
+        const newCenter = getTouchCenter(e.touches);
+
+        if (lastTouchDistance) {
+          let zoomChange = newDistance / lastTouchDistance;
+          let newScale = scale * zoomChange;
+          newScale = Math.min(Math.max(newScale, minScale), maxScale);
+
+          // Adjust origin to zoom on pinch center
+          originX = newCenter.x - ((newCenter.x - originX) / scale) * newScale;
+          originY = newCenter.y - ((newCenter.y - originY) / scale) * newScale;
+
+          scale = newScale;
+          constrainPan();
+          drawImage();
+        }
+        lastTouchDistance = newDistance;
+        lastTouchCenter = newCenter;
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        lastTouchDistance = null;
+        lastTouchCenter = null;
+      }
+      if (e.touches.length === 0) {
+        isPanning = false;
+      }
+    });
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function getTouchCenter(touches) {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2,
+      };
+    }
+
+    // Pan with mouse drag
+    canvas.addEventListener('mousedown', (e) => {
+      if (!imgLoaded) return;
+      isPanning = true;
+      startPan.x = e.clientX - originX;
+      startPan.y = e.clientY - originY;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+      canvas.style.cursor = 'crosshair';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!imgLoaded) return;
+      if (!isPanning) return;
+      originX = e.clientX - startPan.x;
+      originY = e.clientY - startPan.y;
+      constrainPan();
+      drawImage();
+    });
+
+    // Constrain pan so image doesn't move out of bounds too far
+    function constrainPan() {
+      const containerWidth = canvas.width / devicePixelRatio;
+      const containerHeight = canvas.height / devicePixelRatio;
+      const imgWidthScaled = img.width * scale;
+      const imgHeightScaled = img.height * scale;
+
+      // Horizontal constraints
+      if (imgWidthScaled < containerWidth) {
+        // Center horizontally if image smaller than container
+        originX = (containerWidth - imgWidthScaled) / 2;
+      } else {
+        const minX = containerWidth - imgWidthScaled;
+        if (originX > 0) originX = 0;
+        if (originX < minX) originX = minX;
+      }
+
+      // Vertical constraints
+      if (imgHeightScaled < containerHeight) {
+        // Center vertically if image smaller than container
+        originY = (containerHeight - imgHeightScaled) / 2;
+      } else {
+        const minY = containerHeight - imgHeightScaled;
+        if (originY > 0) originY = 0;
+        if (originY < minY) originY = minY;
+      }
+    }
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if (imgLoaded) {
+        constrainPan();
+        drawImage();
+      }
+    });
+
+    // Initial canvas sizing
+    resizeCanvas();
+
+    // Extract palette colors from image using color quantization (median cut)
+    // For performance, sample the image at a reduced resolution
+    function extractPaletteColors() {
+      paletteColorsContainer.innerHTML = '';
+      paletteColors = [];
+
+      // Draw image to an offscreen canvas at smaller size for analysis
+      const sampleSize = 100; // max width or height for sampling
+      let sampleWidth = img.width;
+      let sampleHeight = img.height;
+      if (img.width > img.height && img.width > sampleSize) {
+        sampleWidth = sampleSize;
+        sampleHeight = Math.round((img.height / img.width) * sampleSize);
+      } else if (img.height > img.width && img.height > sampleSize) {
+        sampleHeight = sampleSize;
+        sampleWidth = Math.round((img.width / img.height) * sampleSize);
+      } else if (img.width === img.height && img.width > sampleSize) {
+        sampleWidth = sampleSize;
+        sampleHeight = sampleSize;
+      }
+
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = sampleWidth;
+      offCanvas.height = sampleHeight;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(img, 0, 0, sampleWidth, sampleHeight);
+
+      const imageData = offCtx.getImageData(0, 0, sampleWidth, sampleHeight);
+      const pixels = imageData.data;
+
+      // Collect pixels ignoring fully transparent
+      const pixelArray = [];
+      for (let i = 0; i < pixels.length; i += 4) {
+        const a = pixels[i + 3];
+        if (a < 128) continue; // ignore transparent or semi-transparent pixels
+        pixelArray.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
+      }
+
+      if (pixelArray.length === 0) return;
+
+      // Use median cut quantization to reduce colors to max 64
+      const maxColors = 64;
+      const quantizedColors = medianCutQuantize(pixelArray, maxColors);
+
+      paletteColors = quantizedColors.map((c) => rgbToHex(c[0], c[1], c[2]));
+
+      renderPaletteColors();
+    }
+
+    // Render palette colors
+    function renderPaletteColors() {
+      paletteColorsContainer.innerHTML = '';
+      paletteColors.forEach((hex) => {
+        const colorDiv = document.createElement('button');
+        colorDiv.setAttribute('type', 'button');
+        colorDiv.setAttribute('aria-label', `Select palette color ${hex}`);
+        colorDiv.className =
+          'w-10 h-10 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150';
+        colorDiv.style.backgroundColor = hex;
+        colorDiv.addEventListener('click', () => {
+          colorPreview.style.backgroundColor = hex;
+          colorHex.textContent = hex;
+
+          // Convert hex to rgb and hsl
+          const r = parseInt(hex.substr(1, 2), 16);
+          const g = parseInt(hex.substr(3, 2), 16);
+          const b = parseInt(hex.substr(5, 2), 16);
+          colorRgb.textContent = `rgb(${r}, ${g}, ${b})`;
+          colorHsl.textContent = rgbToHsl(r, g, b);
+
+          addColorToHistory(hex);
+        });
+        paletteColorsContainer.appendChild(colorDiv);
+      });
+    }
+
+    // Median Cut Quantization implementation
+    // Adapted from https://github.com/leeoniya/uie-color-extractor/blob/master/src/quantize.js (MIT License)
+    function medianCutQuantize(pixels, maxColors) {
+      if (pixels.length === 0) return [];
+
+      // Each box is an object with pixels and bounds
+      function VBox(pixels) {
+        this.pixels = pixels;
+        this.rMin = 255;
+        this.rMax = 0;
+        this.gMin = 255;
+        this.gMax = 0;
+        this.bMin = 255;
+        this.bMax = 0;
+        this.calculateBounds();
+      }
+      VBox.prototype.calculateBounds = function () {
+        this.rMin = 255;
+        this.rMax = 0;
+        this.gMin = 255;
+        this.gMax = 0;
+        this.bMin = 255;
+        this.bMax = 0;
+        this.pixels.forEach((p) => {
+          if (p[0] < this.rMin) this.rMin = p[0];
+          if (p[0] > this.rMax) this.rMax = p[0];
+          if (p[1] < this.gMin) this.gMin = p[1];
+          if (p[1] > this.gMax) this.gMax = p[1];
+          if (p[2] < this.bMin) this.bMin = p[2];
+          if (p[2] > this.bMax) this.bMax = p[2];
+        });
+      };
+      VBox.prototype.getLongestColorDimension = function () {
+        const rLength = this.rMax - this.rMin;
+        const gLength = this.gMax - this.gMin;
+        const bLength = this.bMax - this.bMin;
+        if (rLength >= gLength && rLength >= bLength) return 'r';
+        if (gLength >= rLength && gLength >= bLength) return 'g';
+        return 'b';
+      };
+      VBox.prototype.splitBox = function () {
+        if (this.pixels.length === 0) return [];
+
+        const dimension = this.getLongestColorDimension();
+        // Sort pixels by the longest dimension
+        this.pixels.sort((a, b) => a[dimension === 'r' ? 0 : dimension === 'g' ? 1 : 2] - b[dimension === 'r' ? 0 : dimension === 'g' ? 1 : 2]);
+
+        const mid = Math.floor(this.pixels.length / 2);
+        const leftPixels = this.pixels.slice(0, mid);
+        const rightPixels = this.pixels.slice(mid);
+
+        return [new VBox(leftPixels), new VBox(rightPixels)];
+      };
+      VBox.prototype.getAverageColor = function () {
+        if (this.pixels.length === 0) return [0, 0, 0];
+        let rSum = 0,
+          gSum = 0,
+          bSum = 0;
+        this.pixels.forEach((p) => {
+          rSum += p[0];
+          gSum += p[1];
+          bSum += p[2];
+        });
+        return [
+          Math.round(rSum / this.pixels.length),
+          Math.round(gSum / this.pixels.length),
+          Math.round(bSum / this.pixels.length),
+        ];
+      };
+
+      // Start with one box containing all pixels
+      let boxes = [new VBox(pixels)];
+
+      // Iteratively split boxes until we have enough colors or can't split anymore
+      while (boxes.length < maxColors) {
+        // Find box with largest volume to split
+        let maxRange = 0;
+        let boxIndex = -1;
+        for (let i = 0; i < boxes.length; i++) {
+          const box = boxes[i];
+          const range = Math.max(box.rMax - box.rMin, box.gMax - box.gMin, box.bMax - box.bMin);
+          if (range > maxRange && box.pixels.length > 1) {
+            maxRange = range;
+            boxIndex = i;
+          }
+        }
+        if (boxIndex === -1) break; // no box to split
+
+        const boxToSplit = boxes[boxIndex];
+        const newBoxes = boxToSplit.splitBox();
+        if (newBoxes.length === 0) break;
+
+        boxes.splice(boxIndex, 1, ...newBoxes);
+      }
+
+      // Get average colors of each box
+      return boxes.map((box) => box.getAverageColor());
+    }
+  </script>
+</body>
+</html>
