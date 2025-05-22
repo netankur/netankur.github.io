@@ -3,72 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The words counter tool is a simple yet useful web-based application that allows you to analyze and count the number of words, sentences, paragraphs, letters and top keywords in your text." />
-    <meta name="author" content="Netankur" />
-    <meta name="keywords" content="Words Counter">
-    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
-    <title>Word Counts Tool</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Word Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            padding: 20px;
+        .gradient-bg {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        }
+        .text-area-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background-color: #e0e0e0;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #6e8efb, #a777e3);
+            transition: width 0.5s ease;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="mb-4"><i class="fas fa-file-alt"></i> Word Counts Tool</h1>
-        <div class="form-group">
-            <label for="textInput">Enter Text:</label>
-            <textarea id="textInput" class="form-control" rows="10"></textarea>
+<body class="min-h-screen bg-gray-50">
+    <div class="gradient-bg text-white py-8 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2">Word Counter</h1>
         </div>
-        <button id="analyzeBtn" class="btn btn-primary"><i class="fas fa-chart-bar"></i> Analyze</button>
+    </div>
 
-        <div id="results" class="mt-4">
-            <h3>Results:</h3>
-            <p><strong>Words:</strong> <span id="wordCount">0</span></p>
-            <p><strong>Paragraphs:</strong> <span id="paragraphCount">0</span></p>
-            <p><strong>Letters:</strong> <span id="letterCount">0</span></p>
-            <p><strong>Sentences:</strong> <span id="sentenceCount">0</span></p>
-            <p><strong>Main Keywords:</strong> <span id="keywords">None</span></p>
+    <div class="container mx-auto max-w-6xl px-4 py-8 -mt-10">
+        <div class="bg-white rounded-xl shadow-lg text-area-shadow overflow-hidden">
+            <div class="p-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Enter your text below</h2>
+                    <div class="flex space-x-2">
+                        <button id="clear-btn" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm transition">
+                            <i class="fas fa-trash-alt mr-1"></i> Clear
+                        </button>
+                        <button id="copy-btn" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm transition">
+                            <i class="fas fa-copy mr-1"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <textarea id="text-input" class="w-full h-64 p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Type or paste your text here..."></textarea>
+                
+                <div class="mt-4 flex items-center">
+                    <div class="flex-1">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="progress-text" class="ml-2 text-sm text-gray-500">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+            <div class="stat-card bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-font text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Words</p>
+                        <h3 id="word-count" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                        <i class="fas fa-keyboard text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Characters</p>
+                        <h3 id="char-count" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-clock text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Reading Time</p>
+                        <h3 id="reading-time" class="text-2xl font-bold">0s</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                        <i class="fas fa-stopwatch text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Speaking Time</p>
+                        <h3 id="speaking-time" class="text-2xl font-bold">0s</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+                    Detailed Statistics
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Characters (no spaces)</span>
+                        <span id="char-no-spaces" class="font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Sentences</span>
+                        <span id="sentence-count" class="font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Paragraphs</span>
+                        <span id="paragraph-count" class="font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Avg. Word Length</span>
+                        <span id="avg-word-length" class="font-medium">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-tachometer-alt text-purple-500 mr-2"></i>
+                    Text Analysis
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Short Words (&lt;4 chars)</span>
+                            <span id="short-words" class="font-medium">0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="short-words-bar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Long Words (&gt;6 chars)</span>
+                            <span id="long-words" class="font-medium">0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="long-words-bar" class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Unique Words</span>
+                            <span id="unique-words" class="font-medium">0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="unique-words-bar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md mt-8">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                <i class="fas fa-list-ol text-yellow-500 mr-2"></i>
+                Keyword Density
+            </h3>
+            <div id="keyword-density" class="flex flex-wrap gap-2">
+                <div class="text-center text-sm px-3 py-1 bg-gray-100 rounded-full">
+                    No keywords detected
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('analyzeBtn').addEventListener('click', function () {
-            const text = document.getElementById('textInput').value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const textInput = document.getElementById('text-input');
+            const wordCount = document.getElementById('word-count');
+            const charCount = document.getElementById('char-count');
+            const charNoSpaces = document.getElementById('char-no-spaces');
+            const sentenceCount = document.getElementById('sentence-count');
+            const paragraphCount = document.getElementById('paragraph-count');
+            const readingTime = document.getElementById('reading-time');
+            const speakingTime = document.getElementById('speaking-time');
+            const avgWordLength = document.getElementById('avg-word-length');
+            const shortWords = document.getElementById('short-words');
+            const longWords = document.getElementById('long-words');
+            const uniqueWords = document.getElementById('unique-words');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const clearBtn = document.getElementById('clear-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const keywordDensity = document.getElementById('keyword-density');
+            const shortWordsBar = document.getElementById('short-words-bar');
+            const longWordsBar = document.getElementById('long-words-bar');
+            const uniqueWordsBar = document.getElementById('unique-words-bar');
 
-            // Word count
-            const words = text.match(/\b\w+\b/g) || [];
-            document.getElementById('wordCount').textContent = words.length;
+            // Max characters for progress calculation
+            const MAX_CHARS = 10000;
 
-            // Paragraph count
-            const paragraphs = text.split(/\n+/);
-            document.getElementById('paragraphCount').textContent = paragraphs.length;
+            textInput.addEventListener('input', updateCounts);
+            clearBtn.addEventListener('click', clearText);
+            copyBtn.addEventListener('click', copyText);
 
-            // Letter count
-            const letters = text.match(/[a-zA-Z]/g) || [];
-            document.getElementById('letterCount').textContent = letters.length;
-
-            // Sentence count
-            const sentences = text.match(/[^.!?]+[.!?]+[\])'"`’”]*/g) || [];
-            document.getElementById('sentenceCount').textContent = sentences.length;
-
-            // Main keywords (simple word frequency)
-            const wordFrequency = {};
-            words.forEach(word => {
-                word = word.toLowerCase();
-                wordFrequency[word] = (wordFrequency[word] || 0) + 1;
-            });
-            const sortedWords = Object.entries(wordFrequency).sort((a, b) => b[1] - a[1]);
-            const topKeywords = sortedWords.slice(0, 5).map(([word]) => word);
-            document.getElementById('keywords').textContent = topKeywords.join(', ') || 'None';
+            function updateCounts() {
+                const text = textInput.value;
+                const words = text.trim() ? text.trim().split(/\s+/) : [];
+                const chars = text.length;
+                const charsNoSpaces = text.replace(/\s+/g, '').length;
+                
+                // Word count
+                wordCount.textContent = words.length;
+                
+                // Character counts
+                charCount.textContent = chars;
+                charNoSpaces.textContent = charsNoSpaces;
+                
+                // Sentences (simple count based on punctuation)
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                sentenceCount.textContent = sentences.length;
+                
+                // Paragraphs
+                const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+                paragraphCount.textContent = paragraphs.length;
+                
+                // Reading time (avg. reading speed: 200 words per minute)
+                const readingTimeMinutes = words.length / 200;
+                readingTime.textContent = readingTimeMinutes < 1 
+                    ? `${Math.ceil(readingTimeMinutes * 60)}s` 
+                    : `${Math.ceil(readingTimeMinutes)}m`;
+                
+                // Speaking time (avg. speaking speed: 150 words per minute)
+                const speakingTimeMinutes = words.length / 150;
+                speakingTime.textContent = speakingTimeMinutes < 1 
+                    ? `${Math.ceil(speakingTimeMinutes * 60)}s` 
+                    : `${Math.ceil(speakingTimeMinutes)}m`;
+                
+                // Average word length
+                const totalLetters = words.join('').length;
+                avgWordLength.textContent = words.length ? (totalLetters / words.length).toFixed(1) : '0';
+                
+                // Short and long words
+                const shortWordsCount = words.filter(w => w.length < 4).length;
+                const longWordsCount = words.filter(w => w.length > 6).length;
+                shortWords.textContent = shortWordsCount;
+                longWords.textContent = longWordsCount;
+                
+                // Unique words
+                const uniqueWordsCount = new Set(words.map(w => w.toLowerCase())).size;
+                uniqueWords.textContent = uniqueWordsCount;
+                
+                // Progress bar
+                const progressPercent = Math.min((chars / MAX_CHARS) * 100, 100);
+                progressFill.style.width = `${progressPercent}%`;
+                progressText.textContent = `${Math.round(progressPercent)}%`;
+                
+                // Word length distribution bars
+                if (words.length) {
+                    shortWordsBar.style.width = `${(shortWordsCount / words.length) * 100}%`;
+                    longWordsBar.style.width = `${(longWordsCount / words.length) * 100}%`;
+                    uniqueWordsBar.style.width = `${(uniqueWordsCount / words.length) * 100}%`;
+                } else {
+                    shortWordsBar.style.width = '0%';
+                    longWordsBar.style.width = '0%';
+                    uniqueWordsBar.style.width = '0%';
+                }
+                
+                // Keyword density (top 10 most frequent words)
+                updateKeywordDensity(words);
+            }
+            
+            function updateKeywordDensity(words) {
+                if (words.length === 0) {
+                    keywordDensity.innerHTML = `
+                        <div class="text-center text-sm px-3 py-1 bg-gray-100 rounded-full">
+                            No keywords detected
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Filter out common words and short words
+                const commonWords = new Set(['the', 'and', 'a', 'to', 'of', 'in', 'is', 'it', 'that', 'for', 'you', 'was', 'on', 'are', 'with', 'as', 'at', 'be', 'this', 'have', 'from', 'or', 'an', 'by', 'not', 'but', 'what', 'all', 'were', 'we', 'when', 'your', 'can', 'said', 'there', 'use', 'they', 'which', 'she', 'do', 'how', 'their', 'if', 'will', 'up', 'other', 'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would', 'make', 'like', 'him', 'into', 'time', 'has', 'look', 'two', 'more', 'go', 'see', 'no', 'way', 'could', 'my', 'than', 'first', 'been', 'its', 'who', 'now', 'people', 'get', 'made', 'may', 'part']);
+                
+                const wordFrequency = {};
+                words.forEach(word => {
+                    const lowerWord = word.toLowerCase().replace(/[^a-z']/g, '');
+                    if (lowerWord.length > 3 && !commonWords.has(lowerWord)) {
+                        wordFrequency[lowerWord] = (wordFrequency[lowerWord] || 0) + 1;
+                    }
+                });
+                
+                const sortedKeywords = Object.entries(wordFrequency)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                
+                if (sortedKeywords.length === 0) {
+                    keywordDensity.innerHTML = `
+                        <div class="text-center text-sm px-3 py-1 bg-gray-100 rounded-full">
+                            No significant keywords found
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const maxFrequency = sortedKeywords[0][1];
+                keywordDensity.innerHTML = sortedKeywords.map(([word, count]) => {
+                    const percentage = (count / words.length * 100).toFixed(1);
+                    const intensity = Math.min(90 + Math.floor(count / maxFrequency * 10) * 10, 100);
+                    return `
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium">${word}</span>
+                            <span class="text-xs text-gray-500">${count} (${percentage}%)</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${intensity}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            function clearText() {
+                textInput.value = '';
+                updateCounts();
+            }
+            
+            function copyText() {
+                textInput.select();
+                document.execCommand('copy');
+                
+                // Show feedback
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }
         });
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
