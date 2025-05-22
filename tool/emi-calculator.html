@@ -3,218 +3,430 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan EMI Calculator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>EMI Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Smooth Font */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 20px;
-        }
-
-        /* Glassmorphic Container */
-        .container {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .container:hover {
-            transform: scale(1.02);
-        }
-
-        h2 {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        /* Input Fields */
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-            color: #555;
-        }
-
-        .input-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: #fdfdfd;
-            color: #333;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .input-group input:focus, select:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
-        }
-
-        /* Buttons */
-        .btn {
-            width: 48%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5;
+            border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
         }
-
-        #calculateBtn {
-            background: #4caf50;
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .tooltip {
+            position: absolute;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.8);
             color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-
-        #resetBtn {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Results Section */
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            display: none;
-            color: #333;
-            text-align: left;
-            font-weight: bold;
-            animation: fadeIn 1s ease-in-out;
-        }
-
+        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .result p {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        /* Pie Chart */
-        #emiChart {
-            margin-top: 20px;
-            max-height: 250px;
-        }
-
-        /* Responsive */
-        @media (max-width: 500px) {
-            .container {
-                padding: 20px;
-            }
-
-            .btn {
-                width: 100%;
-                margin-bottom: 10px;
-            }
+        
+        .result-card {
+            animation: fadeIn 0.5s ease-out forwards;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>Loan EMI Calculator</h2>
-
-        <div class="calculator">
-            <div class="input-group">
-                <label><i class="fas fa-dollar-sign"></i> Loan Amount:</label>
-                <input type="number" id="loanAmount" placeholder="Enter loan amount" min="1000" max="10000000">
-            </div>
-
-            <div class="input-group">
-                <label><i class="fas fa-percent"></i> Interest Rate (%):</label>
-                <input type="number" id="interestRate" placeholder="Enter annual interest rate" min="1" max="50" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label>Loan Tenure:</label>
-                <select id="tenureType">
-                    <option value="months">Months</option>
-                    <option value="years">Years</option>
-                </select>
-                <input type="number" id="tenure" placeholder="Enter tenure" min="1" max="360">
-            </div>
-
-            <button id="calculateBtn" class="btn">Calculate</button>
-            <button id="resetBtn" class="btn">Reset</button>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-dark mb-2">EMI Calculator</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Calculate your monthly payments, total interest, and visualize your loan amortization</p>
         </div>
-
-        <div class="result" id="resultSection">
-            <h3>EMI Details</h3>
-            <p>Monthly EMI: <span id="emiResult">0.00</span></p>
-            <p>Total Interest: <span id="totalInterest">0.00</span></p>
-            <p>Total Payment: <span id="totalPayment">0.00</span></p>
-            <canvas id="emiChart"></canvas>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Input Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+                <div class="flex items-center mb-6">
+                    <div class="bg-primary/10 p-3 rounded-lg mr-4">
+                        <i class="fas fa-calculator text-primary text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-semibold text-dark">Loan Details</h2>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Loan Amount -->
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label for="loanAmount" class="font-medium text-gray-700">Loan Amount (₹)</label>
+                            <span id="loanAmountValue" class="font-medium text-primary">10,00,000</span>
+                        </div>
+                        <input type="range" id="loanAmount" min="1" max="5000000" step="1" value="1000000" class="w-full range-slider h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>1</span>
+                            <span>50L</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Interest Rate -->
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label for="interestRate" class="font-medium text-gray-700">Interest Rate (%)</label>
+                            <span id="interestRateValue" class="font-medium text-primary">8.5</span>
+                        </div>
+                        <input type="range" id="interestRate" min="1" max="30" step="0.1" value="8.5" class="w-full range-slider h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>1%</span>
+                            <span>30%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Loan Tenure -->
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label for="loanTenure" class="font-medium text-gray-700">Loan Tenure (Years)</label>
+                            <span id="loanTenureValue" class="font-medium text-primary">10</span>
+                        </div>
+                        <input type="range" id="loanTenure" min="1" max="30" step="1" value="10" class="w-full range-slider h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>1 Year</span>
+                            <span>30 Years</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Options -->
+                    <div class="pt-4 border-t border-gray-200">
+                        <button id="toggleAdvanced" class="flex items-center text-primary font-medium">
+                            <i class="fas fa-cog mr-2"></i> Advanced Options
+                            <i id="advancedArrow" class="fas fa-chevron-down ml-2 text-sm transition-transform"></i>
+                        </button>
+                        
+                        <div id="advancedOptions" class="mt-4 space-y-4 hidden">
+                            <div>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="preEMI" class="rounded text-primary border-gray-300">
+                                    <span class="ml-2 text-gray-700">Pre-EMI Period (Months)</span>
+                                </label>
+                                <input type="number" id="preEMIMonths" min="0" max="36" value="0" disabled class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="includeFees" class="rounded text-primary border-gray-300">
+                                    <span class="ml-2 text-gray-700">Include Processing Fees</span>
+                                </label>
+                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <div>
+                                        <label for="processingFeePercent" class="block text-sm text-gray-600 mb-1">Percentage (%)</label>
+                                        <input type="number" id="processingFeePercent" min="0" max="10" step="0.1" value="1" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label for="processingFeeFixed" class="block text-sm text-gray-600 mb-1">Fixed Amount (₹)</label>
+                                        <input type="number" id="processingFeeFixed" min="0" value="0" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="calculateBtn" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                        <i class="fas fa-calculator mr-2"></i> Calculate EMI
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Result Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-6">
+                    <div class="bg-secondary/10 p-3 rounded-lg mr-4">
+                        <i class="fas fa-chart-pie text-secondary text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-semibold text-dark">Payment Summary</h2>
+                </div>
+                
+                <div id="resultContainer" class="hidden">
+                    <div class="result-card bg-gray-50 rounded-lg p-5 mb-6">
+                        <div class="text-center mb-4">
+                            <p class="text-gray-600">Your Monthly Payment</p>
+                            <h3 id="emiAmount" class="text-3xl font-bold text-dark">₹12,398</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white p-3 rounded-lg">
+                                <p class="text-gray-500">Total Interest</p>
+                                <p id="totalInterest" class="font-medium">₹4,87,760</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg">
+                                <p class="text-gray-500">Total Payment</p>
+                                <p id="totalPayment" class="font-medium">₹14,87,760</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-medium text-dark mb-3">Payment Breakup</h4>
+                        <div class="chart-container">
+                            <canvas id="paymentChart"></canvas>
+                            <div class="tooltip" id="chartTooltip"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-3">Amortization Schedule</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-600 text-left text-sm">
+                                        <th class="py-2 px-3">Year</th>
+                                        <th class="py-2 px-3">Principal</th>
+                                        <th class="py-2 px-3">Interest</th>
+                                        <th class="py-2 px-3">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="amortizationTable" class="text-sm divide-y divide-gray-200">
+                                    <!-- Filled by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="placeholder" class="text-center py-12">
+                    <div class="bg-gray-100 p-6 rounded-full inline-block mb-4">
+                        <i class="fas fa-calculator text-gray-400 text-3xl"></i>
+                    </div>
+                    <h4 class="text-gray-500 font-medium">Enter loan details to calculate EMI</h4>
+                    <p class="text-gray-400 text-sm mt-1">Adjust the sliders and click "Calculate EMI"</p>
+                </div>
+            </div>
         </div>
     </div>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.getElementById("calculateBtn").addEventListener("click", calculateEMI);
-        document.getElementById("resetBtn").addEventListener("click", resetForm);
-
+        // DOM Elements
+        const loanAmountInput = document.getElementById('loanAmount');
+        const interestRateInput = document.getElementById('interestRate');
+        const loanTenureInput = document.getElementById('loanTenure');
+        const loanAmountValue = document.getElementById('loanAmountValue');
+        const interestRateValue = document.getElementById('interestRateValue');
+        const loanTenureValue = document.getElementById('loanTenureValue');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const toggleAdvanced = document.getElementById('toggleAdvanced');
+        const advancedOptions = document.getElementById('advancedOptions');
+        const advancedArrow = document.getElementById('advancedArrow');
+        const preEMICheckbox = document.getElementById('preEMI');
+        const preEMIMonths = document.getElementById('preEMIMonths');
+        const includeFeesCheckbox = document.getElementById('includeFees');
+        const processingFeePercent = document.getElementById('processingFeePercent');
+        const processingFeeFixed = document.getElementById('processingFeeFixed');
+        const resultContainer = document.getElementById('resultContainer');
+        const placeholder = document.getElementById('placeholder');
+        const emiAmount = document.getElementById('emiAmount');
+        const totalInterest = document.getElementById('totalInterest');
+        const totalPayment = document.getElementById('totalPayment');
+        const amortizationTable = document.getElementById('amortizationTable');
+        
+        // Initialize Chart
+        let paymentChart;
+        
+        // Format currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-IN', { 
+                style: 'currency', 
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount).replace('₹', '₹');
+        };
+        
+        // Update slider values
+        loanAmountInput.addEventListener('input', () => {
+            loanAmountValue.textContent = formatCurrency(parseInt(loanAmountInput.value));
+        });
+        
+        interestRateInput.addEventListener('input', () => {
+            interestRateValue.textContent = parseFloat(interestRateInput.value).toFixed(1);
+        });
+        
+        loanTenureInput.addEventListener('input', () => {
+            loanTenureValue.textContent = loanTenureInput.value;
+        });
+        
+        // Toggle advanced options
+        toggleAdvanced.addEventListener('click', () => {
+            advancedOptions.classList.toggle('hidden');
+            advancedArrow.classList.toggle('rotate-180');
+        });
+        
+        // Enable/disable pre-EMI months input
+        preEMICheckbox.addEventListener('change', () => {
+            preEMIMonths.disabled = !preEMICheckbox.checked;
+        });
+        
+        // Enable/disable processing fee inputs
+        includeFeesCheckbox.addEventListener('change', () => {
+            processingFeePercent.disabled = !includeFeesCheckbox.checked;
+            processingFeeFixed.disabled = !includeFeesCheckbox.checked;
+        });
+        
+        // Calculate EMI
+        calculateBtn.addEventListener('click', calculateEMI);
+        
         function calculateEMI() {
-            let loanAmount = document.getElementById("loanAmount").value;
-            let interestRate = document.getElementById("interestRate").value;
-            let tenure = document.getElementById("tenure").value;
-            let tenureType = document.getElementById("tenureType").value;
-
-            if (tenureType === "years") tenure *= 12;
-
-            let monthlyRate = (interestRate / 12) / 100;
-            let emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
-            let totalPayment = emi * tenure;
-            let totalInterest = totalPayment - loanAmount;
-
-            document.getElementById("emiResult").innerText = emi.toFixed(2);
-            document.getElementById("totalInterest").innerText = totalInterest.toFixed(2);
-            document.getElementById("totalPayment").innerText = totalPayment.toFixed(2);
-            document.getElementById("resultSection").style.display = "block";
-
-            let ctx = document.getElementById("emiChart").getContext("2d");
-            new Chart(ctx, { type: "pie", data: { labels: ["Principal", "Interest"], datasets: [{ data: [loanAmount, totalInterest], backgroundColor: ["#4caf50", "#f44336"] }] } });
+            // Get input values
+            const principal = parseFloat(loanAmountInput.value);
+            const rate = parseFloat(interestRateInput.value) / 100 / 12; // Monthly interest rate
+            const months = parseFloat(loanTenureInput.value) * 12; // Total months
+            
+            // Calculate EMI using the formula: P * r * (1+r)^n / ((1+r)^n - 1)
+            const emi = principal * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1);
+            
+            // Calculate total payment and interest
+            const totalPaymentAmount = emi * months;
+            const totalInterestAmount = totalPaymentAmount - principal;
+            
+            // Update result display
+            emiAmount.textContent = formatCurrency(emi);
+            totalInterest.textContent = formatCurrency(totalInterestAmount);
+            totalPayment.textContent = formatCurrency(totalPaymentAmount);
+            
+            // Generate amortization schedule
+            generateAmortizationSchedule(principal, rate, months, emi);
+            
+            // Create payment chart
+            createPaymentChart(principal, totalInterestAmount);
+            
+            // Show results
+            placeholder.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
         }
-
-        function resetForm() {
-            document.getElementById("loanAmount").value = "";
-            document.getElementById("interestRate").value = "";
-            document.getElementById("tenure").value = "";
-            document.getElementById("resultSection").style.display = "none";
+        
+        function generateAmortizationSchedule(principal, monthlyRate, months, emi) {
+            let balance = principal;
+            let year = 1;
+            let yearlyPrincipal = 0;
+            let yearlyInterest = 0;
+            
+            amortizationTable.innerHTML = '';
+            
+            for (let i = 1; i <= months; i++) {
+                const interest = balance * monthlyRate;
+                const principalPayment = emi - interest;
+                
+                yearlyPrincipal += principalPayment;
+                yearlyInterest += interest;
+                balance -= principalPayment;
+                
+                // Add yearly summary
+                if (i % 12 === 0 || i === months) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="py-2 px-3">${year}</td>
+                        <td class="py-2 px-3">${formatCurrency(yearlyPrincipal)}</td>
+                        <td class="py-2 px-3">${formatCurrency(yearlyInterest)}</td>
+                        <td class="py-2 px-3">${formatCurrency(Math.max(0, balance))}</td>
+                    `;
+                    amortizationTable.appendChild(row);
+                    
+                    year++;
+                    yearlyPrincipal = 0;
+                    yearlyInterest = 0;
+                }
+            }
+        }
+        
+        function createPaymentChart(principal, totalInterest) {
+            const ctx = document.getElementById('paymentChart').getContext('2d');
+            const tooltip = document.getElementById('chartTooltip');
+            
+            if (paymentChart) {
+                paymentChart.destroy();
+            }
+            
+            paymentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Principal', 'Interest'],
+                    datasets: [{
+                        data: [principal, totalInterest],
+                        backgroundColor: ['#4f46e5', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            enabled: false,
+                            external: (context) => {
+                                const { chart, tooltip } = context;
+                                const dataIndex = tooltip.dataPoints?.[0]?.dataIndex;
+                                
+                                if (dataIndex !== undefined) {
+                                    const label = chart.data.labels[dataIndex];
+                                    const value = chart.data.datasets[0].data[dataIndex];
+                                    const percentage = (value / (principal + totalInterest) * 100).toFixed(1);
+                                    
+                                    tooltip.innerHTML = `
+                                        <div class="font-medium">${label}</div>
+                                        <div>${formatCurrency(value)}</div>
+                                        <div class="text-gray-300">${percentage}% of total</div>
+                                    `;
+                                    
+                                    const canvasRect = chart.canvas.getBoundingClientRect();
+                                    tooltip.style.left = canvasRect.left + tooltip.caretX + 'px';
+                                    tooltip.style.top = canvasRect.top + tooltip.caretY + 'px';
+                                    tooltip.style.opacity = 1;
+                                } else {
+                                    tooltip.style.opacity = 0;
+                                }
+                            }
+                        }
+                    },
+                    onHover: (event, chartElement) => {
+                        const canvas = document.getElementById('paymentChart');
+                        canvas.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    }
+                }
+            });
+            
+            // Hide tooltip when mouse leaves chart
+            document.getElementById('paymentChart').addEventListener('mouseleave', () => {
+                tooltip.style.opacity = 0;
+            });
         }
     </script>
 </body>
