@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PDF Compressor</title>
+    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    
+    <script src="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .card {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+        }
+        h1 { margin-top: 0; font-size: 1.75rem; color: #1a1a1a; }
+        p { color: #666; margin-bottom: 1.5rem; }
+        input[type="file"] { display: none; }
+        .file-label {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .file-label:hover { background-color: #dde1e5; }
+        #fileName {
+            display: block;
+            margin: 0.75rem 0;
+            color: #888;
+            font-style: italic;
+            min-height: 20px;
+        }
+        .size-info {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .size-info div { flex: 1; }
+        .size-info span { display: block; }
+        .size-label { font-size: 0.8rem; color: #6c757d; }
+        .size-value { font-weight: 600; font-size: 1rem; }
+        .slider-container { margin-bottom: 1.5rem; opacity: 0.5; pointer-events: none; }
+        .slider-container.ready { opacity: 1; pointer-events: auto; }
+        .slider-label { display: flex; justify-content: space-between; font-weight: 600; color: #495057; margin-bottom: 0.5rem; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        .warning { font-size: 0.8rem; color: #dc3545; margin-top: 1rem; }
+        button, .download-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s;
+        }
+        button { background-color: #007bff; color: white; }
+        button:disabled { background-color: #5a6268; cursor: not-allowed; }
+        button:not(:disabled):hover { background-color: #0056b3; }
+        .download-btn { display: block; background-color: #28a745; color: white; text-decoration: none; margin-top: 1rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>PDF Compressor 🚀</h1>
+        <p>Choose a file and move the slider to see the real-time estimated size.</p>
+        
+        <input type="file" id="pdfInput" accept=".pdf">
+        <label for="pdfInput" class="file-label">Choose File</label>
+        <span id="fileName">No file chosen</span>
+
+        <div class="size-info">
+            <div>
+                <span class="size-label">Original Size</span>
+                <span class="size-value" id="originalSize">--</span>
+            </div>
+            <div>
+                <span class="size-label">Estimated Size</span>
+                <span class="size-value" id="estimatedSize">--</span>
+            </div>
+        </div>
+        
+        <div id="sliderContainer" class="slider-container">
+            <div class="slider-label">
+                <span>Image Quality</span>
+                <span id="dpiValue">150 DPI</span>
+            </div>
+            <input type="range" id="dpiSlider" min="72" max="300" value="150" step="1">
+        </div>
+
+        <button id="compressBtn" disabled>Compress PDF</button>
+        <div class="warning">Note: Text will not be selectable in the compressed file.</div>
+
+        <div id="result" class="hidden">
+            <p id="resultText"></p>
+            <a id="downloadLink" class="download-btn">Download Compressed PDF</a>
+        </div>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const { pdfjsLib } = window;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`;
+
+        const pdfInput = document.getElementById('pdfInput');
+        const fileNameSpan = document.getElementById('fileName');
+        const compressBtn = document.getElementById('compressBtn');
+        const sliderContainer = document.getElementById('sliderContainer');
+        const dpiSlider = document.getElementById('dpiSlider');
+        const dpiValueSpan = document.getElementById('dpiValue');
+        const originalSizeSpan = document.getElementById('originalSize');
+        const estimatedSizeSpan = document.getElementById('estimatedSize');
+        const resultDiv = document.getElementById('result');
+        const resultText = document.getElementById('resultText');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let analysisCache = {}; // To store analysis results for estimation
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        async function analyzePdf(file) {
+            fileNameSpan.textContent = 'Analyzing...';
+            compressBtn.disabled = true;
+            sliderContainer.classList.remove('ready');
+
+            const fileBuffer = await file.arrayBuffer();
+            const pdfjsDoc = await pdfjsLib.getDocument({ data: fileBuffer }).promise;
+            
+            const sampleDpis = [72, 150, 300];
+            const samplePoints = [];
+
+            const firstPage = await pdfjsDoc.getPage(1);
+            for (const dpi of sampleDpis) {
+                const viewport = firstPage.getViewport({ scale: dpi / 72 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await firstPage.render({ canvasContext: context, viewport }).promise;
+                const jpegBytes = await new Promise(resolve => canvas.toBlob(b => b.arrayBuffer().then(resolve), 'image/jpeg', 0.8));
+                samplePoints.push({ dpi, size: jpegBytes.byteLength });
+            }
+            
+            analysisCache = {
+                pdfjsDoc,
+                numPages: pdfjsDoc.numPages,
+                samplePoints,
+                fileBuffer,
+            };
+
+            fileNameSpan.textContent = file.name;
+            originalSizeSpan.textContent = formatBytes(file.size);
+            sliderContainer.classList.add('ready');
+            compressBtn.disabled = false;
+            updateEstimatedSize();
+        }
+
+        function updateEstimatedSize() {
+            if (!analysisCache.samplePoints) return;
+            
+            const currentDpi = parseInt(dpiSlider.value);
+            dpiValueSpan.textContent = `${currentDpi} DPI`;
+            const { numPages, samplePoints } = analysisCache;
+            
+            // Find the two sample points the current DPI is between for interpolation
+            let p1 = samplePoints[0], p2 = samplePoints[1];
+            for (let i = 0; i < samplePoints.length - 1; i++) {
+                if (currentDpi >= samplePoints[i].dpi && currentDpi <= samplePoints[i+1].dpi) {
+                    p1 = samplePoints[i];
+                    p2 = samplePoints[i+1];
+                    break;
+                }
+            }
+            if (currentDpi > samplePoints[samplePoints.length - 1].dpi) {
+                 p1 = samplePoints[samplePoints.length - 2];
+                 p2 = samplePoints[samplePoints.length - 1];
+            }
+
+            // Linear interpolation: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+            const estimatedPageSize = p1.size + (currentDpi - p1.dpi) * (p2.size - p1.size) / (p2.dpi - p1.dpi);
+            const totalEstimatedSize = estimatedPageSize * numPages;
+            
+            estimatedSizeSpan.textContent = formatBytes(totalEstimatedSize);
+        }
+
+        pdfInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await analyzePdf(file);
+            }
+        });
+
+        dpiSlider.addEventListener('input', updateEstimatedSize);
+
+        compressBtn.addEventListener('click', async () => {
+            if (!analysisCache.pdfjsDoc) {
+                alert('Please select and analyze a file first.');
+                return;
+            }
+
+            compressBtn.textContent = 'Compressing...';
+            compressBtn.disabled = true;
+            sliderContainer.classList.remove('ready');
+            resultDiv.classList.add('hidden');
+
+            try {
+                const { pdfjsDoc, fileBuffer } = analysisCache;
+                const newPdfDoc = await PDFDocument.create();
+                const targetDpi = parseInt(dpiSlider.value);
+
+                for (let i = 1; i <= pdfjsDoc.numPages; i++) {
+                    const page = await pdfjsDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: targetDpi / 72 });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const context = canvas.getContext('2d');
+                    await page.render({ canvasContext: context, viewport }).promise;
+                    
+                    const jpegImageBytes = await new Promise(resolve => canvas.toBlob(b => b.arrayBuffer().then(resolve), 'image/jpeg', 0.8));
+                    const jpegImage = await newPdfDoc.embedJpg(jpegImageBytes);
+                    
+                    const newPage = newPdfDoc.addPage([jpegImage.width, jpegImage.height]);
+                    newPage.drawImage(jpegImage, { x: 0, y: 0, width: newPage.getWidth(), height: newPage.getHeight() });
+                }
+
+                const compressedBytes = await newPdfDoc.save();
+                const reduction = Math.round(((fileBuffer.byteLength - compressedBytes.byteLength) / fileBuffer.byteLength) * 100);
+
+                const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                resultText.innerHTML = `Success! 🎉 Final size is <b>${formatBytes(compressedBytes.byteLength)}</b>.<br>Reduced by ${reduction}%.`;
+                downloadLink.href = url;
+                downloadLink.download = `compressed_${pdfInput.files[0].name}`;
+                resultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error during compression:', error);
+                alert('An error occurred during the final compression.');
+            } finally {
+                compressBtn.textContent = 'Compress PDF';
+                compressBtn.disabled = false;
+                sliderContainer.classList.add('ready');
+            }
+        });
+    </script>
+</body>
+</html>
