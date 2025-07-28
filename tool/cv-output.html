@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            /* A refined, professional color palette */
+            --accent-color: #2563eb;       /* A strong, professional blue */
+            --accent-color-light: #dbeafe; /* A light, complementary blue for hover states */
+            --text-primary: #111827;       /* Very dark gray for headings */
+            --text-secondary: #4b5563;     /* Lighter gray for body/sub-text */
+            --border-color: #e5e7eb;       /* For subtle borders/lines */
+            --background-white: #ffffff;
+            --placeholder-bg: #f3f4f6;
+        }
+
+        /* Global Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            background-color: var(--background-white);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.6;
+            animation: fadeIn 0.7s ease-out;
+        }
+
+        /* Export Controls - Hidden in print */
+        .export-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .export-btn.secondary {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+        }
+
+        .export-btn.secondary:hover {
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+        }
+
+        .export-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .resume-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 45px 40px;
+            background: white;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1.name {
+            font-size: 2.8em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        h2.section-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        h2.section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 35px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+
+        h3 {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        /* Header & Personal Info */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 45px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            transition: color 0.2s ease-in-out;
+        }
+        .contact-item:hover { color: var(--accent-color); cursor: pointer; }
+        .contact-item i { font-size: 1.1em; color: var(--accent-color); }
+
+        .photo-placeholder {
+            width: 110px;
+            height: 110px;
+            background-color: var(--placeholder-bg);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        /* Main Sections */
+        section {
+            margin-bottom: 40px;
+        }
+        section:last-child { margin-bottom: 0; }
+        
+        /* Personal Details Section */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .detail-label {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+        .detail-value {
+            font-size: 0.95em;
+            color: var(--text-primary);
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            display: flex;
+            gap: 25px;
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .timeline-item:last-child { margin-bottom: 0; }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 6px;
+            width: 1px;
+            height: 100%;
+            background-color: var(--border-color);
+        }
+        .timeline-item:last-child::before { height: 5px; }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 0px;
+            top: 6px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            z-index: 1;
+        }
+
+        .timeline-date {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 500;
+            flex-basis: 120px;
+            flex-shrink: 0;
+            padding-top: 1px;
+        }
+        
+        .timeline-content h4 {
+            font-weight: 500;
+            margin: 2px 0 8px 0;
+            color: var(--text-primary);
+        }
+        .timeline-content p { font-size: 0.95em; }
+        .timeline-content ul { padding-left: 20px; margin-top: 8px; font-size: 0.95em; }
+        
+        /* Skills, Languages, and Hobbies Sections */
+        .tag-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tag {
+            background-color: var(--placeholder-bg);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        .tag:hover {
+            background-color: var(--accent-color-light);
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Print Styles */
+        @media print {
+            .export-controls {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            .resume-container {
+                max-width: none;
+                padding: 20px;
+                margin: 0;
+                box-shadow: none;
+            }
+            
+            .timeline-item {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            h2.section-title {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .export-controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px;
+                justify-content: center;
+            }
+            
+            .export-btn {
+                min-width: 100px;
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .resume-container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Export Controls -->
+    <div class="export-controls">
+        <button class="export-btn" onclick="printResume()">
+            <i class="ph-bold ph-printer"></i>
+            Print / Save as PDF
+        </button>
+        <button class="export-btn secondary" style="display:none;" onclick="downloadPDF()">
+            <i class="ph-bold ph-download"></i>
+            Download PDF
+        </button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Generating PDF...</div>
+        </div>
+    </div>
+
+    <div class="resume-container" id="resumeContent">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="name">Your Name</h1>
+                <div class="personal-info">
+                    <div class="contact-item">
+                        <i class="ph-bold ph-map-pin"></i>
+                        <span>Berlin, Germany</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ph-bold ph-envelope-simple"></i>
+                        <span>sample@email.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ph-bold ph-phone"></i>
+                        <span>(+1) 123 456 7890</span>
+                    </div>
+                     <div class="contact-item">
+                        <i class="ph-bold ph-globe"></i>
+                        <span>your-website.com</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="photo-placeholder"></div>
+            </div>
+        </header>
+
+        <main>
+            <section class="profile-section">
+                <h2 class="section-title">Profile</h2>
+                <p>Full-stack developer specializing in modern, responsive web applications. With a strong foundation in both front-end and back-end technologies, I thrive on solving complex problems and delivering high-quality, efficient code.</p>
+            </section>
+            
+            <section class="personal-details-section">
+                <h2 class="section-title">Personal Details</h2>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Date of Birth</span>
+                        <span class="detail-value">January 01, 1995</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Gender</span>
+                        <span class="detail-value">Female</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Nationality</span>
+                        <span class="detail-value">German</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="experience-section">
+                <h2 class="section-title">Work Experience</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            May 2023 - Present
+                        </div>
+                        <div class="timeline-content">
+                            <h3>React Native Developer</h3>
+                            <h4>Facebook, Inc.</h4>
+                            <ul>
+                                <li>Develop and maintain features for the main mobile application using React Native.</li>
+                                <li>Collaborate with cross-functional teams to define, design, and ship new features.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                         <div class="timeline-date">
+                            Jan 2021 - Apr 2023
+                        </div>
+                        <div class="timeline-content">
+                            <h3>Software Engineer</h3>
+                            <h4>Tech Solutions LLC</h4>
+                            <ul>
+                                <li>Engineered scalable back-end services and RESTful APIs using Node.js and Express.</li>
+                                <li>Maintained and improved the performance of existing software.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="education-section">
+                <h2 class="section-title">Education</h2>
+                 <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            2017 - 2021
+                        </div>
+                        <div class="timeline-content">
+                            <h3>BSc. Software Engineering</h3>
+                            <h4>Harvard University</h4>
+                            <p>Graduated with honors, focusing on software architecture and algorithm design.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="qualifications-section">
+                <h2 class="section-title">Other Qualifications</h2>
+                 <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            Issued Jun 2023
+                        </div>
+                        <div class="timeline-content">
+                            <h3>AWS Certified Solutions Architect – Associate</h3>
+                            <h4>Amazon Web Services (AWS)</h4>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            Dec 2022
+                        </div>
+                        <div class="timeline-content">
+                            <h3>Innovator of the Year Award</h3>
+                            <h4>Tech Solutions LLC</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="skills-section">
+                <h2 class="section-title">Skills</h2>
+                <div class="tag-grid">
+                    <span class="tag">React Native</span>
+                    <span class="tag">JavaScript (ES6+)</span>
+                    <span class="tag">TypeScript</span>
+                    <span class="tag">Node.js</span>
+                    <span class="tag">HTML5 & CSS3</span>
+                    <span class="tag">REST APIs</span>
+                    <span class="tag">Git & GitHub</span>
+                    <span class="tag">Agile Methodologies</span>
+                    <span class="tag">Docker</span>
+                </div>
+            </section>
+            
+            <section class="languages-section">
+                <h2 class="section-title">Languages</h2>
+                <div class="tag-grid">
+                    <span class="tag">German</span>
+                    <span class="tag">English</span>
+                    <span class="tag">Spanish</span>
+                </div>
+            </section>
+            
+            <section class="hobbies-section">
+                <h2 class="section-title">Hobbies & Interests</h2>
+                <div class="tag-grid">
+                    <span class="tag">Photography</span>
+                    <span class="tag">Open Source Contribution</span>
+                    <span class="tag">Hiking & Outdoors</span>
+                    <span class="tag">Chess</span>
+                    <span class="tag">Reading Sci-Fi</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Load resume data from localStorage and populate the template
+        function loadResumeData() {
+            const data = JSON.parse(localStorage.getItem('resumeData') || '{}');
+            
+            if (Object.keys(data).length === 0) {
+                console.log("No resume data found. Using default template.");
+                return;
+            }
+            
+            // Update personal information
+            if (data.name) {
+                document.querySelector('.name').textContent = data.name;
+            }
+            
+            // Handle profile picture
+            if (data.profileImageData) {
+                const headerRight = document.querySelector('.header-right');
+                const photoPlaceholder = headerRight.querySelector('.photo-placeholder');
+                photoPlaceholder.innerHTML = `<img src="${data.profileImageData}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            }
+            
+            // Update contact information - only show if data exists
+            const contactItems = document.querySelectorAll('.contact-item');
+            let contactIndex = 0;
+            
+            // Clear existing contact items
+            contactItems.forEach(item => item.style.display = 'none');
+            
+            if (data.location) {
+                if (contactItems[contactIndex]) {
+                    contactItems[contactIndex].querySelector('span').textContent = data.location;
+                    contactItems[contactIndex].style.display = 'flex';
+                    contactIndex++;
+                }
+            }
+            if (data.email) {
+                if (contactItems[contactIndex]) {
+                    contactItems[contactIndex].querySelector('span').textContent = data.email;
+                    contactItems[contactIndex].style.display = 'flex';
+                    contactIndex++;
+                }
+            }
+            if (data.phone) {
+                if (contactItems[contactIndex]) {
+                    contactItems[contactIndex].querySelector('span').textContent = data.phone;
+                    contactItems[contactIndex].style.display = 'flex';
+                    contactIndex++;
+                }
+            }
+            if (data.website) {
+                if (contactItems[contactIndex]) {
+                    contactItems[contactIndex].querySelector('span').textContent = data.website;
+                    contactItems[contactIndex].style.display = 'flex';
+                    contactIndex++;
+                }
+            }
+            
+            // Update section titles
+            updateSectionTitle('.profile-section .section-title', data.profileTitle, 'Profile');
+            updateSectionTitle('.experience-section .section-title', data.experienceTitle, 'Work Experience');
+            updateSectionTitle('.education-section .section-title', data.educationTitle, 'Education');
+            updateSectionTitle('.qualifications-section .section-title', data.qualificationTitle, 'Other Qualifications');
+            updateSectionTitle('.skills-section .section-title', data.skillsTitle, 'Skills');
+            updateSectionTitle('.languages-section .section-title', data.languagesTitle, 'Languages');
+            updateSectionTitle('.hobbies-section .section-title', data.hobbiesTitle, 'Hobbies & Interests');
+            
+            // Update profile - only show section if data exists
+            const profileSection = document.querySelector('.profile-section');
+            if (data.profile) {
+                profileSection.querySelector('p').textContent = data.profile;
+            } else {
+                profileSection.style.display = 'none';
+            }
+            
+            // Update personal details - only show if any data exists
+            updatePersonalDetails(data);
+            
+            // Update sections
+            updateExperienceSection(data.experience, data.experienceTitle);
+            updateEducationSection(data.education, data.educationTitle);
+            updateQualificationsSection(data.qualifications, data.qualificationTitle);
+            updateTagSection('.skills-section', data.skills, data.skillsTitle);
+            updateTagSection('.languages-section', data.languages, data.languagesTitle);
+            updateTagSection('.hobbies-section', data.hobbies, data.hobbiesTitle);
+            
+            // Handle custom sections
+            handleCustomSections(data.customSections);
+            
+            console.log("Resume data loaded successfully:", data);
+        }
+        
+        function updateSectionTitle(selector, newTitle, defaultTitle) {
+            const titleElement = document.querySelector(selector);
+            if (titleElement) {
+                titleElement.textContent = newTitle || defaultTitle;
+            }
+        }
+        
+        function updatePersonalDetails(data) {
+            const personalDetailsSection = document.querySelector('.personal-details-section');
+            const detailValues = personalDetailsSection.querySelectorAll('.detail-value');
+            const detailItems = personalDetailsSection.querySelectorAll('.detail-item');
+            let hasPersonalDetails = false;
+            
+            if (data.dob) {
+                const date = new Date(data.dob);
+                detailValues[0].textContent = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                hasPersonalDetails = true;
+            } else {
+                detailItems[0].style.display = 'none';
+            }
+            
+            if (data.gender) {
+                detailValues[1].textContent = data.gender;
+                hasPersonalDetails = true;
+            } else {
+                detailItems[1].style.display = 'none';
+            }
+            
+            if (data.nationality) {
+                detailValues[2].textContent = data.nationality;
+                hasPersonalDetails = true;
+            } else {
+                detailItems[2].style.display = 'none';
+            }
+            
+            if (!hasPersonalDetails) {
+                personalDetailsSection.style.display = 'none';
+            }
+        }
+        
+        function updateExperienceSection(experienceData, sectionTitle) {
+            const section = document.querySelector('.experience-section');
+            if (!section) return;
+            
+            if (experienceData && experienceData.length > 0) {
+                if (sectionTitle) {
+                    const titleElement = section.querySelector('.section-title');
+                    if (titleElement) titleElement.textContent = sectionTitle;
+                }
+                
+                const timeline = section.querySelector('.timeline');
+                timeline.innerHTML = '';
+                
+                experienceData.forEach(exp => {
+                    if (exp.jobTitle || exp.company) {
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = 'timeline-item';
+                        
+                        const dateRange = (exp.startDate || exp.endDate) ? 
+                            `${exp.startDate || ''} - ${exp.endDate || ''}`.trim().replace(/^-\s*/, '').replace(/\s*-$/, '') : '';
+                        
+                        const descriptions = exp.jobDescription ? exp.jobDescription.split('\n').filter(desc => desc.trim()) : [];
+                        const descriptionList = descriptions.map(desc => `<li>${desc.trim()}</li>`).join('');
+                        
+                        timelineItem.innerHTML = `
+                            ${dateRange ? `<div class="timeline-date">${dateRange}</div>` : '<div class="timeline-date"></div>'}
+                            <div class="timeline-content">
+                                ${exp.jobTitle ? `<h3>${exp.jobTitle}</h3>` : ''}
+                                ${exp.company ? `<h4>${exp.company}</h4>` : ''}
+                                ${descriptionList ? `<ul>${descriptionList}</ul>` : ''}
+                            </div>
+                        `;
+                        timeline.appendChild(timelineItem);
+                    }
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function updateEducationSection(educationData, sectionTitle) {
+            const section = document.querySelector('.education-section');
+            if (!section) return;
+            
+            if (educationData && educationData.length > 0) {
+                if (sectionTitle) {
+                    const titleElement = section.querySelector('.section-title');
+                    if (titleElement) titleElement.textContent = sectionTitle;
+                }
+                
+                const timeline = section.querySelector('.timeline');
+                timeline.innerHTML = '';
+                
+                educationData.forEach(edu => {
+                    if (edu.degree || edu.institution) {
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = 'timeline-item';
+                        
+                        const dateRange = (edu.eduStartYear || edu.eduEndYear) ? 
+                            `${edu.eduStartYear || ''} - ${edu.eduEndYear || ''}`.trim().replace(/^-\s*/, '').replace(/\s*-$/, '') : '';
+                        
+                        timelineItem.innerHTML = `
+                            ${dateRange ? `<div class="timeline-date">${dateRange}</div>` : '<div class="timeline-date"></div>'}
+                            <div class="timeline-content">
+                                ${edu.degree ? `<h3>${edu.degree}</h3>` : ''}
+                                ${edu.institution ? `<h4>${edu.institution}</h4>` : ''}
+                                ${edu.eduDescription ? `<p>${edu.eduDescription}</p>` : ''}
+                            </div>
+                        `;
+                        timeline.appendChild(timelineItem);
+                    }
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function updateQualificationsSection(qualificationsData, sectionTitle) {
+            const section = document.querySelector('.qualifications-section');
+            if (!section) return;
+            
+            if (qualificationsData && qualificationsData.length > 0) {
+                if (sectionTitle) {
+                    const titleElement = section.querySelector('.section-title');
+                    if (titleElement) titleElement.textContent = sectionTitle;
+                }
+                
+                const timeline = section.querySelector('.timeline');
+                timeline.innerHTML = '';
+                
+                qualificationsData.forEach(qual => {
+                    if (qual.qualification || qual.issuer) {
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = 'timeline-item';
+                        
+                        const dateText = qual.issueDate ? 
+                            (qual.issueDate.toLowerCase().includes('issued') ? qual.issueDate : `Issued ${qual.issueDate}`) : '';
+                        
+                        timelineItem.innerHTML = `
+                            ${dateText ? `<div class="timeline-date">${dateText}</div>` : '<div class="timeline-date"></div>'}
+                            <div class="timeline-content">
+                                ${qual.qualification ? `<h3>${qual.qualification}</h3>` : ''}
+                                ${qual.issuer ? `<h4>${qual.issuer}</h4>` : ''}
+                            </div>
+                        `;
+                        timeline.appendChild(timelineItem);
+                    }
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function updateTagSection(sectionSelector, dataArray, sectionTitle) {
+            const section = document.querySelector(sectionSelector);
+            if (!section) return;
+            
+            if (dataArray && dataArray.length > 0) {
+                if (sectionTitle) {
+                    const titleElement = section.querySelector('.section-title');
+                    if (titleElement) titleElement.textContent = sectionTitle;
+                }
+                
+                const tagGrid = section.querySelector('.tag-grid');
+                tagGrid.innerHTML = '';
+                
+                dataArray.forEach(item => {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag';
+                    tag.textContent = item;
+                    tagGrid.appendChild(tag);
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+        
+        function handleCustomSections(customSections) {
+            if (!customSections || customSections.length === 0) return;
+            
+            const main = document.querySelector('main');
+            
+            customSections.forEach(customSection => {
+                if (!customSection.title || !customSection.type) return;
+                
+                const section = document.createElement('section');
+                section.className = 'custom-section';
+                
+                let content = `<h2 class="section-title">${customSection.title}</h2>`;
+                
+                if (customSection.type === 'tags' && Array.isArray(customSection.data) && customSection.data.length > 0) {
+                    const tags = customSection.data.map(item => `<span class="tag">${item}</span>`).join('');
+                    content += `<div class="tag-grid">${tags}</div>`;
+                } else if (customSection.type === 'paragraph' && customSection.data) {
+                    content += `<p>${customSection.data}</p>`;
+                } else if (customSection.type === 'timeline' && Array.isArray(customSection.data) && customSection.data.length > 0) {
+                    const timelineItems = customSection.data.map(item => {
+                        if (!item.title && !item.subtitle) return '';
+                        
+                        const dateRange = (item.startDate || item.endDate) ? 
+                            `${item.startDate || ''} - ${item.endDate || ''}`.trim().replace(/^-\s*/, '').replace(/\s*-$/, '') : '';
+                        
+                        return `
+                            <div class="timeline-item">
+                                ${dateRange ? `<div class="timeline-date">${dateRange}</div>` : '<div class="timeline-date"></div>'}
+                                <div class="timeline-content">
+                                    ${item.title ? `<h3>${item.title}</h3>` : ''}
+                                    ${item.subtitle ? `<h4>${item.subtitle}</h4>` : ''}
+                                    ${item.description ? `<p>${item.description}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).filter(item => item).join('');
+                    
+                    if (timelineItems) {
+                        content += `<div class="timeline">${timelineItems}</div>`;
+                    }
+                }
+                
+                section.innerHTML = content;
+                main.appendChild(section);
+            });
+        }
+
+        // Enhanced Print Function
+        function printResume() {
+            window.print();
+        }
+
+        // IMPROVED: Direct PDF Download Function with proper section handling
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const resumeContent = document.getElementById('resumeContent');
+    
+    try {
+        // Show loading overlay
+        loadingOverlay.style.display = 'flex';
+        
+        // Get the resume data for filename
+        const data = JSON.parse(localStorage.getItem('resumeData') || '{}');
+        const fileName = data.name ? `${data.name.replace(/\s+/g, '_')}_Resume.pdf` : 'Resume.pdf';
+        
+        // Create a properly sized container for PDF generation
+        const pdfContainer = document.createElement('div');
+        pdfContainer.innerHTML = resumeContent.innerHTML;
+        pdfContainer.style.position = 'absolute';
+        pdfContainer.style.top = '-9999px';
+        pdfContainer.style.left = '0';
+        pdfContainer.style.width = '210mm'; // A4 width
+        pdfContainer.style.maxWidth = '210mm';
+        pdfContainer.style.padding = '15mm';
+        pdfContainer.style.margin = '0';
+        pdfContainer.style.background = '#ffffff';
+        pdfContainer.style.fontFamily = "'Inter', sans-serif";
+        pdfContainer.style.fontSize = '12px';
+        pdfContainer.style.lineHeight = '1.4';
+        pdfContainer.style.color = '#374151';
+        pdfContainer.style.boxSizing = 'border-box';
+        
+        // Apply comprehensive PDF-specific styles
+        const pdfStyles = document.createElement('style');
+        pdfStyles.textContent = `
+            /* Hide export controls */
+            .export-controls { display: none !important; }
+            
+            /* Container styles */
+            .resume-container {
+                max-width: none !important;
+                width: 180mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+                box-shadow: none !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+            }
+            
+            /* Typography fixes */
+            h1.name {
+                font-size: 28px !important;
+                margin-bottom: 10px !important;
+                border-bottom: 2px solid #2563eb !important;
+                padding-bottom: 4px !important;
+                display: inline-block !important;
+                page-break-after: avoid !important;
+            }
+            
+            h2.section-title {
+                font-size: 16px !important;
+                margin-bottom: 12px !important;
+                margin-top: 20px !important;
+                padding-bottom: 4px !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            
+            h3 {
+                font-size: 14px !important;
+                margin-bottom: 3px !important;
+                page-break-after: avoid !important;
+            }
+            
+            h4 {
+                font-size: 12px !important;
+                margin: 2px 0 4px 0 !important;
+                font-weight: 500 !important;
+            }
+            
+            /* Header section */
+            .header {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                margin-bottom: 20px !important;
+                gap: 15px !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .contact-item {
+                font-size: 11px !important;
+                margin-bottom: 2px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+            }
+            
+            .photo-placeholder {
+                width: 80px !important;
+                height: 80px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            /* Section spacing */
+            section {
+                margin-bottom: 18px !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            section:last-child {
+                margin-bottom: 0 !important;
+            }
+            
+            /* Timeline items */
+            .timeline-item {
+                margin-bottom: 15px !important;
+                padding-left: 15px !important;
+                gap: 15px !important;
+                display: flex !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .timeline-item:last-child {
+                margin-bottom: 0 !important;
+            }
+            
+            .timeline-date {
+                font-size: 10px !important;
+                flex-basis: 90px !important;
+                flex-shrink: 0 !important;
+                font-weight: 500 !important;
+                color: #6b7280 !important;
+            }
+            
+            .timeline-content {
+                flex: 1 !important;
+            }
+            
+            .timeline-content p,
+            .timeline-content li {
+                font-size: 11px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 4px !important;
+            }
+            
+            .timeline-content ul {
+                margin: 4px 0 !important;
+                padding-left: 15px !important;
+            }
+            
+            /* Timeline styling */
+            .timeline-item::before {
+                content: '' !important;
+                position: absolute !important;
+                left: 3px !important;
+                top: 4px !important;
+                width: 1px !important;
+                height: calc(100% - 4px) !important;
+                background-color: #e5e7eb !important;
+            }
+            
+            .timeline-item:last-child::before {
+                height: 4px !important;
+            }
+            
+            .timeline-item::after {
+                content: '' !important;
+                position: absolute !important;
+                left: -1px !important;
+                top: 4px !important;
+                width: 7px !important;
+                height: 7px !important;
+                border-radius: 50% !important;
+                background-color: #2563eb !important;
+                z-index: 1 !important;
+            }
+            
+            /* Tags */
+            .tag-grid {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+            
+            .tag {
+                background-color: #f3f4f6 !important;
+                color: #6b7280 !important;
+                padding: 3px 8px !important;
+                border-radius: 12px !important;
+                font-size: 10px !important;
+                font-weight: 500 !important;
+                display: inline-block !important;
+            }
+            
+            /* Personal details */
+            .details-grid {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+                gap: 12px !important;
+            }
+            
+            .detail-label {
+                font-size: 10px !important;
+                font-weight: 500 !important;
+                color: #6b7280 !important;
+                margin-bottom: 2px !important;
+            }
+            
+            .detail-value {
+                font-size: 11px !important;
+                color: #374151 !important;
+            }
+            
+            /* Profile section */
+            .profile-section p {
+                font-size: 11px !important;
+                line-height: 1.5 !important;
+                text-align: justify !important;
+            }
+            
+            /* Ensure proper page breaks */
+            .timeline,
+            .tag-grid,
+            .details-grid {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        `;
+        
+        pdfContainer.appendChild(pdfStyles);
+        
+        // Remove export controls
+        const exportControls = pdfContainer.querySelector('.export-controls');
+        if (exportControls) {
+            exportControls.remove();
+        }
+        
+        // Add to DOM for rendering
+        document.body.appendChild(pdfContainer);
+        
+        // Wait for layout and fonts
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Generate canvas with optimized settings
+        const canvas = await html2canvas(pdfContainer, {
+            scale: 2, // High quality
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: 794, // A4 width in pixels
+            height: pdfContainer.scrollHeight,
+            windowWidth: 794,
+            windowHeight: pdfContainer.scrollHeight,
+            onclone: function(clonedDoc) {
+                // Ensure all styles are applied in cloned document
+                const clonedContainer = clonedDoc.querySelector('.resume-container');
+                if (clonedContainer) {
+                    clonedContainer.style.transform = 'none';
+                    clonedContainer.style.webkitTransform = 'none';
+                }
+            }
+        });
+        
+        // Clean up
+        document.body.removeChild(pdfContainer);
+        
+        // Create PDF with proper A4 dimensions
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+            compress: true
+        });
+        
+        // A4 dimensions
+        const A4_WIDTH = 210;
+        const A4_HEIGHT = 297;
+        const MARGIN = 15;
+        
+        // Calculate image dimensions
+        const imgWidth = A4_WIDTH - (2 * MARGIN);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Split content across pages properly
+        const pageHeight = A4_HEIGHT - (2 * MARGIN);
+        let yPosition = MARGIN;
+        let sourceY = 0;
+        let remainingHeight = imgHeight;
+        
+        while (remainingHeight > 0) {
+            // Calculate how much content fits on current page
+            const availableHeight = pageHeight - (yPosition - MARGIN);
+            const contentHeight = Math.min(remainingHeight, availableHeight);
+            
+            // Calculate source area
+            const sourceHeight = (contentHeight / imgHeight) * canvas.height;
+            
+            // Create canvas for this page section
+            const pageCanvas = document.createElement('canvas');
+            const ctx = pageCanvas.getContext('2d');
+            pageCanvas.width = canvas.width;
+            pageCanvas.height = sourceHeight;
+            
+            // Draw the section
+            ctx.drawImage(
+                canvas,
+                0, sourceY, canvas.width, sourceHeight,
+                0, 0, canvas.width, sourceHeight
+            );
+            
+            // Add to PDF
+            pdf.addImage(
+                pageCanvas.toDataURL('image/jpeg', 0.95),
+                'JPEG',
+                MARGIN,
+                yPosition,
+                imgWidth,
+                contentHeight,
+                undefined,
+                'FAST'
+            );
+            
+            // Update positions
+            remainingHeight -= contentHeight;
+            sourceY += sourceHeight;
+            
+            // Add new page if more content remains
+            if (remainingHeight > 0) {
+                pdf.addPage();
+                yPosition = MARGIN;
+            }
+        }
+        
+        // Add document metadata
+        pdf.setProperties({
+            title: fileName.replace('.pdf', ''),
+            subject: 'Professional Resume',
+            author: data.name || 'Resume Builder User',
+            creator: 'Resume Builder App',
+            keywords: 'resume, cv, professional, career'
+        });
+        
+        // Save the PDF
+        pdf.save(fileName);
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try the Print/Save as PDF option instead.');
+    } finally {
+        // Hide loading overlay
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadResumeData);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P or Cmd+P for print
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                printResume();
+            }
+            // Ctrl+D or Cmd+D for download PDF
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                downloadPDF();
+            }
+        });
+        
+        console.log("Enhanced resume with PDF export functionality loaded successfully.");
+    </script>
+</body>
+</html>
