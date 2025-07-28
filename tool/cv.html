@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#1976d2',
+                        'primary-light': '#e3f2fd',
+                        'secondary': '#757575',
+                        'accent': '#4caf50',
+                    },
+                    screens: {
+                        'xs': '475px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+        .material-icons { font-family: 'Material Icons'; }
+        .drag-over { border-color: #1976d2 !important; background-color: #e3f2fd !important; }
+        
+        /* Custom scrollbar for better mobile experience */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Enhanced touch targets for mobile */
+        @media (max-width: 768px) {
+            button, input, select, textarea {
+                min-height: 44px;
+            }
+            .material-icons {
+                font-size: 24px;
+            }
+        }
+
+        /* Smooth transitions */
+        * {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <!-- Mobile-optimized container -->
+    <div class="w-full max-w-6xl mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
+        <!-- Responsive Header -->
+        <div class="text-center mb-6 sm:mb-8">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-light text-primary mb-2">Resume Builder</h1>
+            <p class="text-base sm:text-lg text-secondary px-2">Create your professional resume with ease</p>
+        </div>
+
+        <!-- Mobile-optimized Action Buttons -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:justify-center gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8">
+            <button onclick="saveToLocalStorage()" class="bg-accent text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base min-h-[44px]">
+                <span class="material-icons text-lg sm:text-xl">save</span>
+                <span class="hidden xs:inline">Save</span>
+            </button>
+            <button onclick="loadFromLocalStorage()" class="bg-blue-500 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base min-h-[44px]">
+                <span class="material-icons text-lg sm:text-xl">refresh</span>
+                <span class="hidden xs:inline">Load</span>
+            </button>
+            <button onclick="exportToJSON()" class="bg-purple-500 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base min-h-[44px]">
+                <span class="material-icons text-lg sm:text-xl">download</span>
+                <span class="hidden xs:inline">Export</span>
+            </button>
+            <label class="bg-orange-500 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 cursor-pointer text-sm sm:text-base min-h-[44px]">
+                <span class="material-icons text-lg sm:text-xl">upload</span>
+                <span class="hidden xs:inline">Import</span>
+                <input type="file" id="jsonImport" accept=".json" class="hidden" onchange="importFromJSON(event)">
+            </label>
+            <button onclick="clearAllData()" class="bg-red-500 text-white px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base min-h-[44px] col-span-2 sm:col-span-1">
+                <span class="material-icons text-lg sm:text-xl">clear</span>
+                <span class="hidden xs:inline">Clear</span>
+            </button>
+        </div>
+        
+        <form id="resumeForm" class="space-y-4 sm:space-y-6">
+            <!-- Personal Information -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">person</span>
+                    <input type="text" value="Personal Information" name="personalTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    <!-- Mobile-optimized Profile Picture Upload -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Profile Picture</label>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <div class="relative flex-shrink-0">
+                                <img id="profilePreview" src="" alt="Profile Preview" 
+                                     class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-gray-200 hidden">
+                                <div id="profilePlaceholder" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span class="material-icons text-gray-400 text-2xl sm:text-3xl">person</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <label class="bg-primary text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base">
+                                    <span class="material-icons">camera_alt</span>
+                                    Upload Photo
+                                    <input type="file" id="profilePicture" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                </label>
+                                <button type="button" onclick="removeProfilePicture()" class="text-red-600 hover:text-red-800 text-sm flex items-center justify-center gap-1 px-4 py-2 border border-red-300 rounded-lg min-h-[44px]">
+                                    <span class="material-icons text-sm">delete</span>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="profileImageData" name="profileImageData">
+                    </div>
+
+                    <!-- Name Field -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="name" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+
+                    <!-- Contact Information - Responsive Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Location</label>
+                            <input type="text" id="location" name="location" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Website</label>
+                            <input type="url" id="website" name="website" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                    </div>
+
+                    <!-- Personal Details - Responsive Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Gender</label>
+                            <select id="gender" name="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2 sm:col-span-2 lg:col-span-1">
+                            <label class="block text-sm font-medium text-gray-700">Nationality</label>
+                            <input type="text" id="nationality" name="nationality" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">description</span>
+                    <input type="text" value="Profile" name="profileTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Professional Summary</label>
+                        <textarea id="profile" name="profile" rows="4" placeholder="Write a brief professional summary..." 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">work</span>
+                    <input type="text" value="Work Experience" name="experienceTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6 space-y-4">
+                    <div id="experienceContainer" class="space-y-4">
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative" data-section="experience">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Job Title</label>
+                                    <input type="text" name="jobTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Company</label>
+                                    <input type="text" name="company" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                                    <input type="text" name="startDate" placeholder="e.g., Jan 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">End Date</label>
+                                    <input type="text" name="endDate" placeholder="e.g., Present or Dec 2023" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea name="jobDescription" rows="3" placeholder="Describe your responsibilities and achievements..."
+                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 min-h-[44px] text-base" onclick="addExperience()">
+                        <span class="material-icons">add</span>
+                        Add Experience
+                    </button>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">school</span>
+                    <input type="text" value="Education" name="educationTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6 space-y-4">
+                    <div id="educationContainer" class="space-y-4">
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative" data-section="education">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Degree</label>
+                                    <input type="text" name="degree" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Institution</label>
+                                    <input type="text" name="institution" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Start Year</label>
+                                    <input type="text" name="eduStartYear" placeholder="e.g., 2017" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">End Year</label>
+                                    <input type="text" name="eduEndYear" placeholder="e.g., 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea name="eduDescription" rows="3" placeholder="Additional details about your education..."
+                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 min-h-[44px] text-base" onclick="addEducation()">
+                        <span class="material-icons">add</span>
+                        Add Education
+                    </button>
+                </div>
+            </div>
+
+            <!-- Qualifications -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">verified</span>
+                    <input type="text" value="Other Qualifications" name="qualificationTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6 space-y-4">
+                    <div id="qualificationContainer" class="space-y-4">
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative" data-section="qualification">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Qualification/Certificate</label>
+                                    <input type="text" name="qualification" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Issuer</label>
+                                    <input type="text" name="issuer" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                                <input type="text" name="issueDate" placeholder="e.g., Jun 2023" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 min-h-[44px] text-base" onclick="addQualification()">
+                        <span class="material-icons">add</span>
+                        Add Qualification
+                    </button>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">build</span>
+                    <input type="text" value="Skills" name="skillsTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Skills (separate with commas)</label>
+                        <div class="border border-gray-300 rounded-lg p-3 min-h-[48px] cursor-text focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent" onclick="focusTagInput('skillsInput')">
+                            <div class="flex flex-wrap gap-2 mb-2" id="skillsDisplay"></div>
+                            <input type="text" class="w-full border-none outline-none text-base" id="skillsInput" placeholder="Type skills separated by commas...">
+                        </div>
+                        <input type="hidden" id="skills" name="skills">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Languages -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">language</span>
+                    <input type="text" value="Languages" name="languagesTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Languages (separate with commas)</label>
+                        <div class="border border-gray-300 rounded-lg p-3 min-h-[48px] cursor-text focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent" onclick="focusTagInput('languagesInput')">
+                            <div class="flex flex-wrap gap-2 mb-2" id="languagesDisplay"></div>
+                            <input type="text" class="w-full border-none outline-none text-base" id="languagesInput" placeholder="Type languages separated by commas...">
+                        </div>
+                        <input type="hidden" id="languages" name="languages">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hobbies -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">interests</span>
+                    <input type="text" value="Hobbies & Interests" name="hobbiesTitle" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Hobbies & Interests (separate with commas)</label>
+                        <div class="border border-gray-300 rounded-lg p-3 min-h-[48px] cursor-text focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent" onclick="focusTagInput('hobbiesInput')">
+                            <div class="flex flex-wrap gap-2 mb-2" id="hobbiesDisplay"></div>
+                            <input type="text" class="w-full border-none outline-none text-base" id="hobbiesInput" placeholder="Type hobbies separated by commas...">
+                        </div>
+                        <input type="hidden" id="hobbies" name="hobbies">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Sections Container -->
+            <div id="customSectionsContainer" class="space-y-4 sm:space-y-6"></div>
+
+            <!-- Add Custom Section Button -->
+            <div class="text-center">
+                <button type="button" onclick="addCustomSection()" class="bg-primary text-white px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto min-h-[44px] text-base">
+                    <span class="material-icons">add_circle</span>
+                    Add Custom Section
+                </button>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-gradient-to-r from-primary to-blue-600 text-white py-4 px-8 rounded-lg text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[56px]"  onclick="saveToLocalStorage()">
+                <span class="material-icons">visibility</span>
+                Generate Resume
+            </button>
+        </form>
+    </div>
+
+    <script>
+        let customSectionCounter = 0;
+        let skillsTags = [], languagesTags = [], hobbiesTags = [];
+
+        // Profile picture handling
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profilePreview');
+                    const placeholder = document.getElementById('profilePlaceholder');
+                    const imageData = document.getElementById('profileImageData');
+                    
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    imageData.value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeProfilePicture() {
+            const preview = document.getElementById('profilePreview');
+            const placeholder = document.getElementById('profilePlaceholder');
+            const imageData = document.getElementById('profileImageData');
+            const fileInput = document.getElementById('profilePicture');
+            
+            preview.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+            imageData.value = '';
+            fileInput.value = '';
+        }
+
+        // Custom section management
+        function addCustomSection() {
+            customSectionCounter++;
+            const container = document.getElementById('customSectionsContainer');
+            const section = document.createElement('div');
+            section.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+            section.id = `customSection_${customSectionCounter}`;
+            
+            section.innerHTML = `
+                <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex items-center gap-3">
+                    <span class="material-icons text-primary text-xl sm:text-2xl">add_circle</span>
+                    <input type="text" value="Custom Section ${customSectionCounter}" name="customTitle_${customSectionCounter}" placeholder="Section Title" 
+                           class="text-lg sm:text-xl font-medium text-primary bg-transparent border-none outline-none flex-1 min-h-[44px]">
+                    <button type="button" onclick="removeCustomSection(${customSectionCounter})" class="text-red-500 hover:text-red-700 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </div>
+                <div class="p-4 sm:p-6 space-y-4">
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">Section Type</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button type="button" onclick="selectCustomType(${customSectionCounter}, 'tags')" 
+                                    class="custom-type-btn border-2 border-gray-200 rounded-lg p-4 text-center hover:border-primary transition-colors min-h-[80px] flex flex-col items-center justify-center gap-2" data-type="tags">
+                                <span class="material-icons text-primary text-2xl">local_offer</span>
+                                <span class="text-sm">Tags</span>
+                            </button>
+                            <button type="button" onclick="selectCustomType(${customSectionCounter}, 'paragraph')" 
+                                    class="custom-type-btn border-2 border-gray-200 rounded-lg p-4 text-center hover:border-primary transition-colors min-h-[80px] flex flex-col items-center justify-center gap-2" data-type="paragraph">
+                                <span class="material-icons text-primary text-2xl">article</span>
+                                <span class="text-sm">Paragraph</span>
+                            </button>
+                            <button type="button" onclick="selectCustomType(${customSectionCounter}, 'timeline')" 
+                                    class="custom-type-btn border-2 border-gray-200 rounded-lg p-4 text-center hover:border-primary transition-colors min-h-[80px] flex flex-col items-center justify-center gap-2" data-type="timeline">
+                                <span class="material-icons text-primary text-2xl">timeline</span>
+                                <span class="text-sm">Timeline</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tags Type -->
+                    <div id="customTags_${customSectionCounter}" class="custom-fields hidden space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Content (separate with commas)</label>
+                        <div class="border border-gray-300 rounded-lg p-3 min-h-[48px] cursor-text focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent" onclick="focusTagInput('customTagsInput_${customSectionCounter}')">
+                            <div class="flex flex-wrap gap-2 mb-2" id="customTagsDisplay_${customSectionCounter}"></div>
+                            <input type="text" class="w-full border-none outline-none text-base" id="customTagsInput_${customSectionCounter}" placeholder="Type items separated by commas...">
+                        </div>
+                        <input type="hidden" id="customTagsData_${customSectionCounter}" name="customTagsData_${customSectionCounter}">
+                    </div>
+
+                    <!-- Paragraph Type -->
+                    <div id="customParagraph_${customSectionCounter}" class="custom-fields hidden space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Content</label>
+                        <textarea name="customParagraphData_${customSectionCounter}" rows="4" placeholder="Write your content here..."
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                    </div>
+
+                    <!-- Timeline Type -->
+                    <div id="customTimeline_${customSectionCounter}" class="custom-fields hidden space-y-4">
+                        <div id="customTimelineContainer_${customSectionCounter}" class="space-y-4">
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative" data-section="customTimeline_${customSectionCounter}">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                                        <input type="text" name="customTimelineTitle_${customSectionCounter}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-gray-700">Subtitle</label>
+                                        <input type="text" name="customTimelineSubtitle_${customSectionCounter}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                                        <input type="text" name="customTimelineStart_${customSectionCounter}" placeholder="e.g., Jan 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                                        <input type="text" name="customTimelineEnd_${customSectionCounter}" placeholder="e.g., Present" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea name="customTimelineDescription_${customSectionCounter}" rows="3" placeholder="Describe the details..."
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 min-h-[44px] text-base" onclick="addCustomTimelineItem(${customSectionCounter})">
+                            <span class="material-icons">add</span>
+                            Add Timeline Item
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="customSectionType_${customSectionCounter}" name="customSectionType_${customSectionCounter}">
+                </div>
+            `;
+            
+            container.appendChild(section);
+            
+            // Initialize tag input for this custom section
+            initCustomTagInput(customSectionCounter);
+        }
+
+        function removeCustomSection(sectionId) {
+            const section = document.getElementById(`customSection_${sectionId}`);
+            if (section) {
+                section.remove();
+            }
+        }
+
+        function selectCustomType(sectionId, type) {
+            const section = document.getElementById(`customSection_${sectionId}`);
+            const buttons = section.querySelectorAll('.custom-type-btn');
+            const fields = section.querySelectorAll('.custom-fields');
+            
+            buttons.forEach(btn => btn.classList.remove('border-primary', 'bg-primary-light'));
+            fields.forEach(field => field.classList.add('hidden'));
+            
+            const selectedBtn = section.querySelector(`[data-type="${type}"]`);
+            selectedBtn.classList.add('border-primary', 'bg-primary-light');
+            
+            document.getElementById(`custom${type.charAt(0).toUpperCase() + type.slice(1)}_${sectionId}`).classList.remove('hidden');
+            document.getElementById(`customSectionType_${sectionId}`).value = type;
+        }
+
+        function addCustomTimelineItem(sectionId) {
+            const container = document.getElementById(`customTimelineContainer_${sectionId}`);
+            const item = document.createElement('div');
+            item.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative';
+            item.setAttribute('data-section', `customTimeline_${sectionId}`);
+            
+            item.innerHTML = `
+                <button type="button" onclick="removeTimelineItem(this)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                    <span class="material-icons">close</span>
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="customTimelineTitle_${sectionId}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Subtitle</label>
+                        <input type="text" name="customTimelineSubtitle_${sectionId}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="text" name="customTimelineStart_${sectionId}" placeholder="e.g., Jan 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input type="text" name="customTimelineEnd_${sectionId}" placeholder="e.g., Present" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="customTimelineDescription_${sectionId}" rows="3" placeholder="Describe the details..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        }
+
+        function removeTimelineItem(button) {
+            button.parentElement.remove();
+        }
+
+        // Dynamic sections for main sections
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const item = createExperienceItem();
+            container.appendChild(item);
+        }
+
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const item = createEducationItem();
+            container.appendChild(item);
+        }
+
+        function addQualification() {
+            const container = document.getElementById('qualificationContainer');
+            const item = createQualificationItem();
+            container.appendChild(item);
+        }
+
+        function createExperienceItem() {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative';
+            div.setAttribute('data-section', 'experience');
+            div.innerHTML = `
+                <button type="button" onclick="removeSection(this)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                    <span class="material-icons">close</span>
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Job Title</label>
+                        <input type="text" name="jobTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Company</label>
+                        <input type="text" name="company" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="text" name="startDate" placeholder="e.g., Jan 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input type="text" name="endDate" placeholder="e.g., Present or Dec 2023" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="jobDescription" rows="3" placeholder="Describe your responsibilities and achievements..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                </div>
+            `;
+            return div;
+        }
+
+        function createEducationItem() {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative';
+            div.setAttribute('data-section', 'education');
+            div.innerHTML = `
+                <button type="button" onclick="removeSection(this)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                    <span class="material-icons">close</span>
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Degree</label>
+                        <input type="text" name="degree" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Institution</label>
+                        <input type="text" name="institution" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Start Year</label>
+                        <input type="text" name="eduStartYear" placeholder="e.g., 2017" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">End Year</label>
+                        <input type="text" name="eduEndYear" placeholder="e.g., 2021" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="eduDescription" rows="3" placeholder="Additional details about your education..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical text-base"></textarea>
+                </div>
+            `;
+            return div;
+        }
+
+        function createQualificationItem() {
+            const div = document.createElement('div');
+            div.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-5 relative';
+            div.setAttribute('data-section', 'qualification');
+            div.innerHTML = `
+                <button type="button" onclick="removeSection(this)" class="absolute top-3 right-3 text-red-500 hover:text-red-700 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                    <span class="material-icons">close</span>
+                </button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Qualification/Certificate</label>
+                        <input type="text" name="qualification" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Issuer</label>
+                        <input type="text" name="issuer" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Date Issued</label>
+                    <input type="text" name="issueDate" placeholder="e.g., Jun 2023" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-base min-h-[44px]">
+                </div>
+            `;
+            return div;
+        }
+
+        function removeSection(button) {
+            button.parentElement.remove();
+        }
+
+        // Tag management
+        function initTagInput(inputId, displayId, hiddenId, tagsArray) {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            const hidden = document.getElementById(hiddenId);
+
+            input.addEventListener('input', function(e) {
+                const value = e.target.value;
+                if (value.includes(',')) {
+                    const newTags = value.split(',').map(tag => tag.trim()).filter(tag => tag && !tagsArray.includes(tag));
+                    tagsArray.push(...newTags);
+                    updateTagDisplay(display, tagsArray, inputId, displayId, hiddenId);
+                    input.value = '';
+                }
+            });
+
+            input.addEventListener('blur', function(e) {
+                const value = e.target.value.trim();
+                if (value && !tagsArray.includes(value)) {
+                    tagsArray.push(value);
+                    updateTagDisplay(display, tagsArray, inputId, displayId, hiddenId);
+                    input.value = '';
+                }
+            });
+        }
+
+        function initCustomTagInput(sectionId) {
+            const inputId = `customTagsInput_${sectionId}`;
+            const displayId = `customTagsDisplay_${sectionId}`;
+            const hiddenId = `customTagsData_${sectionId}`;
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            const hidden = document.getElementById(hiddenId);
+            let customTags = [];
+
+            input.addEventListener('input', function(e) {
+                const value = e.target.value;
+                if (value.includes(',')) {
+                    const newTags = value.split(',').map(tag => tag.trim()).filter(tag => tag && !customTags.includes(tag));
+                    customTags.push(...newTags);
+                    updateTagDisplay(display, customTags, inputId, displayId, hiddenId);
+                    input.value = '';
+                }
+            });
+
+            input.addEventListener('blur', function(e) {
+                const value = e.target.value.trim();
+                if (value && !customTags.includes(value)) {
+                    customTags.push(value);
+                    updateTagDisplay(display, customTags, inputId, displayId, hiddenId);
+                    input.value = '';
+                }
+            });
+        }
+
+        function updateTagDisplay(display, tagsArray, inputId, displayId, hiddenId) {
+            display.innerHTML = '';
+            tagsArray.forEach(tag => {
+                const chip = document.createElement('div');
+                chip.className = 'bg-primary-light text-primary px-3 py-1 rounded-full text-sm flex items-center gap-2 flex-shrink-0';
+                chip.innerHTML = `
+                    <span>${tag}</span>
+                    <button type="button" onclick="removeTag('${tag}', '${inputId}', '${displayId}', '${hiddenId}')" class="text-primary hover:text-red-600 min-h-[20px] min-w-[20px] flex items-center justify-center">
+                        &times;
+                    </button>
+                `;
+                display.appendChild(chip);
+            });
+            document.getElementById(hiddenId).value = JSON.stringify(tagsArray);
+        }
+
+        function removeTag(tagToRemove, inputId, displayId, hiddenId) {
+            let tagsArray;
+            if (inputId === 'skillsInput') tagsArray = skillsTags;
+            else if (inputId === 'languagesInput') tagsArray = languagesTags;
+            else if (inputId === 'hobbiesInput') tagsArray = hobbiesTags;
+            else {
+                // Custom tag handling
+                const currentTags = JSON.parse(document.getElementById(hiddenId).value || '[]');
+                const updatedTags = currentTags.filter(tag => tag !== tagToRemove);
+                document.getElementById(hiddenId).value = JSON.stringify(updatedTags);
+                updateTagDisplay(document.getElementById(displayId), updatedTags, inputId, displayId, hiddenId);
+                return;
+            }
+            
+            const index = tagsArray.indexOf(tagToRemove);
+            if (index > -1) {
+                tagsArray.splice(index, 1);
+                updateTagDisplay(document.getElementById(displayId), tagsArray, inputId, displayId, hiddenId);
+            }
+        }
+
+        function focusTagInput(inputId) {
+            document.getElementById(inputId).focus();
+        }
+
+        // Local storage functions
+        function saveToLocalStorage() {
+            const data = collectFormData();
+            localStorage.setItem('resumeBuilderData', JSON.stringify(data));
+            alert('Data saved to local storage successfully!');
+        }
+
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('resumeBuilderData');
+            if (data) {
+                populateForm(JSON.parse(data));
+                alert('Data loaded from local storage successfully!');
+            } else {
+                alert('No saved data found in local storage.');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                localStorage.removeItem('resumeBuilderData');
+                document.getElementById('resumeForm').reset();
+                // Clear custom sections
+                document.getElementById('customSectionsContainer').innerHTML = '';
+                customSectionCounter = 0;
+                // Clear profile picture
+                removeProfilePicture();
+                // Clear tags
+                skillsTags = [];
+                languagesTags = [];
+                hobbiesTags = [];
+                updateTagDisplay(document.getElementById('skillsDisplay'), skillsTags, 'skillsInput', 'skillsDisplay', 'skills');
+                updateTagDisplay(document.getElementById('languagesDisplay'), languagesTags, 'languagesInput', 'languagesDisplay', 'languages');
+                updateTagDisplay(document.getElementById('hobbiesDisplay'), hobbiesTags, 'hobbiesInput', 'hobbiesDisplay', 'hobbies');
+                alert('All data cleared successfully!');
+            }
+        }
+
+        // JSON export/import functions
+        function exportToJSON() {
+            const data = collectFormData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resume_data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importFromJSON(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        populateForm(data);
+                        alert('JSON data imported successfully!');
+                    } catch (error) {
+                        alert('Error importing JSON file. Please check the format.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function collectFormData() {
+            const formData = new FormData(document.getElementById('resumeForm'));
+            const data = { customSections: [] };
+            
+            // Basic form data
+            for (let [key, value] of formData.entries()) {
+                if (value.trim()) {
+                    data[key] = value;
+                }
+            }
+            
+            // Collect experience data
+            data.experience = collectSectionData('experience', ['jobTitle', 'company', 'startDate', 'endDate', 'jobDescription']);
+            
+            // Collect education data
+            data.education = collectSectionData('education', ['degree', 'institution', 'eduStartYear', 'eduEndYear', 'eduDescription']);
+            
+            // Collect qualification data
+            data.qualifications = collectSectionData('qualification', ['qualification', 'issuer', 'issueDate']);
+            
+            // Parse tags
+            data.skills = JSON.parse(data.skills || '[]');
+            data.languages = JSON.parse(data.languages || '[]');
+            data.hobbies = JSON.parse(data.hobbies || '[]');
+            
+            // Collect custom sections
+            for (let i = 1; i <= customSectionCounter; i++) {
+                const sectionElement = document.getElementById(`customSection_${i}`);
+                if (sectionElement) {
+                    const customSection = {
+                        id: i,
+                        title: document.querySelector(`[name="customTitle_${i}"]`)?.value || '',
+                        type: document.querySelector(`[name="customSectionType_${i}"]`)?.value || ''
+                    };
+                    
+                    if (customSection.type === 'tags') {
+                        customSection.data = JSON.parse(document.querySelector(`[name="customTagsData_${i}"]`)?.value || '[]');
+                    } else if (customSection.type === 'paragraph') {
+                        customSection.data = document.querySelector(`[name="customParagraphData_${i}"]`)?.value || '';
+                    } else if (customSection.type === 'timeline') {
+                        customSection.data = collectCustomTimelineData(i);
+                    }
+                    
+                    if (customSection.title && customSection.type) {
+                        data.customSections.push(customSection);
+                    }
+                }
+            }
+            
+            return data;
+        }
+
+        function collectSectionData(sectionType, fields) {
+            const sections = document.querySelectorAll(`[data-section="${sectionType}"]`);
+            const result = [];
+            
+            sections.forEach(section => {
+                const item = {};
+                let hasData = false;
+                
+                fields.forEach(field => {
+                    const input = section.querySelector(`[name="${field}"]`);
+                    if (input && input.value.trim()) {
+                        item[field] = input.value.trim();
+                        hasData = true;
+                    }
+                });
+                
+                if (hasData) {
+                    result.push(item);
+                }
+            });
+            
+            return result;
+        }
+
+        function collectCustomTimelineData(sectionId) {
+            const sections = document.querySelectorAll(`[data-section="customTimeline_${sectionId}"]`);
+            const result = [];
+            
+            sections.forEach(section => {
+                const item = {
+                    title: section.querySelector(`[name="customTimelineTitle_${sectionId}"]`)?.value || '',
+                    subtitle: section.querySelector(`[name="customTimelineSubtitle_${sectionId}"]`)?.value || '',
+                    startDate: section.querySelector(`[name="customTimelineStart_${sectionId}"]`)?.value || '',
+                    endDate: section.querySelector(`[name="customTimelineEnd_${sectionId}"]`)?.value || '',
+                    description: section.querySelector(`[name="customTimelineDescription_${sectionId}"]`)?.value || ''
+                };
+                
+                if (item.title || item.subtitle) {
+                    result.push(item);
+                }
+            });
+            
+            return result;
+        }
+
+        function populateForm(data) {
+            // Clear existing form
+            document.getElementById('resumeForm').reset();
+            document.getElementById('customSectionsContainer').innerHTML = '';
+            customSectionCounter = 0;
+            
+            // Populate basic fields
+            Object.keys(data).forEach(key => {
+                const input = document.querySelector(`[name="${key}"]`);
+                if (input && typeof data[key] === 'string') {
+                    input.value = data[key];
+                }
+            });
+            
+            // Handle profile image
+            if (data.profileImageData) {
+                const preview = document.getElementById('profilePreview');
+                const placeholder = document.getElementById('profilePlaceholder');
+                const imageData = document.getElementById('profileImageData');
+                
+                preview.src = data.profileImageData;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                imageData.value = data.profileImageData;
+            }
+            
+            // Populate tags
+            if (data.skills) {
+                skillsTags = data.skills;
+                updateTagDisplay(document.getElementById('skillsDisplay'), skillsTags, 'skillsInput', 'skillsDisplay', 'skills');
+            }
+            if (data.languages) {
+                languagesTags = data.languages;
+                updateTagDisplay(document.getElementById('languagesDisplay'), languagesTags, 'languagesInput', 'languagesDisplay', 'languages');
+            }
+            if (data.hobbies) {
+                hobbiesTags = data.hobbies;
+                updateTagDisplay(document.getElementById('hobbiesDisplay'), hobbiesTags, 'hobbiesInput', 'hobbiesDisplay', 'hobbies');
+            }
+            
+            // Populate experience
+            if (data.experience) {
+                populateDynamicSection('experienceContainer', data.experience, createExperienceItem, ['jobTitle', 'company', 'startDate', 'endDate', 'jobDescription']);
+            }
+            
+            // Populate education
+            if (data.education) {
+                populateDynamicSection('educationContainer', data.education, createEducationItem, ['degree', 'institution', 'eduStartYear', 'eduEndYear', 'eduDescription']);
+            }
+            
+            // Populate qualifications
+            if (data.qualifications) {
+                populateDynamicSection('qualificationContainer', data.qualifications, createQualificationItem, ['qualification', 'issuer', 'issueDate']);
+            }
+            
+            // Populate custom sections
+            if (data.customSections) {
+                data.customSections.forEach(section => {
+                    addCustomSection();
+                    const sectionElement = document.getElementById(`customSection_${customSectionCounter}`);
+                    sectionElement.querySelector(`[name="customTitle_${customSectionCounter}"]`).value = section.title;
+                    selectCustomType(customSectionCounter, section.type);
+                    
+                    if (section.type === 'tags' && Array.isArray(section.data)) {
+                        const hiddenInput = document.getElementById(`customTagsData_${customSectionCounter}`);
+                        const display = document.getElementById(`customTagsDisplay_${customSectionCounter}`);
+                        hiddenInput.value = JSON.stringify(section.data);
+                        updateTagDisplay(display, section.data, `customTagsInput_${customSectionCounter}`, `customTagsDisplay_${customSectionCounter}`, `customTagsData_${customSectionCounter}`);
+                    } else if (section.type === 'paragraph' && typeof section.data === 'string') {
+                        document.querySelector(`[name="customParagraphData_${customSectionCounter}"]`).value = section.data;
+                    } else if (section.type === 'timeline' && Array.isArray(section.data)) {
+                        populateCustomTimeline(customSectionCounter, section.data);
+                    }
+                });
+            }
+        }
+
+        function populateDynamicSection(containerId, dataArray, createFunction, fields) {
+            const container = document.getElementById(containerId);
+            // Clear existing items except the first one
+            const items = container.querySelectorAll('[data-section]');
+            for (let i = 1; i < items.length; i++) {
+                items[i].remove();
+            }
+            
+            dataArray.forEach((item, index) => {
+                let sectionElement;
+                if (index === 0) {
+                    sectionElement = container.querySelector('[data-section]');
+                } else {
+                    sectionElement = createFunction();
+                    container.appendChild(sectionElement);
+                }
+                
+                fields.forEach(field => {
+                    const input = sectionElement.querySelector(`[name="${field}"]`);
+                    if (input && item[field]) {
+                        input.value = item[field];
+                    }
+                });
+            });
+        }
+
+        function populateCustomTimeline(sectionId, timelineData) {
+            const container = document.getElementById(`customTimelineContainer_${sectionId}`);
+            // Clear existing items except the first one
+            const items = container.querySelectorAll('[data-section]');
+            for (let i = 1; i < items.length; i++) {
+                items[i].remove();
+            }
+            
+            timelineData.forEach((item, index) => {
+                let timelineElement;
+                if (index === 0) {
+                    timelineElement = container.querySelector('[data-section]');
+                } else {
+                    addCustomTimelineItem(sectionId);
+                    timelineElement = container.lastElementChild;
+                }
+                
+                const fields = ['customTimelineTitle', 'customTimelineSubtitle', 'customTimelineStart', 'customTimelineEnd', 'customTimelineDescription'];
+                fields.forEach(field => {
+                    const input = timelineElement.querySelector(`[name="${field}_${sectionId}"]`);
+                    const dataKey = field.replace(`_${sectionId}`, '').replace('customTimeline', '').toLowerCase();
+                    const actualKey = dataKey === 'start' ? 'startDate' : dataKey === 'end' ? 'endDate' : dataKey;
+                    if (input && item[actualKey]) {
+                        input.value = item[actualKey];
+                    }
+                });
+            });
+        }
+
+        // Initialize tag inputs
+        initTagInput('skillsInput', 'skillsDisplay', 'skills', skillsTags);
+        initTagInput('languagesInput', 'languagesDisplay', 'languages', languagesTags);
+        initTagInput('hobbiesInput', 'hobbiesDisplay', 'hobbies', hobbiesTags);
+
+        // Form submission
+        document.getElementById('resumeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const data = collectFormData();
+            localStorage.setItem('resumeData', JSON.stringify(data));
+            window.open('preview.html', '_blank');
+        });
+
+        // Load data on page load
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('resumeBuilderData');
+            if (savedData) {
+                try {
+                    populateForm(JSON.parse(savedData));
+                } catch (error) {
+                    console.error('Error loading saved data:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
