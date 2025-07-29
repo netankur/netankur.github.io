@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Cipher - Material Design</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                        'roboto-mono': ['Roboto Mono', 'monospace'],
+                    },
+                    colors: {
+                        'material': {
+                            'primary': '#bb86fc',
+                            'primary-variant': '#3700b3',
+                            'secondary': '#03dac6',
+                            'surface': '#121212',
+                            'surface-variant': '#1e1e1e',
+                            'surface-container': '#2d2d2d',
+                            'on-surface': '#e0e0e0',
+                            'on-surface-variant': '#b0b0b0',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-gentle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-roboto bg-gray-900 text-gray-100 min-h-screen transition-colors duration-300">
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="fixed top-4 right-4 z-50 p-2 hover:bg-gray-800 transition-all duration-200">
+        <span class="material-icons text-material-primary text-lg">dark_mode</span>
+    </button>
+
+    <!-- Main Container -->
+    <div class="max-w-3xl mx-auto px-4 py-6 animate-fade-in">
+        <!-- Header Section -->
+        <header class="border-b border-gray-700 pb-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="p-1.5 bg-material-primary/20 border border-material-primary/30">
+                        <span class="material-icons text-material-primary text-xl">security</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-light text-white">URL Cipher</h1>
+                        <p class="text-xs text-material-on-surface-variant">Secure URL encryption & decryption</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="px-2 py-0.5 bg-material-primary/10 border border-material-primary/30 text-material-primary text-xs font-medium">
+                        v2.1 Simple
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Input Section -->
+        <section class="mb-8">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h2 class="text-lg font-medium text-white">Input Data</h2>
+                    <p class="text-xs text-material-on-surface-variant">Enter your URL or encrypted text</p>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-material-on-surface-variant">
+                    <span class="material-icons text-sm" id="inputStatus">help_outline</span>
+                    <span id="inputStatusText">Enter your data</span>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="urlInput" 
+                    class="w-full bg-transparent border-b border-gray-600 py-2 px-0 text-material-on-surface font-roboto-mono text-sm placeholder-gray-500 focus:outline-none focus:border-material-primary transition-all duration-200"
+                    placeholder="https://example.com or ENC_..."
+                />
+                <button 
+                    id="clearInput" 
+                    class="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-800 transition-colors duration-200 opacity-0"
+                >
+                    <span class="material-icons text-gray-400 text-sm">close</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Action Section -->
+        <section class="mb-8">
+            <h2 class="text-lg font-medium text-white mb-3">Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button 
+                    id="encryptBtn" 
+                    class="group flex items-center space-x-3 p-3 border border-material-primary/30 hover:border-material-primary hover:bg-material-primary/5 transition-all duration-200"
+                    onclick="encryptURL()"
+                >
+                    <div class="p-2 bg-material-primary/20 group-hover:bg-material-primary/30 transition-colors duration-200">
+                        <span class="material-icons text-material-primary text-lg">lock</span>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-sm font-medium text-white">Encrypt URL</h3>
+                        <p class="text-xs text-material-on-surface-variant">Convert to encrypted format</p>
+                    </div>
+                </button>
+                
+                <button 
+                    id="decryptBtn" 
+                    class="group flex items-center space-x-3 p-3 border border-material-secondary/30 hover:border-material-secondary hover:bg-material-secondary/5 transition-all duration-200"
+                    onclick="decryptURL()"
+                >
+                    <div class="p-2 bg-material-secondary/20 group-hover:bg-material-secondary/30 transition-colors duration-200">
+                        <span class="material-icons text-material-secondary text-lg">lock_open</span>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-sm font-medium text-white">Decrypt Text</h3>
+                        <p class="text-xs text-material-on-surface-variant">Restore to original URL</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section id="resultSection" class="hidden border-t border-gray-700 pt-4 mb-8 animate-slide-up">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h2 class="text-lg font-medium text-white">Result</h2>
+                    <p class="text-xs text-material-on-surface-variant">Your processed data</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="resultLength" class="text-xs text-gray-500"></span>
+                    <div class="flex items-center space-x-1">
+                        <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse-gentle"></div>
+                        <span class="text-xs text-green-400">Ready</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <textarea 
+                    id="resultArea" 
+                    readonly 
+                    class="w-full bg-transparent border border-gray-600 p-3 text-material-on-surface font-roboto-mono text-xs resize-none h-20 focus:outline-none focus:border-material-primary transition-colors duration-200"
+                    placeholder="Result will appear here..."
+                ></textarea>
+            </div>
+
+            <!-- Decryption Info -->
+            <div id="decryptionInfo" class="hidden mb-3 p-2 bg-material-secondary/10 border border-material-secondary/30 text-xs">
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-material-secondary text-sm">info</span>
+                    <span id="decryptionDetails" class="text-material-secondary"></span>
+                </div>
+            </div>
+
+            <!-- Result Actions -->
+            <div class="flex flex-wrap gap-2">
+                <button 
+                    class="flex items-center space-x-1 px-3 py-1.5 border border-gray-600 hover:border-gray-500 hover:bg-gray-800 text-material-on-surface text-xs transition-all duration-200"
+                    onclick="copyResult()"
+                >
+                    <span class="material-icons text-sm">content_copy</span>
+                    <span>Copy</span>
+                </button>
+                
+                <button 
+                    id="openUrlBtn" 
+                    class="hidden flex items-center space-x-1 px-3 py-1.5 border border-material-primary/50 hover:border-material-primary hover:bg-material-primary/5 text-material-primary text-xs transition-all duration-200"
+                    onclick="openURL()"
+                >
+                    <span class="material-icons text-sm">open_in_new</span>
+                    <span>Open</span>
+                </button>
+                
+                <div class="relative">
+                    <button 
+                        class="flex items-center space-x-1 px-3 py-1.5 border border-gray-600 hover:border-gray-500 hover:bg-gray-800 text-material-on-surface text-xs transition-all duration-200"
+                        onclick="toggleShareMenu()"
+                    >
+                        <span class="material-icons text-sm">share</span>
+                        <span>Share</span>
+                    </button>
+                    
+                    <div id="shareDropdown" class="hidden absolute bottom-full left-0 mb-1 bg-gray-800 border border-gray-600 min-w-40 z-10">
+                        <div class="p-1 space-y-0.5">
+                            <button onclick="shareVia('copy')" class="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-700 text-xs transition-colors duration-200">
+                                <span class="material-icons text-sm">link</span>
+                                <span>Copy Link</span>
+                            </button>
+                            <button onclick="shareVia('email')" class="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-700 text-xs transition-colors duration-200">
+                                <span class="material-icons text-sm">email</span>
+                                <span>Email</span>
+                            </button>
+                            <button onclick="shareVia('qr')" class="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-700 text-xs transition-colors duration-200">
+                                <span class="material-icons text-sm">qr_code</span>
+                                <span>QR Code</span>
+                            </button>
+                            <button id="nativeShareBtn" onclick="shareVia('native')" class="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-700 text-xs transition-colors duration-200">
+                                <span class="material-icons text-sm">mobile_screen_share</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button 
+                    class="flex items-center space-x-1 px-3 py-1.5 border border-red-600/50 hover:border-red-500 hover:bg-red-600/10 text-red-400 text-xs transition-all duration-200"
+                    onclick="clearAll()"
+                >
+                    <span class="material-icons text-sm">clear</span>
+                    <span>Clear</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section class="border-t border-gray-700 pt-4 mb-8">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h2 class="text-lg font-medium text-white">Recent Operations</h2>
+                    <p class="text-xs text-material-on-surface-variant">Your encryption/decryption history</p>
+                </div>
+                <button onclick="clearHistory()" class="text-xs text-gray-500 hover:text-gray-400 transition-colors duration-200 underline">
+                    Clear History
+                </button>
+            </div>
+            <div id="historyList" class="space-y-1">
+                <p class="text-xs text-gray-500 py-4 text-center border border-gray-700 border-dashed">No recent operations</p>
+            </div>
+        </section>
+
+        <!-- Algorithm Info Section -->
+        <section class="border-t-2 border-material-primary/20 pt-4">
+            <div class="flex items-start space-x-3">
+                <span class="material-icons text-material-primary text-lg">info</span>
+                <div>
+                    <h3 class="text-sm font-medium text-white mb-1">Encryption Algorithm</h3>
+                    <p class="text-xs text-material-on-surface-variant leading-relaxed">
+                        Multi-layer encryption using Caesar cipher (shift +7) → String reversal → Base64 encoding → Custom wrapper format. 
+                        Includes automatic key detection for reliable decryption.
+                    </p>
+                    <div class="flex items-center space-x-3 mt-2 text-xs text-gray-500">
+                        <span>• Caesar cipher encryption</span>
+                        <span>• Auto-key detection</span>
+                        <span>• Instant processing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 border border-gray-600 text-material-on-surface px-4 py-2 z-50 hidden animate-slide-up">
+        <div class="flex items-center space-x-2">
+            <span id="toastIcon" class="material-icons text-sm"></span>
+            <span id="toastMessage" class="text-xs font-medium"></span>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 border border-gray-600 p-6 max-w-xs w-full mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-white">QR Code</h3>
+                <button onclick="closeQRModal()" class="p-1 hover:bg-gray-700 transition-colors duration-200">
+                    <span class="material-icons text-gray-400 text-sm">close</span>
+                </button>
+            </div>
+            <div id="qrCode" class="flex justify-center bg-white p-3 mb-3"></div>
+            <p class="text-xs text-material-on-surface-variant text-center">Scan to access the URL</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        // Fixed default values (no user customization)
+        const ENCRYPTION_KEY = 7;
+        const OUTPUT_FORMAT = 'standard';
+        const ADD_TIMESTAMP = false;
+        const AUTO_DETECTION = true;
+        
+        let operationHistory = [];
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            themeToggle.querySelector('.material-icons').textContent = isDark ? 'light_mode' : 'dark_mode';
+            localStorage.setItem('darkMode', isDark);
+        });
+
+        // Load theme preference
+        if (localStorage.getItem('darkMode') === 'false') {
+            html.classList.remove('dark');
+            themeToggle.querySelector('.material-icons').textContent = 'dark_mode';
+        }
+
+        // Input validation and status updates
+        const urlInput = document.getElementById('urlInput');
+        const inputStatus = document.getElementById('inputStatus');
+        const inputStatusText = document.getElementById('inputStatusText');
+        const clearInputBtn = document.getElementById('clearInput');
+
+        urlInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            clearInputBtn.classList.toggle('opacity-0', !value);
+            
+            if (!value) {
+                updateInputStatus('help_outline', 'Enter your data', 'text-gray-400');
+                return;
+            }
+
+            if (value.startsWith('ENC_') && value.endsWith('_END')) {
+                updateInputStatus('lock', 'Encrypted text detected', 'text-material-secondary');
+                e.target.classList.add('border-material-secondary');
+                e.target.classList.remove('border-material-primary');
+            } else if (isValidURL(value)) {
+                updateInputStatus('link', 'Valid URL detected', 'text-material-primary');
+                e.target.classList.add('border-material-primary');
+                e.target.classList.remove('border-material-secondary');
+            } else if (isBase64(value)) {
+                updateInputStatus('lock', 'Possible encrypted text', 'text-yellow-400');
+                e.target.classList.add('border-yellow-400');
+                e.target.classList.remove('border-material-primary', 'border-material-secondary');
+            } else {
+                updateInputStatus('warning', 'Unknown format', 'text-yellow-400');
+                e.target.classList.remove('border-material-primary', 'border-material-secondary', 'border-yellow-400');
+            }
+        });
+
+        clearInputBtn.addEventListener('click', () => {
+            urlInput.value = '';
+            urlInput.focus();
+            clearInputBtn.classList.add('opacity-0');
+            updateInputStatus('help_outline', 'Enter your data', 'text-gray-400');
+        });
+
+        function updateInputStatus(icon, text, colorClass) {
+            inputStatus.textContent = icon;
+            inputStatusText.textContent = text;
+            inputStatus.className = `material-icons text-sm ${colorClass}`;
+        }
+
+        function isBase64(str) {
+            try {
+                return btoa(atob(str)) === str;
+            } catch(err) {
+                return false;
+            }
+        }
+
+        // SIMPLIFIED ENCRYPTION FUNCTION (fixed parameters)
+        function customEncrypt(text) {
+            try {
+                // Caesar cipher shift
+                let shifted = '';
+                for (let i = 0; i < text.length; i++) {
+                    shifted += String.fromCharCode(text.charCodeAt(i) + ENCRYPTION_KEY);
+                }
+                
+                // String reversal
+                const reversed = shifted.split('').reverse().join('');
+                
+                // Base64 encoding
+                const encoded = btoa(reversed);
+                
+                // Standard format with wrapper
+                return `ENC_${encoded}_END`;
+            } catch (error) {
+                throw new Error('Encryption failed: ' + error.message);
+            }
+        }
+        
+        // SIMPLIFIED DECRYPTION FUNCTION (with auto-detection)
+        function customDecrypt(encryptedText) {
+            // Try direct decryption first
+            try {
+                const result = attemptDecryption(encryptedText, ENCRYPTION_KEY);
+                showDecryptionInfo(`Decrypted successfully with key ${ENCRYPTION_KEY}`);
+                return result;
+            } catch (error) {
+                if (!AUTO_DETECTION) {
+                    throw error;
+                }
+            }
+
+            // Auto-detection: try different keys
+            if (AUTO_DETECTION) {
+                for (let testKey = 1; testKey <= 25; testKey++) {
+                    if (testKey === ENCRYPTION_KEY) continue; // Already tried
+                    
+                    try {
+                        const result = attemptDecryption(encryptedText, testKey);
+                        showDecryptionInfo(`Auto-detected encryption key: ${testKey}`);
+                        return result;
+                    } catch (error) {
+                        continue;
+                    }
+                }
+            }
+
+            throw new Error('Decryption failed: Unable to decrypt with any key (1-25)');
+        }
+
+        function attemptDecryption(encryptedText, key) {
+            let cleanText = encryptedText.trim();
+            
+            // Remove wrapper if present
+            if (cleanText.startsWith('ENC_') && cleanText.endsWith('_END')) {
+                cleanText = cleanText.slice(4, -4);
+            }
+            
+            // Handle URL-safe format
+            cleanText = cleanText.replace(/-/g, '+').replace(/_/g, '/');
+            
+            // Add Base64 padding if needed
+            while (cleanText.length % 4) {
+                cleanText += '=';
+            }
+            
+            // Base64 decode
+            const decoded = atob(cleanText);
+            
+            // Reverse string
+            const unreversed = decoded.split('').reverse().join('');
+            
+            // Caesar cipher decrypt
+            let original = '';
+            for (let i = 0; i < unreversed.length; i++) {
+                original += String.fromCharCode(unreversed.charCodeAt(i) - key);
+            }
+            
+            // Validate result
+            if (original.length === 0) {
+                throw new Error('Empty result');
+            }
+            
+            return original;
+        }
+
+        function showDecryptionInfo(message) {
+            const decryptionInfo = document.getElementById('decryptionInfo');
+            const decryptionDetails = document.getElementById('decryptionDetails');
+            
+            decryptionDetails.textContent = message;
+            decryptionInfo.classList.remove('hidden');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                decryptionInfo.classList.add('hidden');
+            }, 5000);
+        }
+        
+        function encryptURL() {
+            const input = urlInput.value.trim();
+            if (!input) {
+                showToast('error', 'Please enter a URL to encrypt');
+                return;
+            }
+            
+            try {
+                const encrypted = customEncrypt(input);
+                displayResult(encrypted, 'encrypted', input);
+                addToHistory('encrypt', input, encrypted);
+                showToast('success', 'URL encrypted successfully');
+            } catch (error) {
+                showToast('error', error.message);
+                console.error('Encryption error:', error);
+            }
+        }
+        
+        function decryptURL() {
+            const input = urlInput.value.trim();
+            if (!input) {
+                showToast('error', 'Please enter encrypted text to decrypt');
+                return;
+            }
+            
+            try {
+                const decrypted = customDecrypt(input);
+                displayResult(decrypted, 'decrypted', input);
+                addToHistory('decrypt', input, decrypted);
+                showToast('success', 'Text decrypted successfully');
+            } catch (error) {
+                showToast('error', error.message);
+                console.error('Decryption error:', error);
+            }
+        }
+        
+        function displayResult(result, type, original) {
+            const resultArea = document.getElementById('resultArea');
+            const resultSection = document.getElementById('resultSection');
+            const openUrlBtn = document.getElementById('openUrlBtn');
+            const resultLength = document.getElementById('resultLength');
+            
+            resultArea.value = result;
+            resultSection.classList.remove('hidden');
+            resultLength.textContent = `${result.length} chars`;
+            
+            // Show open button for valid URLs
+            if (type === 'decrypted' && isValidURL(result)) {
+                openUrlBtn.classList.remove('hidden');
+                // Make result clickable
+                resultArea.classList.add('cursor-pointer', 'hover:bg-gray-800');
+                resultArea.title = 'Click to open URL';
+                resultArea.onclick = () => window.open(result, '_blank');
+            } else {
+                openUrlBtn.classList.add('hidden');
+                resultArea.classList.remove('cursor-pointer', 'hover:bg-gray-800');
+                resultArea.onclick = null;
+                resultArea.title = '';
+            }
+            
+            // Auto-select result for easy copying
+            setTimeout(() => resultArea.select(), 100);
+        }
+        
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        function copyResult() {
+            const resultArea = document.getElementById('resultArea');
+            resultArea.select();
+            
+            navigator.clipboard.writeText(resultArea.value).then(() => {
+                showToast('success', 'Copied to clipboard');
+            }).catch(() => {
+                document.execCommand('copy');
+                showToast('success', 'Copied to clipboard');
+            });
+        }
+        
+        function openURL() {
+            const resultArea = document.getElementById('resultArea');
+            const url = resultArea.value;
+            
+            if (isValidURL(url)) {
+                window.open(url, '_blank');
+                showToast('success', 'URL opened in new tab');
+            }
+        }
+        
+        function clearAll() {
+            urlInput.value = '';
+            document.getElementById('resultArea').value = '';
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('decryptionInfo').classList.add('hidden');
+            clearInputBtn.classList.add('opacity-0');
+            updateInputStatus('help_outline', 'Enter your data', 'text-gray-400');
+            hideShareMenu();
+        }
+        
+        function toggleShareMenu() {
+            const dropdown = document.getElementById('shareDropdown');
+            dropdown.classList.toggle('hidden');
+            
+            // Show native share only if supported
+            const nativeShareBtn = document.getElementById('nativeShareBtn');
+            nativeShareBtn.style.display = navigator.share ? 'flex' : 'none';
+        }
+        
+        function hideShareMenu() {
+            document.getElementById('shareDropdown').classList.add('hidden');
+        }
+        
+        function shareVia(method) {
+            const resultArea = document.getElementById('resultArea');
+            const text = resultArea.value;
+            
+            switch(method) {
+                case 'copy':
+                    copyResult();
+                    break;
+                    
+                case 'email':
+                    const subject = 'Encrypted URL';
+                    const body = `Here's the processed URL:\n\n${text}`;
+                    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                    break;
+                    
+                case 'qr':
+                    generateQRCode(text);
+                    break;
+                    
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'URL Cipher Result',
+                            text: text,
+                        }).catch(console.error);
+                    }
+                    break;
+            }
+            
+            hideShareMenu();
+        }
+        
+        function generateQRCode(text) {
+            const qrModal = document.getElementById('qrModal');
+            const qrCode = document.getElementById('qrCode');
+            
+            qrCode.innerHTML = '';
+            QRCode.toCanvas(qrCode, text, {
+                width: 180,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, (error) => {
+                if (error) {
+                    showToast('error', 'Failed to generate QR code');
+                } else {
+                    qrModal.classList.remove('hidden');
+                }
+            });
+        }
+        
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+        }
+        
+        function addToHistory(type, input, output) {
+            const historyItem = {
+                type,
+                input: input.substring(0, 40) + (input.length > 40 ? '...' : ''),
+                output: output.substring(0, 40) + (output.length > 40 ? '...' : ''),
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            operationHistory.unshift(historyItem);
+            if (operationHistory.length > 5) operationHistory.pop();
+            
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (operationHistory.length === 0) {
+                historyList.innerHTML = '<p class="text-xs text-gray-500 py-4 text-center border border-gray-700 border-dashed">No recent operations</p>';
+                return;
+            }
+            
+            historyList.innerHTML = operationHistory.map(item => `
+                <div class="flex items-center justify-between p-2 border-l ${item.type === 'encrypt' ? 'border-material-primary' : 'border-material-secondary'} hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                     onclick="loadFromHistory('${item.output}')">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-sm ${item.type === 'encrypt' ? 'text-material-primary' : 'text-material-secondary'}">
+                            ${item.type === 'encrypt' ? 'lock' : 'lock_open'}
+                        </span>
+                        <div>
+                            <p class="text-xs text-material-on-surface font-medium">${item.input}</p>
+                            <p class="text-xs text-gray-500">${item.type === 'encrypt' ? 'Encrypted' : 'Decrypted'} • ${item.timestamp}</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-500 text-xs">chevron_right</span>
+                </div>
+            `).join('');
+        }
+        
+        function loadFromHistory(value) {
+            urlInput.value = value;
+            urlInput.dispatchEvent(new Event('input'));
+            showToast('success', 'Loaded from history');
+        }
+        
+        function clearHistory() {
+            operationHistory = [];
+            updateHistoryDisplay();
+            showToast('success', 'History cleared');
+        }
+        
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const icons = {
+                success: 'check_circle',
+                error: 'error',
+                info: 'info'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'e':
+                        e.preventDefault();
+                        encryptURL();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        decryptURL();
+                        break;
+                    case 'k':
+                        e.preventDefault();
+                        clearAll();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Enter' && e.target === urlInput) {
+                const value = urlInput.value.trim();
+                if (value.startsWith('ENC_') || isBase64(value)) {
+                    decryptURL();
+                } else {
+                    encryptURL();
+                }
+            }
+        });
+        
+        // Click outside to close dropdowns
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#shareDropdown') && !e.target.closest('[onclick*="toggleShareMenu"]')) {
+                hideShareMenu();
+            }
+            
+            if (!e.target.closest('#qrModal') && e.target.id === 'qrModal') {
+                closeQRModal();
+            }
+        });
+        
+        // Hide native share button if not supported
+        if (!navigator.share) {
+            document.getElementById('nativeShareBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
