@@ -1,117 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore an endless array of vibrant gradients with Gradient WallGen. This tool generates unique wallpapers on-the-fly, allowing you to download your favorite designs instantly. Perfect for adding a splash of color to your desktop or mobile device!" />
-    <meta name="author" content="Netankur" />
-    <meta name="keywords" content="Gradient WallGen">
-    <link rel="icon" type="image/x-icon" href="../home/assets/img/favicon.ico" />
-  <title>Gradient Wallpaper</title>
-  <style>
-    body {
-      margin: 0;
-      /*height: 100vh;*/
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(to bottom right, #000000, #ffffff); /* Fallback */
-    }
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-  </style>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supercharged Creative Wallpaper Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 700px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            text-align: left;
+        }
+
+        input, select, button {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .preview {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in, pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.9; }
+            100% { opacity: 1; }
+        }
+
+        #download-btn {
+            margin-top: 10px;
+            background-color: #2196F3;
+        }
+
+        #random-colors-btn, #random-all-btn, #reset-btn {
+            background-color: #ff9800;
+            margin: 5px;
+        }
+
+        #random-colors-btn:hover, #random-all-btn:hover, #reset-btn:hover {
+            background-color: #f57c00;
+        }
+    </style>
 </head>
 <body>
-  <!-- Buttons for changing and downloading gradient -->
-  <div style="position: fixed; top: 20px; right: 20px;">
-    <button id="changeButton" class="btn btn-primary mr-2">
-      Change
-    </button>
-    <button id="downloadButton" class="btn btn-success">
-      Download
-    </button>
-  </div>
+    <div class="container">
+        <h1>Supercharged Creative Wallpaper Generator</h1>
+        <form id="wallpaper-form">
+            <label>Wallpaper Type:</label>
+            <select id="wallpaper-type">
+                <option value="full">Full (All Features)</option>
+                <option value="single">Single Color</option>
+                <option value="linear">Linear Gradient</option>
+                <option value="radial">Radial Gradient</option>
+                <option value="patterns">Patterns Only</option>
+            </select>
+            
+            <label>Theme Preset:</label>
+            <select id="theme">
+                <option value="custom">Custom</option>
+                <option value="cosmic">Cosmic</option>
+                <option value="ocean">Ocean</option>
+                <option value="abstract">Abstract</option>
+                <option value="forest">Forest</option>
+            </select>
+            
+            <label>Width (px):</label>
+            <input type="number" id="width" value="1920" min="100" max="3840">
+            
+            <label>Height (px):</label>
+            <input type="number" id="height" value="1080" min="100" max="2160">
+            
+            <label>Primary Color (for Single/Start):</label>
+            <input type="color" id="primary-color" value="#00aa77">
+            
+            <label>Secondary Color (for End):</label>
+            <input type="color" id="secondary-color" value="#005533">
+            
+            <label>Radial Start Color:</label>
+            <input type="color" id="radial-start" value="#ff00ff">
+            
+            <label>Radial End Color:</label>
+            <input type="color" id="radial-end" value="#ff99ff">
+            
+            <label>Primary Pattern Type:</label>
+            <select id="pattern-type">
+                <option value="dots">Random Dots</option>
+                <option value="stars">Twinkling Stars</option>
+                <option value="triangles">Low-Poly Triangles</option>
+                <option value="waves">Wavy Lines</option>
+                <option value="spirals">Spirals</option>
+                <option value="fractals">Simple Fractals</option>
+                <option value="grids">Geometric Grids</option>
+                <option value="particles">Particle Bursts</option>
+                <option value="mandalas">Mandalas</option>
+                <option value="voronoi">Voronoi Cells</option>
+            </select>
+            
+            <label>Pattern Color:</label>
+            <input type="color" id="pattern-color" value="#ffffff">
+            
+            <label>Pattern Density (1-100):</label>
+            <input type="number" id="density" value="50" min="1" max="100">
+            
+            <label>Randomness Factor (1-10):</label>
+            <input type="number" id="randomness" value="5" min="1" max="10">
+            
+            <label>Number of Pattern Layers (1-3):</label>
+            <input type="number" id="layers" value="1" min="1" max="3">
+            
+            <label>Pattern Symmetry:</label>
+            <select id="symmetry">
+                <option value="none">None</option>
+                <option value="horizontal">Horizontal Mirror</option>
+                <option value="vertical">Vertical Mirror</option>
+                <option value="both">Full Mirror</option>
+            </select>
+            
+            <label>Apply Effect:</label>
+            <select id="effect">
+                <option value="none">None</option>
+                <option value="blur">Blur</option>
+                <option value="noise">Noise</option>
+                <option value="invert">Color Invert</option>
+                <option value="sepia">Sepia</option>
+                <option value="grayscale">Grayscale</option>
+            </select>
+            
+            <label>Noise Intensity (0-100, for Noise Effect):</label>
+            <input type="number" id="noise-intensity" value="25" min="0" max="100">
+            
+            <label>Overlay Text (optional):</label>
+            <input type="text" id="overlay-text" placeholder="e.g., Inspire">
+            
+            <label>Text Size (px):</label>
+            <input type="number" id="text-size" value="100" min="10" max="500">
+            
+            <label>Text Font:</label>
+            <select id="text-font">
+                <option value="Arial">Arial</option>
+                <option value="Courier New">Courier</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Impact">Impact</option>
+            </select>
+            
+            <label>Export Filename:</label>
+            <input type="text" id="filename" value="wallpaper" placeholder="e.g., my-wallpaper">
+            
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button type="submit">Generate Wallpaper</button>
+                <button type="button" id="random-colors-btn">Random Colors</button>
+                <button type="button" id="random-all-btn">Random All</button>
+                <button type="button" id="reset-btn">Reset</button>
+            </div>
+        </form>
+        
+        <canvas id="canvas" class="preview"></canvas>
+        <button id="download-btn" style="display: none;">Download Wallpaper</button>
+    </div>
+    <script>
+        // Theme presets
+        const themes = {
+            cosmic: { primary: '#000033', secondary: '#000000', radialStart: '#ff00ff', radialEnd: '#0000ff', pattern: 'stars', color: '#ffffff' },
+            ocean: { primary: '#00bfff', secondary: '#00008b', radialStart: '#20b2aa', radialEnd: '#87cefa', pattern: 'waves', color: '#add8e6' },
+            abstract: { primary: '#ff4500', secondary: '#ffd700', radialStart: '#ff69b4', radialEnd: '#4b0082', pattern: 'triangles', color: '#ffffff' },
+            forest: { primary: '#228b22', secondary: '#006400', radialStart: '#8b4513', radialEnd: '#556b2f', pattern: 'grids', color: '#f0fff0' }
+        };
 
-  <!-- JavaScript libraries -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        const form = document.getElementById('wallpaper-form');
+        const canvas = document.getElementById('canvas');
+        const downloadBtn = document.getElementById('download-btn');
 
-  <!-- Custom JavaScript -->
-  <script>
-    let currentGradientCanvas = null;
+        // Random color generator
+        function randomColor() {
+            return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+        }
 
-    // Function to generate a random gradient
-    function generateRandomGradient() {
-      const canvas = document.createElement('canvas');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const ctx = canvas.getContext('2d');
+        // Random colors button
+        document.getElementById('random-colors-btn').addEventListener('click', () => {
+            document.getElementById('primary-color').value = randomColor();
+            document.getElementById('secondary-color').value = randomColor();
+            document.getElementById('radial-start').value = randomColor();
+            document.getElementById('radial-end').value = randomColor();
+            document.getElementById('pattern-color').value = randomColor();
+            form.dispatchEvent(new Event('submit'));
+        });
 
-      // Random number of colors (2 to 5)
-      const numColors = Math.floor(Math.random() * 4) + 2;
-      const colors = [];
-      for (let i = 0; i < numColors; i++) {
-        colors.push(`rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`);
-      }
+        // Random all button
+        document.getElementById('random-all-btn').addEventListener('click', () => {
+            document.getElementById('wallpaper-type').value = ['full', 'single', 'linear', 'radial', 'patterns'][Math.floor(Math.random() * 5)];
+            document.getElementById('theme').value = 'custom';
+            document.getElementById('primary-color').value = randomColor();
+            document.getElementById('secondary-color').value = randomColor();
+            document.getElementById('radial-start').value = randomColor();
+            document.getElementById('radial-end').value = randomColor();
+            document.getElementById('pattern-type').value = ['dots', 'stars', 'triangles', 'waves', 'spirals', 'fractals', 'grids', 'particles', 'mandalas', 'voronoi'][Math.floor(Math.random() * 10)];
+            document.getElementById('pattern-color').value = randomColor();
+            document.getElementById('density').value = Math.floor(Math.random() * 100) + 1;
+            document.getElementById('randomness').value = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('layers').value = Math.floor(Math.random() * 3) + 1;
+            document.getElementById('symmetry').value = ['none', 'horizontal', 'vertical', 'both'][Math.floor(Math.random() * 4)];
+            document.getElementById('effect').value = ['none', 'blur', 'noise', 'invert', 'sepia', 'grayscale'][Math.floor(Math.random() * 6)];
+            document.getElementById('noise-intensity').value = Math.floor(Math.random() * 100);
+            form.dispatchEvent(new Event('submit'));
+        });
 
-      // Random gradient direction
-      const directions = [
-        "to top", "to right", "to bottom", "to left",
-        "to top right", "to top left", "to bottom right", "to bottom left"
-      ];
-      const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        // Reset button
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.getElementById('wallpaper-type').value = 'full';
+            document.getElementById('theme').value = 'custom';
+            document.getElementById('width').value = 1920;
+            document.getElementById('height').value = 1080;
+            document.getElementById('primary-color').value = '#00aa77';
+            document.getElementById('secondary-color').value = '#005533';
+            document.getElementById('radial-start').value = '#ff00ff';
+            document.getElementById('radial-end').value = '#ff99ff';
+            document.getElementById('pattern-type').value = 'dots';
+            document.getElementById('pattern-color').value = '#ffffff';
+            document.getElementById('density').value = 50;
+            document.getElementById('randomness').value = 5;
+            document.getElementById('layers').value = 1;
+            document.getElementById('symmetry').value = 'none';
+            document.getElementById('effect').value = 'none';
+            document.getElementById('noise-intensity').value = 25;
+            document.getElementById('overlay-text').value = '';
+            document.getElementById('text-size').value = 100;
+            document.getElementById('text-font').value = 'Arial';
+            document.getElementById('filename').value = 'wallpaper';
+            form.dispatchEvent(new Event('submit'));
+        });
 
-      // Create linear gradient
-      const gradient = ctx.createLinearGradient(0, 0, 
-        randomDirection.includes("right") ? canvas.width : 0,
-        randomDirection.includes("bottom") ? canvas.height : 0
-      );
-      colors.forEach((color, index) => {
-        gradient.addColorStop(index / (colors.length - 1), color);
-      });
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get user inputs
+            const wallpaperType = document.getElementById('wallpaper-type').value;
+            const theme = document.getElementById('theme').value;
+            let primaryColor = document.getElementById('primary-color').value;
+            let secondaryColor = document.getElementById('secondary-color').value;
+            let radialStart = document.getElementById('radial-start').value;
+            let radialEnd = document.getElementById('radial-end').value;
+            let patternType = document.getElementById('pattern-type').value;
+            let patternColor = document.getElementById('pattern-color').value;
+            
+            if (theme !== 'custom' && themes[theme]) {
+                primaryColor = themes[theme].primary;
+                secondaryColor = themes[theme].secondary;
+                radialStart = themes[theme].radialStart;
+                radialEnd = themes[theme].radialEnd;
+                patternType = themes[theme].pattern;
+                patternColor = themes[theme].color;
+            }
+            
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const density = parseInt(document.getElementById('density').value);
+            const randomness = parseInt(document.getElementById('randomness').value);
+            const layers = parseInt(document.getElementById('layers').value);
+            const symmetry = document.getElementById('symmetry').value;
+            const effect = document.getElementById('effect').value;
+            const noiseIntensity = parseInt(document.getElementById('noise-intensity').value);
+            const overlayText = document.getElementById('overlay-text').value;
+            const textSize = parseInt(document.getElementById('text-size').value);
+            const textFont = document.getElementById('text-font').value;
+            const filename = document.getElementById('filename').value || 'wallpaper';
+            
+            // Set up canvas
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw based on wallpaper type
+            if (wallpaperType === 'single') {
+                ctx.fillStyle = primaryColor;
+                ctx.fillRect(0, 0, width, height);
+            } else if (wallpaperType === 'linear') {
+                const linearGradient = ctx.createLinearGradient(0, 0, width, height);
+                linearGradient.addColorStop(0, primaryColor);
+                linearGradient.addColorStop(1, secondaryColor);
+                ctx.fillStyle = linearGradient;
+                ctx.fillRect(0, 0, width, height);
+            } else if (wallpaperType === 'radial') {
+                const radialX = Math.random() * width;
+                const radialY = Math.random() * height;
+                const radialGradient = ctx.createRadialGradient(radialX, radialY, 0, radialX, radialY, Math.max(width, height) / 2);
+                radialGradient.addColorStop(0, radialStart);
+                radialGradient.addColorStop(1, radialEnd);
+                ctx.fillStyle = radialGradient;
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                // Full or patterns: background
+                if (wallpaperType !== 'patterns') {
+                    const linearGradient = ctx.createLinearGradient(0, 0, width, height);
+                    linearGradient.addColorStop(0, primaryColor);
+                    linearGradient.addColorStop(1, secondaryColor);
+                    ctx.fillStyle = linearGradient;
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    const radialX = Math.random() * width;
+                    const radialY = Math.random() * height;
+                    const radialGradient = ctx.createRadialGradient(radialX, radialY, 0, radialX, radialY, Math.max(width, height) / 2);
+                    radialGradient.addColorStop(0, radialStart);
+                    radialGradient.addColorStop(1, radialEnd);
+                    ctx.fillStyle = radialGradient;
+                    ctx.globalAlpha = 0.6 + (Math.random() * 0.4);
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Draw patterns if not single/linear/radial
+                if (wallpaperType !== 'single' && wallpaperType !== 'linear' && wallpaperType !== 'radial') {
+                    const patternTypes = [patternType];
+                    for (let l = 1; l < layers; l++) {
+                        patternTypes.push(['dots', 'stars', 'triangles', 'waves', 'spirals', 'fractals', 'grids', 'particles', 'mandalas', 'voronoi'][Math.floor(Math.random() * 10)]);
+                    }
+                    
+                    patternTypes.forEach((type, index) => {
+                        ctx.globalAlpha = 1 - (index * 0.3);
+                        drawPattern(ctx, type, width, height, density, randomness, patternColor, symmetry);
+                        ctx.globalAlpha = 1;
+                    });
+                }
+            }
+            
+            // Apply effect
+            if (effect !== 'none') {
+                applyEffect(ctx, effect, width, height, noiseIntensity);
+            }
+            
+            // Add optional text overlay
+            if (overlayText) {
+                ctx.font = `${textSize}px ${textFont}`;
+                ctx.fillStyle = patternColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(overlayText, width / 2 + (Math.random() * 50 - 25), height / 2);
+            }
+            
+            // Show download button
+            downloadBtn.style.display = 'block';
+            downloadBtn.onclick = function() {
+                const link = document.createElement('a');
+                link.download = `${filename}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+        });
+        
+        function drawPattern(ctx, type, width, height, density, randomness, color, symmetry) {
+            const itemCount = Math.floor((density / 100) * 1000 * (randomness / 5));
+            for (let i = 0; i < itemCount; i++) {
+                let x = Math.random() * width;
+                let y = Math.random() * height;
+                const size = (Math.random() * randomness * 5) + 2;
+                const opacity = Math.random() * 0.5 + 0.5;
+                ctx.fillStyle = `${color}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
+                
+                // Draw base shape
+                drawShape(ctx, type, x, y, size);
+                
+                // Apply symmetry
+                if (symmetry === 'horizontal' || symmetry === 'both') {
+                    drawShape(ctx, type, x, height - y, size);
+                }
+                if (symmetry === 'vertical' || symmetry === 'both') {
+                    drawShape(ctx, type, width - x, y, size);
+                }
+                if (symmetry === 'both') {
+                    drawShape(ctx, type, width - x, height - y, size);
+                }
+            }
+        }
+        
+        function drawShape(ctx, type, x, y, size) {
+            if (type === 'dots') {
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (type === 'stars') {
+                ctx.beginPath();
+                for (let j = 0; j < 5; j++) {
+                    ctx.lineTo(x + size * Math.cos((j * 72 * Math.PI) / 180), y + size * Math.sin((j * 72 * Math.PI) / 180));
+                    ctx.lineTo(x + size / 2 * Math.cos(((j + 0.5) * 72 * Math.PI) / 180), y + size / 2 * Math.sin(((j + 0.5) * 72 * Math.PI) / 180));
+                }
+                ctx.closePath();
+                ctx.fill();
+            } else if (type === 'triangles') {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + size, y + size * Math.random());
+                ctx.lineTo(x + size * Math.random(), y + size);
+                ctx.closePath();
+                ctx.fill();
+            } else if (type === 'waves') {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(x + size / 2, y + size * (Math.random() - 0.5) * 2, x + size, y); // Adjusted for randomness
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = size / 5;
+                ctx.stroke();
+            } else if (type === 'spirals') {
+                ctx.beginPath();
+                let angle = 0;
+                for (let r = 0; r < size; r += 0.5) {
+                    angle += (Math.PI * 2) / 10;
+                    ctx.lineTo(x + r * Math.cos(angle), y + r * Math.sin(angle));
+                }
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else if (type === 'fractals') {
+                drawFractalTriangle(ctx, x, y, size, 3);
+            } else if (type === 'grids') {
+                ctx.beginPath();
+                ctx.rect(x, y, size, size);
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            } else if (type === 'particles') {
+                for (let j = 0; j < 5; j++) {
+                    ctx.beginPath();
+                    ctx.arc(x + (Math.random() * size - size/2), y + (Math.random() * size - size/2), size/5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (type === 'mandalas') {
+                for (let j = 0; j < 8; j++) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, (j * Math.PI / 4), ((j + 1) * Math.PI / 4));
+                    ctx.lineTo(x, y);
+                    ctx.fill();
+                }
+            } else if (type === 'voronoi') {
+                // Simple voronoi-like cells (approximated)
+                ctx.beginPath();
+                for (let j = 0; j < 6; j++) {
+                    ctx.lineTo(x + size * Math.cos(j * Math.PI / 3), y + size * Math.sin(j * Math.PI / 3));
+                }
+                ctx.closePath();
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.stroke();
+            }
+        }
+        
+        function drawFractalTriangle(ctx, x, y, size, depth) {
+            if (depth === 0) return;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + size, y);
+            ctx.lineTo(x + size / 2, y - size * Math.sqrt(3)/2);
+            ctx.closePath();
+            ctx.strokeStyle = ctx.fillStyle;
+            ctx.stroke();
+            drawFractalTriangle(ctx, x, y, size / 2, depth - 1);
+            drawFractalTriangle(ctx, x + size / 2, y, size / 2, depth - 1);
+            drawFractalTriangle(ctx, x + size / 4, y - size * Math.sqrt(3)/4, size / 2, depth - 1);
+        }
+        
+        function applyEffect(ctx, effect, width, height, noiseIntensity) {
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            if (effect === 'blur') {
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        const idx = (y * width + x) * 4;
+                        for (let c = 0; c < 3; c++) {
+                            data[idx + c] = (data[idx + c - 4] + data[idx + c + 4] + data[idx + c - width*4] + data[idx + c + width*4]) / 4;
+                        }
+                    }
+                }
+            } else if (effect === 'noise') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = (Math.random() * (noiseIntensity / 50) - (noiseIntensity / 100)) * 255;
+                    data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
+                    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
+                }
+            } else if (effect === 'invert') {
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = 255 - data[i];
+                    data[i + 1] = 255 - data[i + 1];
+                    data[i + 2] = 255 - data[i + 2];
+                }
+            } else if (effect === 'sepia') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                    data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                    data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                }
+            } else if (effect === 'grayscale') {
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = data[i + 1] = data[i + 2] = avg;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
 
-      // Fill rectangle with gradient
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Store the current gradient canvas
-      currentGradientCanvas = canvas;
-
-      return canvas;
-    }
-
-    // Function to handle changing the gradient
-    function changeGradient() {
-      const canvas = generateRandomGradient();
-      document.body.style.background = `url(${canvas.toDataURL('image/png')}) no-repeat center center fixed`;
-      document.body.style.backgroundSize = 'cover';
-    }
-
-    // Event listener for the change button
-    document.getElementById('changeButton').addEventListener('click', changeGradient);
-
-    // Function to download the current gradient as a JPEG image
-    function downloadCurrentGradient() {
-      if (currentGradientCanvas) {
-        const link = document.createElement('a');
-        link.download = `gradient_${Math.floor(Math.random() * 1000000)}.jpg`;
-        currentGradientCanvas.toBlob(function(blob) {
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }, 'image/jpeg');
-      } else {
-        alert("No gradient to download. Generate a gradient first.");
-      }
-    }
-
-    // Event listener for the download button
-    document.getElementById('downloadButton').addEventListener('click', downloadCurrentGradient);
-  </script>
+        // Initial generation on load
+        form.dispatchEvent(new Event('submit'));
+    </script>
 </body>
 </html>
