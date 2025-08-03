@@ -6,6 +6,12 @@
     "languages": ["HTML", "CSS", "JavaScript"]
   },
   {
+    "title": "CV Builder",
+    "url": "/tool/cv.html",
+    "description": "A comprehensive tool for building and editing professional CV documents with customizable templates and formatting options.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
     "title": "Image to Pdf",
     "url": "/tool/image-to-pdf.html",
     "description": "Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly.",
@@ -249,6 +255,90 @@
     "title": "File Transfer",
     "url": "/tool/share.html",
     "description": "A P2P file transfer tool enables secure file sharing between devices without central servers.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Resize by KB",
+    "url": "/tool/image-resize-kb.html",
+    "description": "Resize images to specific file sizes in kilobytes with quality preservation algorithms to meet size requirements for various platforms.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Optimizer",
+    "url": "/tool/image-optimizer.html",
+    "description": "Optimize image files for faster web loading and reduced file sizes while maintaining visual quality through intelligent compression algorithms.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Color Picker",
+    "url": "/tool/image-colour-picker.html",
+    "description": "Extract precise color codes from any uploaded image with pixel-level accuracy and multiple color format outputs including HEX, RGB, and HSL.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Color Analyzer",
+    "url": "/tool/image-colour.html",
+    "description": "Analyze and extract dominant colors from images with detailed color palette generation and statistical color distribution analysis.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Image Enhancer",
+    "url": "/tool/image-increase.html",
+    "description": "Enhance image resolution and quality using advanced upscaling algorithms to improve image clarity without losing detail.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "PDF Compressor",
+    "url": "/tool/pdf-compress.html",
+    "description": "Compress PDF files to reduce file sizes significantly while preserving document quality and readability for easier sharing and storage.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "QR Code Scanner",
+    "url": "/tool/qr-scan.html",
+    "description": "Scan and decode QR codes using device camera with real-time recognition and support for various QR code content types.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Color Lab",
+    "url": "/tool/colour-lab.html",
+    "description": "An advanced color experimentation laboratory for designers to mix, match, and analyze colors with detailed color theory tools and creative mixing features.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Color Palette Generator Pro",
+    "url": "/tool/colour-palette-2.html",
+    "description": "An enhanced color palette generator offering refined color scheme options with advanced harmonization algorithms and export capabilities.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Gradient Generator",
+    "url": "/tool/gradient.html",
+    "description": "Create and preview stunning CSS gradient backgrounds with real-time customization of colors, directions, and gradient types for web design.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "Text Formatter",
+    "url": "/tool/text-formatter.html",
+    "description": "Format and beautify text content with various styling options, case conversion, and readability improvements for better presentation.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "URL Encryption Tool",
+    "url": "/tool/url-encrypt.html",
+    "description": "Encrypt and decrypt URLs for secure sharing and privacy protection using advanced encryption algorithms with password protection options.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "AI Chat",
+    "url": "/tool/ai-chat.html",
+    "description": "An AI-powered chat interface enabling interactive conversations with artificial intelligence for assistance, learning, and problem-solving across diverse applications.",
+    "languages": ["HTML", "CSS", "JavaScript"]
+  },
+  {
+    "title": "File Transfer Utility",
+    "url": "/tool/files-transfer.html",
+    "description": "A secure file transfer utility enabling easy sharing and transfer of files between devices with progress tracking and error handling.",
     "languages": ["HTML", "CSS", "JavaScript"]
   }
 ]
