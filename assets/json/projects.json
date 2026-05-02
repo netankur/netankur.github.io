@@ -1,0 +1,30 @@
+[
+    {
+        "title": "JSON Lens",
+        "status": "live",
+        "description": "Visual JSON explorer transforming nested data into interactive trees. Handles files up to 50MB effortlessly.",
+        "stack": "React, WebGL",
+        "link": "#"
+    },
+    {
+        "title": "Color Scale",
+        "status": "live",
+        "description": "Accessible color palette generator with perceptually uniform interpolation. Exports to CSS and Figma.",
+        "stack": "Vanilla JS, WASM",
+        "link": "#"
+    },
+    {
+        "title": "Regex Lab",
+        "status": "beta",
+        "description": "Visual regex builder with real-time explanation and match highlighting. Learn patterns instantly.",
+        "stack": "Svelte, Rust",
+        "link": "#"
+    },
+    {
+        "title": "Diff Check",
+        "status": "live",
+        "description": "Side-by-side text comparison with semantic highlighting. Supports 40+ languages with clean share links.",
+        "stack": "Next.js, Workers",
+        "link": "#"
+    }
+]
