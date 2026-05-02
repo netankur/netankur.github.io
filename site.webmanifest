@@ -1,0 +1,21 @@
+{
+  "name": "NetAnkur Tools",
+  "short_name": "NetAnkur",
+  "description": "Privacy-first, open-source web utilities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060608",
+  "theme_color": "#060608",
+  "icons": [
+    {
+      "src": "assets/img/apple-touch-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/img/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
