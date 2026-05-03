@@ -13,9 +13,10 @@
       "type": "image/png"
     },
     {
-      "src": "assets/img/apple-touch-icon.png",
+      "src": "assets/img/apple-touch-icon-2.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
