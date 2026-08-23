@@ -1,30 +1,57 @@
-const CACHE_NAME = 'ankur-pwa';
-const urlsToCache = [
-  '/home/', // Ensure the base URL is cached
+const CACHE_NAME = 'netankur-pwa-v3';
+
+const PRECACHE_URLS = [
+  '/home/',
   '/home/index.html',
-  '/home/css/styles.css',
-  '/home/js/app.js',
-  '/home/assets/img/icon.png'
+  '/home/json/tools.json',
+  '/home/manifest.json',
+  '/home/service-worker.js'
 ];
 
-self.addEventListener('install', function(event) {
+self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('[PWA SW] Pre-caching Home Shell');
+      return cache.addAll(PRECACHE_URLS);
+    })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
+    caches.match(event.request).then(cachedResponse => {
+      const fetchPromise = fetch(event.request)
+        .then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return cachedResponse || caches.match('/home/index.html');
+        });
+
+      return cachedResponse || fetchPromise;
+    })
   );
 });

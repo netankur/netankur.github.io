@@ -307,77 +307,313 @@
         .tools-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 640px) {
             .tools-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         .tool {
             display: flex;
             flex-direction: column;
-            padding: 1.25rem;
+            padding: 1.35rem;
             background: var(--surface);
             border: 1px solid var(--line-light);
-            border-radius: 12px;
-            transition: all var(--trans-fast);
+            border-radius: 14px;
+            cursor: pointer;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            transition: transform var(--trans-fast), background-color var(--trans-fast), border-color var(--trans-fast), box-shadow var(--trans-fast);
+        }
+
+        .tool::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity var(--trans-fast);
         }
 
         .tool:hover {
             background: var(--surface-hover);
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+            border-color: rgba(233, 213, 255, 0.22);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(233, 213, 255, 0.12);
+        }
+
+        .tool:hover::before {
+            opacity: 1;
         }
 
         .tool-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.65rem;
         }
 
         .tool-title-group {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.65rem;
+        }
+
+        .tool-title-group h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            transition: color var(--trans-fast);
+        }
+
+        .tool:hover .tool-title-group h3 {
+            color: var(--accent);
+        }
+
+        .card-arrow-icon {
+            color: var(--text-muted);
+            opacity: 0.5;
+            transition: all var(--trans-fast);
+        }
+
+        .tool:hover .card-arrow-icon {
+            color: var(--accent);
+            opacity: 1;
+            transform: translateX(2px);
         }
 
         .tool-status {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px currentColor;
         }
-        .tool-status.live { background-color: var(--status-live); }
-        .tool-status.beta { background-color: var(--status-beta); }
+        .tool-status.live { background-color: var(--status-live); color: var(--status-live); }
+        .tool-status.beta { background-color: var(--status-beta); color: var(--status-beta); }
 
         .tool-desc {
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            color: var(--text-dim);
             margin-bottom: 1.25rem;
             flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.55;
+            min-height: 2.7rem;
         }
 
-        .tool-meta {
+        .tool-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 1rem;
+            padding-top: 0.85rem;
             border-top: 1px solid var(--line-light);
-            font-size: 0.8rem;
-            color: var(--text-muted);
+            margin-top: auto;
         }
 
-        .tool-link {
+        .tool-tags {
             display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            transition: all var(--trans-fast);
+        }
+
+        .tool:hover .tag {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-dim);
+        }
+
+        .quick-view-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color var(--trans-fast);
+            padding: 0;
+            display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            font-weight: 500;
+        }
+
+        .tool:hover .quick-view-btn {
+            color: var(--accent);
+        }
+
+        /* Load More & Modal Styles */
+        .load-more-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2.25rem;
+            width: 100%;
+        }
+
+        .load-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--line-light);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+        }
+
+        .load-more-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(6, 6, 8, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s var(--ease-out), visibility 0.3s var(--ease-out);
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            position: relative;
+            background: #121217;
+            border: 1px solid rgba(233, 213, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(233, 213, 255, 0.08);
+            transform: scale(0.92) translateY(15px);
+            transition: transform 0.3s var(--ease-out);
+        }
+
+        .modal-backdrop.active .modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
             color: var(--text);
         }
-        
-        .tool-link svg { transition: transform var(--trans-fast); }
-        .tool:hover .tool-link { color: var(--accent); }
-        .tool:hover .tool-link svg { transform: translateX(3px) translateY(-3px); }
+
+        .modal-desc {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .pwa-install-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+        }
+
+        .pwa-install-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            transform: translateY(-1px);
+        }
 
         /* Search Bar Styles */
         .search-container {
@@ -658,6 +894,16 @@
                     <li><a href="#tools" class="nav-item">Tools</a></li>
                     <li><a href="#about" class="nav-item">About</a></li>
                     <li><a href="#contact" class="nav-item">Contact</a></li>
+                    <li>
+                        <button id="pwaInstallBtn" class="pwa-install-btn" style="display: none;" aria-label="Install NetAnkur App">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Install App</span>
+                        </button>
+                    </li>
                 </ul>
 
                 <button class="mobile-menu-btn" id="menuToggle" aria-expanded="false" aria-label="Toggle Menu">
@@ -706,6 +952,16 @@
 
                 <div class="tools-grid" id="projects-container">
                     <div class="loader">Loading tools</div>
+                </div>
+
+                <div class="load-more-container" id="load-more-wrapper" style="display: none;">
+                    <button class="load-more-btn" id="load-more-btn">
+                        <span>Load More Tools</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <polyline points="19 12 12 19 5 12"></polyline>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </section>
@@ -778,6 +1034,28 @@
         </div>
     </footer>
 
+    <!-- Tool Details Modal -->
+    <div class="modal-backdrop" id="toolModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-card">
+            <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+            <div class="modal-header">
+                <span class="tool-status" id="modalStatus"></span>
+                <h3 id="modalTitle">Tool Title</h3>
+            </div>
+            <p class="modal-desc" id="modalDesc">Tool description text...</p>
+            <div class="modal-tags" id="modalTags"></div>
+            <div class="modal-footer">
+                <a href="#" id="modalLaunchBtn" class="btn modal-launch-btn">
+                    <span>Launch Tool</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -825,36 +1103,113 @@
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
         // ==========================================
-        // Dynamic Tools & Search Logic
+        // Dynamic Tools, Pagination & Modal Logic
         // ==========================================
         let allTools = [];
+        let currentFilteredTools = [];
+        let visibleCount = 10;
+        const BATCH_SIZE = 10;
 
-        function renderTools(toolsToRender) {
+        // Modal Elements
+        const modal = document.getElementById('toolModal');
+        const modalCloseBtn = document.getElementById('modalClose');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalTags = document.getElementById('modalTags');
+        const modalStatus = document.getElementById('modalStatus');
+        const modalLaunchBtn = document.getElementById('modalLaunchBtn');
+        const loadMoreWrapper = document.getElementById('load-more-wrapper');
+        const loadMoreBtn = document.getElementById('load-more-btn');
+
+        function openModal(tool) {
+            if (!modal) return;
+            const statusStr = tool.status || 'live';
+            modalStatus.className = `tool-status ${statusStr}`;
+            modalTitle.textContent = tool.title;
+            modalDesc.textContent = tool.description;
+            
+            const languages = Array.isArray(tool.languages) 
+                ? tool.languages 
+                : (tool.languages || tool.stack || 'HTML, CSS, JS').split(',').map(s => s.trim());
+            modalTags.innerHTML = languages.map(lang => `<span class="tag">${lang}</span>`).join('');
+            
+            modalLaunchBtn.href = tool.url || tool.link || '#';
+            modalLaunchBtn.setAttribute('aria-label', `Launch ${tool.title}`);
+
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        function renderTools() {
             const container = document.getElementById('projects-container');
             const headerCount = document.getElementById('tools-count-header');
 
+            const totalMatching = currentFilteredTools.length;
+            const displayed = currentFilteredTools.slice(0, visibleCount);
+
             if (headerCount) {
-                headerCount.textContent = `${toolsToRender.length} ${toolsToRender.length === 1 ? 'Tool' : 'Tools'}`;
+                headerCount.textContent = `Showing ${displayed.length} of ${totalMatching} Tools`;
             }
 
             container.innerHTML = '';
 
-            if (toolsToRender.length === 0) {
+            if (displayed.length === 0) {
                 container.innerHTML = `<div style="grid-column: 1/-1; padding: 3rem 0; text-align: center; color: var(--text-muted);">
                     <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No tools found</p>
                     <p style="font-size: 0.85rem;">Try searching for a different keyword like "pdf", "image", "chart", or "converter".</p>
                 </div>`;
+                if (loadMoreWrapper) loadMoreWrapper.style.display = 'none';
                 return;
             }
 
-            toolsToRender.forEach((tool) => {
+            displayed.forEach((tool) => {
                 const article = document.createElement('article');
                 article.className = `tool reveal visible`;
                 
-                const languagesText = Array.isArray(tool.languages) ? tool.languages.join(', ') : (tool.languages || tool.stack || 'HTML, CSS, JS');
+                const languages = Array.isArray(tool.languages) 
+                    ? tool.languages 
+                    : (tool.languages || tool.stack || 'HTML, CSS, JS').split(',').map(s => s.trim());
+                
+                const tagsHtml = languages.map(lang => `<span class="tag">${lang}</span>`).join('');
                 const statusStr = tool.status || 'live';
                 const statusTitle = statusStr.charAt(0).toUpperCase() + statusStr.slice(1);
                 const toolUrl = tool.url || tool.link || '#';
+
+                article.setAttribute('tabindex', '0');
+                article.setAttribute('role', 'button');
+                article.setAttribute('aria-label', `View details for ${tool.title}`);
+
+                // Tap card -> Open Modal
+                article.onclick = () => {
+                    openModal(tool);
+                };
+
+                article.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openModal(tool);
+                    }
+                };
 
                 article.innerHTML = `
                     <div class="tool-header">
@@ -862,21 +1217,33 @@
                             <span class="tool-status ${statusStr}" title="${statusTitle}"></span>
                             <h3>${tool.title}</h3>
                         </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-arrow-icon">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
                     </div>
-                    <p class="tool-desc">${tool.description}</p>
-                    <div class="tool-meta">
-                        <span>${languagesText}</span>
-                        <a href="${toolUrl}" class="tool-link" aria-label="Explore ${tool.title}">
-                            Explore 
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="7" y1="17" x2="17" y2="7"></line>
-                                <polyline points="7 7 17 7 17 17"></polyline>
-                            </svg>
-                        </a>
+                    <p class="tool-desc" title="${tool.description}">${tool.description}</p>
+                    <div class="tool-footer">
+                        <div class="tool-tags">${tagsHtml}</div>
                     </div>
                 `;
                 
                 container.appendChild(article);
+            });
+
+            // Handle Load More Button Visibility
+            if (loadMoreWrapper) {
+                if (visibleCount < totalMatching) {
+                    loadMoreWrapper.style.display = 'flex';
+                } else {
+                    loadMoreWrapper.style.display = 'none';
+                }
+            }
+        }
+
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                visibleCount += BATCH_SIZE;
+                renderTools();
             });
         }
 
@@ -903,6 +1270,8 @@
             }
 
             allTools = data;
+            currentFilteredTools = [...allTools];
+            visibleCount = BATCH_SIZE;
             
             // Update stats counter
             const toolCountElement = document.getElementById('tool-count');
@@ -910,7 +1279,7 @@
                 toolCountElement.textContent = allTools.length;
             }
 
-            renderTools(allTools);
+            renderTools();
             setupSearch();
         }
 
@@ -927,22 +1296,23 @@
                     clearBtn.style.display = query ? 'block' : 'none';
                 }
 
+                visibleCount = BATCH_SIZE; // Reset visible count on new search
+
                 if (!query) {
-                    renderTools(allTools);
-                    return;
+                    currentFilteredTools = [...allTools];
+                } else {
+                    currentFilteredTools = allTools.filter(tool => {
+                        const titleMatch = tool.title && tool.title.toLowerCase().includes(query);
+                        const descMatch = tool.description && tool.description.toLowerCase().includes(query);
+                        const langMatch = Array.isArray(tool.languages) 
+                            ? tool.languages.some(l => l.toLowerCase().includes(query))
+                            : (tool.languages && tool.languages.toLowerCase().includes(query));
+                        
+                        return titleMatch || descMatch || langMatch;
+                    });
                 }
 
-                const filtered = allTools.filter(tool => {
-                    const titleMatch = tool.title && tool.title.toLowerCase().includes(query);
-                    const descMatch = tool.description && tool.description.toLowerCase().includes(query);
-                    const langMatch = Array.isArray(tool.languages) 
-                        ? tool.languages.some(l => l.toLowerCase().includes(query))
-                        : (tool.languages && tool.languages.toLowerCase().includes(query));
-                    
-                    return titleMatch || descMatch || langMatch;
-                });
-
-                renderTools(filtered);
+                renderTools();
             };
 
             searchInput.addEventListener('input', handleSearch);
@@ -1017,14 +1387,44 @@
         });
 
         // ==========================================
-        // PWA Service Worker Registration
+        // Full PWA & Service Worker Logic
         // ==========================================
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwaInstallBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) {
+                installBtn.style.display = 'inline-flex';
+            }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`[PWA] Install prompt outcome: ${outcome}`);
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] NetAnkur App successfully installed!');
+            if (installBtn) installBtn.style.display = 'none';
+        });
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful');
+                const swPath = window.location.pathname.startsWith('/home') ? '/home/service-worker.js' : '/sw.js';
+                navigator.serviceWorker.register(swPath).then(reg => {
+                    console.log('[PWA] Service Worker registered with scope:', reg.scope);
                 }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
+                    navigator.serviceWorker.register('service-worker.js').catch(e => {
+                        console.log('[PWA] Service Worker registration fallback error:', e);
+                    });
                 });
             });
         }
