@@ -3,342 +3,627 @@
     "title": "Resume Builder",
     "url": "/tool/resume.html",
     "description": "Your streamlined solution for crafting a polished and comprehensive resume document. It simplifies the process by guiding you through inputting essential details like personal information, academic background, work experience, and other pertinent information into a user-friendly interface.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "CV Builder",
     "url": "/tool/cv.html",
     "description": "A comprehensive tool for building and editing professional CV documents with customizable templates and formatting options.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image to Pdf",
     "url": "/tool/image-to-pdf.html",
     "description": "Transform your images into PDF documents effortlessly with our Image to PDF Converter tool. Upload multiple images in formats like PNG, JPG, or JPEG, customize PDF quality, rearrange image order, and generate downloadable PDFs instantly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Resizer",
     "url": "/tool/image-resize.html",
     "description": "Quickly adjust the dimensions of your images with our Image Resize Tool.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Pdf Generator",
     "url": "/tool/pdf.html",
     "description": "Create professional PDF documents effortlessly with our PDF Generator tool. Customize fonts and styles to suit your needs.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Merger",
     "url": "/tool/image-merge.html",
     "description": "Merge multiple images into one with our easy-to-use Image Merge Tool. Choose between horizontal or vertical layouts, adjust sizes, and download your merged image.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Html Editor",
     "url": "/tool/html-editor.html",
     "description": "A simple HTML editor lets you write and edit HTML code easily, with a live preview to see your changes in real-time. Perfect for beginners and quick testing!",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Sticky Notes",
     "url": "/tool/sticky-note.html",
     "description": "A versatile and interactive sticky notes web app that lets you create, edit, delete, and download notes. Perfect for organizing thoughts, tasks, or reminders in a visually appealing way. Easily save and download your notes with random filenames for easy access!",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "To-do List",
     "url": "/tool/to-do-list.html",
     "description": "A simple and interactive To-Do List application to help you manage your daily tasks efficiently.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Unit Converter",
     "url": "/tool/unit-converter.html",
     "description": "A simple and efficient unit converter for length, weight, and temperature conversions. Instantly convert between meters, feet, kilograms, pounds, Celsius, Fahrenheit, and more.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Weather App",
     "url": "/tool/weather.html",
     "description": "Stay updated with real-time weather forecasts using our Weather App. Get accurate temperature, humidity, wind speed, and weather conditions for any location. Enjoy a user-friendly interface with detailed weather insights at your fingertips.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Bar Chart Generator",
     "url": "/tool/bar-chart.html",
     "description": "Visualize your data easily with our Bar Chart Generator. Create customizable bar charts with adjustable labels, colors, and values. Perfect for presentations, reports, and data analysis.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Box Shadow Generator",
     "url": "/tool/box-shadow.html",
     "description": "Easily create CSS box shadows with our Box Shadow Generator. Customize shadow intensity, blur, spread, and color to enhance your web designs. Get instant CSS code for seamless integration.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Dice Roller",
     "url": "/tool/dice-roller.html",
     "description": "Roll virtual dice anytime with our Dice Roller tool. Choose different dice types, roll multiple dice at once, and get random outcomes for board games, RPGs, and fun activities.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "EMI Calculator",
     "url": "/tool/emi-calculator.html",
     "description": "Plan your loans efficiently with our EMI Calculator. Calculate your Equated Monthly Installments (EMIs) based on loan amount, interest rate, and tenure. Get a clear repayment schedule instantly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Markdown Editor",
     "url": "/tool/markdown.html",
     "description": "Write and preview Markdown effortlessly with our Markdown Editor. Convert Markdown to formatted text, preview in real-time, and export content for blogs, notes, and documentation.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Maze Generator",
     "url": "/tool/maze.html",
     "description": "Generate random mazes with our Maze Generator. Solve challenging mazes or use them for puzzles and game design. Customize difficulty levels and explore endless possibilities.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Memory Card Game",
     "url": "/tool/memory-card-game.html",
     "description": "Test your memory with our fun Memory Card Game. Flip cards, match pairs, and challenge yourself to complete the game in the shortest time possible.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Password Generator",
     "url": "/tool/password-generator.html",
     "description": "Create secure passwords instantly with our Password Generator. Customize length, include special characters, and generate strong passwords to keep your accounts safe.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Pie Chart Generator",
     "url": "/tool/pie-chart.html",
     "description": "Visualize data in a clear and engaging way with our Pie Chart Generator. Customize labels, colors, and values to create stunning pie charts for reports and presentations.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Pomodoro Timer",
     "url": "/tool/pomodoro.html",
     "description": "Boost your productivity with our Pomodoro Timer. Utilize the proven Pomodoro technique to stay focused by working in timed intervals with short breaks. Customize session lengths and track your progress effortlessly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Code Minifier",
     "url": "/tool/minifier.html",
     "description": "Optimize your code with our Code Minifier. Reduce file size by minifying HTML, CSS, and JavaScript, improving website performance and load times. Simply paste your code and get a compact, efficient version instantly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Draw Pad",
     "url": "/tool/drawpad.html",
     "description": "Unleash your creativity with our Draw Pad. Sketch, doodle, and create digital art effortlessly with a simple and intuitive drawing tool. Customize brush sizes, colors, and save your creations instantly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Colour Palette Generator",
     "url": "/tool/colour-palette.html",
     "description": "Create stunning colour palettes effortlessly with our Colour Palette Generator. Generate harmonious colour schemes, explore trendy combinations, and save your favourites for design inspiration.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Tic Tac Toe",
     "url": "/tool/tic-tac-toe.html",
     "description": "Enjoy a classic game of Tic Tac Toe with an advanced twist! Play against a friend or challenge yourself.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Words Counter",
     "url": "/tool/word-courter.html",
     "description": "Analyze and count the number of words, sentences, paragraphs, letters, and top keywords in your text.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Text Replace",
     "url": "/tool/text-replace.html",
     "description": "Enhance productivity with our interactive text replace tool. Easily find and replace text.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Dictionary",
     "url": "/tool/dictionary.html",
     "description": "Discover meanings, phonetics, and examples of words. Perfect for quick reference.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "QR Code Generator",
     "url": "/tool/qr-code.html",
     "description": "Generate custom QR codes instantly with this easy-to-use tool. Customize QR code size, colors, and correction level.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Rich Text Editor",
     "url": "/tool/text-editor.html",
     "description": "Easily edit and format text with our intuitive Online Rich Text Editor. Includes a convenient print function.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "File Encryption",
     "url": "/tool/file-encryption.html",
     "description": "Protect your sensitive files with our Secure File Encryption and Decryption Tool. Set a password and encrypt files with AES-GCM encryption.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Music Player",
     "url": "/tool/music.html",
     "description": "Discover and play songs in high-quality audio with a stylish and intuitive interface.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Simple Text Editor",
     "url": "/tool/text-edit.html",
     "description": "A user-friendly web-based text editor that allows you to create and edit text with a variety of fonts.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "QuickLink: Url Shortener",
     "url": "/tool/short.html",
     "description": "Shorten URLs instantly. Easily generate compact links for sharing and tracking, with built-in redirection timers.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Text to Speech",
     "url": "/tool/text-to-speech.html",
     "description": "Convert text into spoken words, with adjustable playback speed and intuitive controls.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "URL Saver",
     "url": "/tool/url.html",
     "description": "Save and retrieve links effortlessly with our URL Saver Tool. Securely store and access URLs using unique IDs.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Gradient WallGen",
     "url": "/tool/wallpaper.html",
     "description": "Generate vibrant gradient wallpapers and download your favorite designs instantly.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "YouTube Embed Player",
     "url": "/tool/yt.html",
     "description": "Embed and watch YouTube videos with our sleek, dark-themed player.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Excel File Viewer",
     "url": "/tool/xls.html",
     "description": "View XLS and XLSX files quickly without software. Perfect for accessing spreadsheet data on any device.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Messaging App",
     "url": "/tool/chat.html",
     "description": "A peer-to-peer chat app enables direct communication between users without a central server.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Simple Chat",
     "url": "/tool/simple-chat.html",
     "description": "A P2P chat app for secure and efficient messaging.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Whiteboard",
     "url": "/tool/whiteboard.html",
     "description": "Collaborative digital space for drawing, writing, and sharing ideas in real time.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "File Transfer",
     "url": "/tool/share.html",
     "description": "A P2P file transfer tool enables secure file sharing between devices without central servers.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Resize by KB",
     "url": "/tool/image-resize-kb.html",
     "description": "Resize images to specific file sizes in kilobytes with quality preservation algorithms to meet size requirements for various platforms.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Optimizer",
     "url": "/tool/image-optimizer.html",
     "description": "Optimize image files for faster web loading and reduced file sizes while maintaining visual quality through intelligent compression algorithms.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Color Picker",
     "url": "/tool/image-colour-picker.html",
     "description": "Extract precise color codes from any uploaded image with pixel-level accuracy and multiple color format outputs including HEX, RGB, and HSL.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Color Analyzer",
     "url": "/tool/image-colour.html",
     "description": "Analyze and extract dominant colors from images with detailed color palette generation and statistical color distribution analysis.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Image Enhancer",
     "url": "/tool/image-increase.html",
     "description": "Enhance image resolution and quality using advanced upscaling algorithms to improve image clarity without losing detail.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "PDF Compressor",
     "url": "/tool/pdf-compress.html",
     "description": "Compress PDF files to reduce file sizes significantly while preserving document quality and readability for easier sharing and storage.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "QR Code Scanner",
     "url": "/tool/qr-scan.html",
     "description": "Scan and decode QR codes using device camera with real-time recognition and support for various QR code content types.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Color Lab",
     "url": "/tool/colour-lab.html",
     "description": "An advanced color experimentation laboratory for designers to mix, match, and analyze colors with detailed color theory tools and creative mixing features.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Color Palette Generator Pro",
     "url": "/tool/colour-palette-2.html",
     "description": "An enhanced color palette generator offering refined color scheme options with advanced harmonization algorithms and export capabilities.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Gradient Generator",
     "url": "/tool/gradient.html",
     "description": "Create and preview stunning CSS gradient backgrounds with real-time customization of colors, directions, and gradient types for web design.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "Text Formatter",
     "url": "/tool/text-formatter.html",
     "description": "Format and beautify text content with various styling options, case conversion, and readability improvements for better presentation.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "URL Encryption Tool",
     "url": "/tool/url-encrypt.html",
     "description": "Encrypt and decrypt URLs for secure sharing and privacy protection using advanced encryption algorithms with password protection options.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "AI Chat",
     "url": "/tool/ai-chat.html",
     "description": "An AI-powered chat interface enabling interactive conversations with artificial intelligence for assistance, learning, and problem-solving across diverse applications.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   },
   {
     "title": "File Transfer Utility",
     "url": "/tool/files-transfer.html",
     "description": "A secure file transfer utility enabling easy sharing and transfer of files between devices with progress tracking and error handling.",
-    "languages": ["HTML", "CSS", "JavaScript"]
+    "languages": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "status": "live"
   }
 ]
